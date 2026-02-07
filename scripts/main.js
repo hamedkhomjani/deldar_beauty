@@ -448,12 +448,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add to Cart Buttons (Shop Page)
     const addCartBtns = document.querySelectorAll('.btn-add-cart');
+
+    function persianToEnglish(str) {
+        const pChars = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        const eChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        return str.replace(/[۰-۹]/g, c => eChars[pChars.indexOf(c)]);
+    }
+
     addCartBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const card = btn.closest('.product-card');
+            const priceText = card.querySelector('.product-price').textContent;
+            const cleanPrice = persianToEnglish(priceText).replace(/[^\d]/g, '');
+
             const product = {
                 name: card.querySelector('.product-title').textContent,
-                price: parseInt(card.querySelector('.product-price').textContent.replace(/[^\d]/g, '')),
+                price: parseInt(cleanPrice),
                 image: card.querySelector('.product-image img').src
             };
             addToCart(product);
