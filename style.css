@@ -177,12 +177,18 @@ body:not(.home-page) #main-header {
 }
 
 #main-header.scrolled {
-    height: 85px;
+    height: 90px;
     background: var(--glass-bg);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-bottom: 1px solid var(--glass-border);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+    #main-header.scrolled {
+        height: 70px;
+    }
 }
 
 nav {
@@ -354,7 +360,8 @@ body.dark-theme .moon-icon {
 
 .btn-premium {
     background: var(--dark-charcoal);
-    color: white;
+    color: #ffffff;
+    /* Keep white text for primary dark buttons */
     border: none;
     padding: 22px 45px;
     border-radius: 50px;
@@ -405,7 +412,8 @@ body.dark-theme .moon-icon {
 
 .btn-outline {
     border: 1px solid var(--accent-gold);
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
+    /* Changed to variable for dark mode visibility */
     padding: 22px 45px;
     border-radius: 50px;
     font-size: 1.1rem;
@@ -1388,18 +1396,22 @@ body.dark-theme .moon-icon {
 
 .success-content p {
     font-size: 1.2rem;
-    color: #666;
+    color: var(--text-secondary);
     margin-bottom: 40px;
     line-height: 1.8;
 }
 
 .btn-back {
-    background: #f2d4cd;
+    background: var(--accent-gold);
+    color: #050505;
+    /* High contrast text on gold/pinkish background */
     border: none;
     padding: 12px 40px;
-    border-radius: 10px;
+    border-radius: 50px;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: var(--transition-smooth);
 }
 
 .social-share {
@@ -1447,7 +1459,7 @@ body.dark-theme .moon-icon {
 
 /* --- Shop Styles --- */
 .shop-page {
-    padding-top: 180px;
+    padding-top: 150px;
     padding-bottom: 100px;
 }
 
@@ -1484,11 +1496,11 @@ body.dark-theme .moon-icon {
 }
 
 .product-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 40px;
     padding: 40px;
     transition: var(--transition-smooth);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--glass-border);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -1543,7 +1555,7 @@ body.dark-theme .moon-icon {
 .product-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
     margin-bottom: 15px;
     font-weight: 400;
 }
@@ -1562,7 +1574,7 @@ body.dark-theme .moon-icon {
     padding: 15px;
     border: 1px solid var(--accent-gold);
     background: transparent;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
     border-radius: 50px;
     font-family: 'Vazirmatn', sans-serif;
     font-weight: 600;
@@ -1571,9 +1583,9 @@ body.dark-theme .moon-icon {
 }
 
 .btn-add-cart:hover {
-    background: var(--dark-charcoal);
-    color: white;
-    border-color: var(--dark-charcoal);
+    background: var(--accent-gold);
+    color: #ffffff;
+    border-color: var(--accent-gold);
 }
 
 .product-badge {
@@ -1786,7 +1798,8 @@ body.dark-theme .moon-icon {
 .btn-dock-booking {
     width: 100%;
     background: var(--gold-gradient);
-    color: var(--dark-charcoal);
+    color: #050505;
+    /* Black text on gold is always better regardless of theme */
     border: none;
     padding: 16px;
     border-radius: 50px;

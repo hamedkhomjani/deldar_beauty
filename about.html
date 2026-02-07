@@ -11,8 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap" rel="stylesheet">
     <style>
         /* Specific Styles for About Page to match the provided design */
-        .about-page {
-            padding-top: 180px;
+        .about-page-content {
+            padding-top: 150px;
             padding-bottom: 100px;
             background-color: var(--bg-primary);
         }
@@ -60,11 +60,12 @@
         }
 
         .about-extra-text {
-            font-size: 1.1rem;
-            color: #666;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
             line-height: 2;
-            text-align: justify;
-            margin-top: 40px;
+            text-align: center;
+            margin: 60px auto;
+            max-width: 900px;
         }
 
         /* Unique About Footer */
@@ -82,8 +83,8 @@
 
         .footer-line {
             flex: 1;
-            height: 2px;
-            background: #4a4a4a;
+            height: 1px;
+            background: var(--glass-border);
         }
 
         .footer-center-logo {
@@ -100,7 +101,7 @@
 
         .about-footer-links a {
             text-decoration: none;
-            color: #333;
+            color: var(--text-primary);
             font-weight: 400;
             font-size: 0.95rem;
             transition: 0.3s;
@@ -148,22 +149,7 @@
                 <a href="index.html"><img src="assets/images/logo.png" alt="سالن زیبایی دلدار"></a>
             </div>
 
-            <a href="https://wa.me/989123456789" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M12.031 6.172c-2.135 0-4.141 1.099-5.323 2.93a.546.546 0 0 0 .755.755c1.182-1.831 3.188-2.93 5.323-2.93 3.515 0 6.375 2.859 6.375 6.375 0 2.135-1.099 4.141-2.93 5.323a.546.546 0 0 0 .755.755c1.831-1.182 2.93-3.188 2.93-5.323 0-3.515-2.859-6.375-6.375-6.375zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.168l-1.391 5.093a.547.547 0 0 0 .678.678l5.093-1.391C9.317 21.463 10.59 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.125c-1.465 0-2.812-.445-3.945-1.195a.547.547 0 0 0-.492-.047l-3.328.914.914-3.328a.547.547 0 0 0-.047-.492c-.75-.1.1.1.1-1.133-1.195-3-2.227-2.812-2.812-3.945c1.195 0 18.125-5.512 18.125-10 0-4.484-3.641-8.125-8.125-8.125z" />
-                </svg>
-            </a>
 
-            <div class="mobile-booking-dock">
-                <button class="btn-dock-booking" onclick="window.location.href='index.html#contact'">
-                    <span>رزرو نوبت آنلاین</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </button>
-            </div>
             <div class="nav-links desktop-only">
                 <a href="index.html">خانه</a>
                 <a href="about.html" class="active">درباره ما</a>
@@ -212,14 +198,13 @@
         <a href="index.html#contact">تماس با ما</a>
     </div>
 
-    <div class="container about-page" style="margin-top: 100px;">
-        <h1 class="about-title" style="font-size: 5rem; font-weight: 700; margin-bottom: 60px;">
+    <div class="container about-page-content">
+        <h1 class="about-title">
             <span class="text-gradient">کمی درباره ما</span>
         </h1>
 
-        <div class="about-content-box"
-            style="background: white; box-shadow: 0 40px 80px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);">
-            <p class="about-text" style="font-size: 1.25rem; line-height: 2.2; color: #444;">
+        <div class="about-content-box">
+            <p class="about-text">
                 در سالن زیبایی دلدار، ما معتقدیم که هر فردی دارای زیبایی منحصر به فردی است که شایسته درخشش است. از زمان
                 تأسیس، هدف ما ارائه خدماتی فراتر از یک تغییر ظاهر ساده بوده است؛ ما به دنبال خلق تجربه‌ای هستیم که در آن
                 شما احساس آرامش، اعتماد به نفس و تجدید قوا کنید. تیم متخصص و هنرمند ما با بهره‌گیری از آخرین تکنیک‌های
@@ -230,8 +215,7 @@
             </div>
         </div>
 
-        <p class="about-extra-text"
-            style="font-size: 1.2rem; color: #666; max-width: 900px; margin: 60px auto; text-align: center;">
+        <p class="about-extra-text">
             تعهد ما به کیفیت و رضایت مشتری، سنگ بنای فعالیت‌های ماست. محیطی لوکس، آرام و بهداشتی فراهم آورده‌ایم تا
             دقایقی که در کنار ما هستید، از دغدغه‌های روزمره دور باشید.
         </p>
