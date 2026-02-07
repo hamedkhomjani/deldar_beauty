@@ -2136,9 +2136,16 @@ body.dark-theme .moon-icon {
     border: none;
     color: #ff5e5e;
     cursor: pointer;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    opacity: 0.8;
+}
+
+.remove-item:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 .cart-footer {
