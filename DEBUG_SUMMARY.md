@@ -183,7 +183,16 @@ See `DOUBLE_CURSOR_FIX.md` for detailed technical documentation.
 
 ---
 
-## Status: ✅ All 9 Issues Resolved
+### 10. **Mobile Booking Dock on Scroll** ✅ ADDED
+**Location:** `style.css` lines 1876-1882, `scripts/main.js` lines 564-574  
+**Feature:** The floating "Online Reservation" button on mobile now appears only after scrolling down, improving initial UX.
+**Implementation:** 
+- CSS: Hidden initially with `transform: translateY(100%)`. slides up with `.visible` class.
+- JS: Adds `.visible` class when scroll position > 200px.
+
+---
+
+## Status: ✅ All 10 Issues Resolved/Features Added
 
 The website should now work flawlessy:
 1. No broken images
@@ -195,3 +204,4 @@ The website should now work flawlessy:
 7. Functional booking modal
 8. Consistent dark mode in modals
 9. Correct Persian typography on iOS
+10. Smart mobile booking button

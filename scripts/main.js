@@ -561,6 +561,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Mobile Booking Dock Logic
+    const mobileDock = document.querySelector('.mobile-booking-dock');
+    if (mobileDock) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                mobileDock.classList.add('visible');
+            } else {
+                mobileDock.classList.remove('visible');
+            }
+        });
+    }
+
     // Initial render
     renderCart();
 });
