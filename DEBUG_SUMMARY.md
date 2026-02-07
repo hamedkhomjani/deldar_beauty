@@ -173,7 +173,17 @@ See `DOUBLE_CURSOR_FIX.md` for detailed technical documentation.
 
 ---
 
-## Status: ✅ All 8 Issues Resolved
+### 9. **Broken Persian Typography on iOS** ✅ FIXED
+**Location:** `style.css` multiple locations (lines 416, 438, 490, 627, 634, 765, 1644, 2037)  
+**Issue:** Persian characters were disconnected and disjointed on iPhone/Safari (e.g., "ا ن ت خ ا ب ی").
+**Cause:** Use of `letter-spacing` (positive or negative) breaks correct rendering of connected scripts like Persian/Arabic on some rendering engines.
+**Solution:** 
+- Removed `letter-spacing` or set to `normal` for all text elements likely to contain Persian content.
+- Affected elements: Hero titles, section headers, taglines, buttons, product categories, testimonials.
+
+---
+
+## Status: ✅ All 9 Issues Resolved
 
 The website should now work flawlessy:
 1. No broken images
@@ -181,6 +191,7 @@ The website should now work flawlessy:
 3. No console errors
 4. Smooth scroll animations
 5. 60fps custom cursor
-6. No double cursors (except where intended)
+6. No double cursors
 7. Functional booking modal
 8. Consistent dark mode in modals
+9. Correct Persian typography on iOS
