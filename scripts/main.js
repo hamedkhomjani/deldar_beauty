@@ -491,6 +491,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Checkout Button Redirect
+    const checkoutBtn = document.querySelector('.btn-checkout');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length > 0) {
+                window.location.href = 'checkout.html';
+            } else {
+                alert('سبد خرید شما خالی است!');
+            }
+        });
+    }
+
     // Initial render
     renderCart();
 });

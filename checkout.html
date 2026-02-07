@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تکمیل سفارش | سالن زیبایی دلدار</title>
+    <meta name="description" content="تکمیل سفارش و پرداخت نهایی محصولات زیبایی و مراقبتی سالن دلدار.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Vazirmatn:wght@100;400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="checkout-page-body">
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <header id="main-header">
+        <nav class="container">
+            <div class="logo">
+                <a href="index.html"><img src="assets/images/logo.png" alt="سالن زیبایی دلدار"></a>
+            </div>
+            <div class="nav-links desktop-only">
+                <a href="index.html">خانه</a>
+                <a href="about.html">درباره ما</a>
+                <a href="shop.html">فروشگاه</a>
+                <a href="index.html#services">خدمات ما</a>
+                <a href="index.html#contact">تماس با ما</a>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container checkout-container">
+        <div class="checkout-grid">
+            <!-- Left Side: Form -->
+            <div class="checkout-form-section" data-reveal>
+                <h1 class="text-gradient">اطلاعات ارسال و پرداخت</h1>
+                <form id="checkout-form" class="premium-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="full-name">نام و نام خانوادگی</label>
+                            <input type="text" id="full-name" required placeholder="مثال: سارا احمدی">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">شماره تماس</label>
+                            <input type="tel" id="phone" required placeholder="۰۹۱۲۰۰۰۰۰۰۰">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">ایمیل (اختیاری)</label>
+                        <input type="email" id="email" placeholder="example@mail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">آدرس دقیق پستی</label>
+                        <textarea id="address" required placeholder="استان، شهر، خیابان..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postal-code">کد پستی</label>
+                            <input type="text" id="postal-code" placeholder="۱۲۳۴۵۶۷۸۹۰">
+                        </div>
+                        <div class="form-group">
+                            <label for="payment-method">روش پرداخت</label>
+                            <select id="payment-method">
+                                <option value="gateway">درگاه آنلاین بانکی</option>
+                                <option value="card">کارت به کارت</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-checkout-final">ثبت و پرداخت نهایی</button>
+                </form>
+            </div>
+
+            <!-- Right Side: Summary -->
+            <div class="order-summary-section" data-reveal>
+                <div class="summary-card">
+                    <h3>خلاصه سفارش</h3>
+                    <div id="checkout-items-list" class="checkout-items">
+                        <!-- Items injected by JS -->
+                    </div>
+                    <div class="summary-details">
+                        <div class="summary-line">
+                            <span>قیمت محصولات:</span>
+                            <span id="subtotal">۰ تومان</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>هزینه ارسال:</span>
+                            <span class="free">رایگان</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="summary-line total">
+                            <span>جمع کل نهایی:</span>
+                            <span id="final-total">۰ تومان</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="success-overlay" class="success-overlay">
+        <div class="success-content">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h2>سفارش شما با موفقیت ثبت شد!</h2>
+            <p>سپاس از انتخاب شما. کد پیگیری به زودی برای شما پیامک خواهد شد.</p>
+            <button class="btn-premium" onclick="window.location.href='index.html'">بازگشت به خانه</button>
+        </div>
+    </div>
+
+    <script src="scripts/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkoutItemsList = document.getElementById('checkout-items-list');
+            const subtotalEl = document.getElementById('subtotal');
+            const finalTotalEl = document.getElementById('final-total');
+            const checkoutForm = document.getElementById('checkout-form');
+            const successOverlay = document.getElementById('success-overlay');
+
+            let checkoutCart = JSON.parse(localStorage.getItem('deldar_cart')) || [];
+
+            if (checkoutCart.length === 0) {
+                window.location.href = 'shop.html';
+                return;
+            }
+
+            function renderCheckoutSummary() {
+                let total = 0;
+                checkoutItemsList.innerHTML = '';
+
+                checkoutCart.forEach(item => {
+                    total += item.price * item.quantity;
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'summary-item';
+                    itemEl.innerHTML = `
+                        <div class="item-info">
+                            <span class="name">${item.name}</span>
+                            <span class="qty">(${item.quantity.toLocaleString('fa-IR')} عدد)</span>
+                        </div>
+                        <span class="price">${(item.price * item.quantity).toLocaleString('fa-IR')} تومان</span>
+                    `;
+                    checkoutItemsList.appendChild(itemEl);
+                });
+
+                subtotalEl.textContent = `${total.toLocaleString('fa-IR')} تومان`;
+                finalTotalEl.textContent = `${total.toLocaleString('fa-IR')} تومان`;
+            }
+
+            checkoutForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Simulate order processing
+                localStorage.removeItem('deldar_cart');
+                successOverlay.classList.add('active');
+            });
+
+            renderCheckoutSummary();
+        });
+    </script>
+</body>
+
+</html>
