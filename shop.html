@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه محصولات | سالن زیبایی دلدار</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Vazirmatn:wght@100;400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <div class="grain-overlay"></div>
+
+    <a href="https://wa.me/989123456789" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+                d="M12.031 6.172c-2.135 0-4.141 1.099-5.323 2.93a.546.546 0 0 0 .755.755c1.182-1.831 3.188-2.93 5.323-2.93 3.515 0 6.375 2.859 6.375 6.375 0 2.135-1.099 4.141-2.93 5.323a.546.546 0 0 0 .755.755c1.831-1.182 2.93-3.188 2.93-5.323 0-3.515-2.859-6.375-6.375-6.375zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.168l-1.391 5.093a.547.547 0 0 0 .678.678l5.093-1.391C9.317 21.463 10.59 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.125c-1.465 0-2.812-.445-3.945-1.195a.547.547 0 0 0-.492-.047l-3.328.914.914-3.328a.547.547 0 0 0-.047-.492c-.75-.1.1.1.1-1.133-1.195-3-2.227-2.812-2.812-3.945c1.195 0 18.125-5.512 18.125-10 0-4.484-3.641-8.125-8.125-8.125z" />
+        </svg>
+    </a>
+
+    <div class="mobile-booking-dock">
+        <button class="btn-dock-booking" onclick="window.location.href='index.html#contact'">
+            <span>رزرو نوبت آنلاین</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+
+    <header id="main-header">
+        <nav class="container">
+            <div class="logo">
+                <a href="index.html"><img src="assets/images/logo.png" alt="سالن زیبایی دلدار"></a>
+            </div>
+            <div class="nav-links desktop-only">
+                <a href="index.html">خانه</a>
+                <a href="about.html">درباره ما</a>
+                <a href="shop.html" class="active">فروشگاه</a>
+                <a href="index.html#services">خدمات ما</a>
+                <a href="index.html#consultation">مشاوره تخصصی</a>
+                <a href="index.html#contact">تماس با ما</a>
+            </div>
+            <div class="menu-icon" id="menu-toggle">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                    <rect y="4" width="24" height="2" rx="1" />
+                    <rect y="11" width="24" height="2" rx="1" />
+                    <rect y="18" width="24" height="2" rx="1" />
+                </svg>
+            </div>
+        </nav>
+    </header>
+
+    <div id="mobile-menu" class="mobile-menu">
+        <div class="close-btn" id="menu-close">&times;</div>
+        <a href="index.html">خانه</a>
+        <a href="about.html">درباره ما</a>
+        <a href="shop.html">فروشگاه</a>
+        <a href="index.html#services">خدمات ما</a>
+        <a href="index.html#consultation">مشاوره تخصصی</a>
+        <a href="index.html#contact">تماس با ما</a>
+    </div>
+
+    <main class="shop-page container">
+        <header class="shop-header" data-reveal>
+            <p class="section-tagline">مجموعه اختصاصی دلدار</p>
+            <h1>فروشگاه محصولات <span class="text-gradient">زیبایی و مراقبتی</span></h1>
+            <p>بهترین محصولات جهانی برای درخشش ابدی شما، دست‌چین شده توسط متخصصین ما.</p>
+        </header>
+
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="product-card" data-reveal>
+                <span class="product-badge">پرفروش</span>
+                <div class="product-image">
+                    <img src="assets/images/product-hair-oil.png" alt="اکسیر موی طلایی">
+                </div>
+                <div class="product-info">
+                    <span class="product-category">مراقبت از مو</span>
+                    <h3 class="product-title">روغن موی اکسیر طلایی</h3>
+                    <p class="product-price">۱,۲۸۰,۰۰۰ تومان</p>
+                    <button class="btn-add-cart">افزودن به سبد خرید</button>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card" data-reveal>
+                <div class="product-image">
+                    <img src="assets/images/product-skin-serum.png" alt="سرم جوان‌ساز صورت">
+                </div>
+                <div class="product-info">
+                    <span class="product-category">مراقبت از پوست</span>
+                    <h3 class="product-title">سرم جوان‌ساز رادیانس</h3>
+                    <p class="product-price">۲,۴۵۰,۰۰۰ تومان</p>
+                    <button class="btn-add-cart">افزودن به سبد خرید</button>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card" data-reveal>
+                <span class="product-badge">جدید</span>
+                <div class="product-image">
+                    <img src="hair_tools_hands.png" alt="ماسک موی پروتئین">
+                </div>
+                <div class="product-info">
+                    <span class="product-category">مراقبت تخصصی</span>
+                    <h3 class="product-title">ماسک احیاکننده بیوتین</h3>
+                    <p class="product-price">۹۵۰,۰۰۰ تومان</p>
+                    <button class="btn-add-cart">افزودن به سبد خرید</button>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card" data-reveal>
+                <div class="product-image">
+                    <img src="assets/images/consultation.png" alt="پک محصولات مراقبتی">
+                </div>
+                <div class="product-info">
+                    <span class="product-category">پکیج هدیه</span>
+                    <h3 class="product-title">مجموعه لوکس مراقبتی</h3>
+                    <p class="product-price">۴,۸۰۰,۰۰۰ تومان</p>
+                    <button class="btn-add-cart">افزودن به سبد خرید</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col footer-brand">
+                <img src="assets/images/logo.png" alt="Logo" class="footer-logo">
+                <p>سالن زیبایی دلدار، جایی که هنر و زیبایی به هم می‌پیوندند. ما تجربه‌ای لوکس و منحصر به فرد را برای شما
+                    خلق می‌کنیم.</p>
+            </div>
+
+            <div class="footer-col footer-links">
+                <h4>دسترسی سریع</h4>
+                <a href="index.html">خانه</a>
+                <a href="about.html">درباره ما</a>
+                <a href="shop.html">فروشگاه محصولات</a>
+                <a href="index.html#services">خدمات تخصصی</a>
+                <a href="index.html#contact">تماس با ما</a>
+            </div>
+
+            <div class="footer-col footer-social">
+                <h4>ما را دنبال کنید</h4>
+                <div class="social-links-v2">
+                    <a href="#" class="social-box" aria-label="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-box" aria-label="Telegram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-box" aria-label="WhatsApp">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-14.7 8.38 8.38 0 0 1 3.8.9L21 2z">
+                            </path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; ۲۰۲۴ تمامی حقوق برای سالن زیبایی دلدار محفوظ است.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+
+</html>
