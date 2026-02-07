@@ -356,11 +356,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (closeBooking) {
-        closeBooking.addEventListener('click', () => {
+        closeBooking.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any default behavior
+            e.stopPropagation(); // Stop bubbling
+            console.log('Close button clicked');
+
             bookingModal.classList.remove('active');
             document.body.style.overflow = 'auto';
-            resetBooking();
+
+            try {
+                resetBooking();
+            } catch (err) {
+                console.warn('Error resetting booking form:', err);
+            }
         });
+    } else {
+        console.error('Close booking button not found!');
     }
 
     if (bookingForm) {

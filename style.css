@@ -105,10 +105,16 @@ body * {
 /* Pointer cursor for interactive elements in modals */
 .modal button,
 .modal a,
+.modal .close-modal,
 .modal input,
 .modal select,
 .modal textarea {
     cursor: pointer !important;
+}
+
+.modal .close-modal {
+    z-index: 100 !important;
+    /* Ensure it is on top */
 }
 
 .modal input,
