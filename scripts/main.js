@@ -334,4 +334,132 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // --- Shopping Cart Logic ---
+    let cart = JSON.parse(localStorage.getItem('deldar_cart')) || [];
+    const cartToggle = document.getElementById('cart-toggle');
+    const closeCart = document.getElementById('close-cart');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartOverlay = document.getElementById('cart-overlay');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartTotalAmount = document.getElementById('cart-total-amount');
+    const cartCountBadge = document.querySelector('.cart-count');
+
+    function updateCart() {
+        localStorage.setItem('deldar_cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function renderCart() {
+        if (!cartItemsContainer) return;
+
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = '<div class="cart-empty-msg">سبد خرید شما فعلاً خالی است.</div>';
+            cartTotalAmount.textContent = '۰ تومان';
+            cartCountBadge.textContent = '۰';
+            return;
+        }
+
+        let total = 0;
+        let count = 0;
+        cartItemsContainer.innerHTML = '';
+
+        cart.forEach((item, index) => {
+            total += item.price * item.quantity;
+            count += item.quantity;
+
+            const itemEl = document.createElement('div');
+            itemEl.className = 'cart-item';
+            itemEl.innerHTML = `
+                <div class="cart-item-img">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <p class="price">${item.price.toLocaleString('fa-IR')} تومان</p>
+                    <div class="cart-item-controls">
+                        <div class="qty-controls">
+                            <button class="qty-btn minus" data-index="${index}">&minus;</button>
+                            <span>${item.quantity.toLocaleString('fa-IR')}</span>
+                            <button class="qty-btn plus" data-index="${index}">&plus;</button>
+                        </div>
+                        <button class="remove-item" data-index="${index}">حذف</button>
+                    </div>
+                </div>
+            `;
+            cartItemsContainer.appendChild(itemEl);
+        });
+
+        cartTotalAmount.textContent = `${total.toLocaleString('fa-IR')} تومان`;
+        cartCountBadge.textContent = count.toLocaleString('fa-IR');
+    }
+
+    function addToCart(product) {
+        const existingItem = cart.find(item => item.name === product.name);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({ ...product, quantity: 1 });
+        }
+        updateCart();
+        openCart();
+    }
+
+    function openCart() {
+        cartDrawer.classList.add('active');
+        cartOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function toggleCart() {
+        cartDrawer.classList.toggle('active');
+        cartOverlay.classList.toggle('active');
+        if (cartDrawer.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    if (cartToggle) cartToggle.addEventListener('click', toggleCart);
+    if (closeCart) closeCart.addEventListener('click', toggleCart);
+    if (cartOverlay) cartOverlay.addEventListener('click', toggleCart);
+
+    // Event Delegation for Cart Item Controls
+    if (cartItemsContainer) {
+        cartItemsContainer.addEventListener('click', (e) => {
+            const index = e.target.dataset.index;
+            if (e.target.classList.contains('plus')) {
+                cart[index].quantity += 1;
+                updateCart();
+            } else if (e.target.classList.contains('minus')) {
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                } else {
+                    cart.splice(index, 1);
+                }
+                updateCart();
+            } else if (e.target.classList.contains('remove-item')) {
+                cart.splice(index, 1);
+                updateCart();
+            }
+        });
+    }
+
+    // Add to Cart Buttons (Shop Page)
+    const addCartBtns = document.querySelectorAll('.btn-add-cart');
+    addCartBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.product-card');
+            const product = {
+                name: card.querySelector('.product-title').textContent,
+                price: parseInt(card.querySelector('.product-price').textContent.replace(/[^\d]/g, '')),
+                image: card.querySelector('.product-image img').src
+            };
+            addToCart(product);
+        });
+    });
+
+    // Initial render
+    renderCart();
 });

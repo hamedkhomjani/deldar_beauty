@@ -112,6 +112,14 @@
                 <a href="#contact">تماس با ما</a>
             </div>
             <div class="header-actions">
+                <button id="cart-toggle" class="cart-toggle" aria-label="Open Cart">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span class="cart-count">0</span>
+                </button>
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
                     <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
                         stroke-width="2">
@@ -503,6 +511,26 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Drawer -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <div id="cart-drawer" class="cart-drawer">
+        <div class="cart-header">
+            <h2>سبد خرید مجلل</h2>
+            <button class="close-cart" id="close-cart">&times;</button>
+        </div>
+        <div class="cart-items-container" id="cart-items">
+            <!-- Items will be injected by JS -->
+            <div class="cart-empty-msg">سبد خرید شما فعلاً خالی است.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>جمع کل:</span>
+                <span class="amount" id="cart-total-amount">۰ تومان</span>
+            </div>
+            <button class="btn-checkout">تایید و پرداخت نهایی</button>
         </div>
     </div>
 
