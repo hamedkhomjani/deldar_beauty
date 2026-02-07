@@ -58,7 +58,7 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     opacity: 0.04;
     pointer-events: none;
     z-index: 9999;
@@ -73,10 +73,49 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    cursor: none;
     transition: background-color 0.6s ease, color 0.6s ease;
-    /* Hide default cursor for custom cursor */
 }
+
+/* Hide default cursor for custom cursor */
+body,
+body * {
+    cursor: none !important;
+}
+
+/* Show default cursor in cart drawer for better UX */
+.cart-drawer,
+.cart-drawer * {
+    cursor: auto !important;
+}
+
+/* Pointer cursor for interactive elements in cart */
+.cart-drawer button,
+.cart-drawer a,
+.cart-drawer .qty-btn,
+.cart-drawer .remove-item {
+    cursor: pointer !important;
+}
+
+/* Show default cursor in modals */
+.modal,
+.modal * {
+    cursor: auto !important;
+}
+
+/* Pointer cursor for interactive elements in modals */
+.modal button,
+.modal a,
+.modal input,
+.modal select,
+.modal textarea {
+    cursor: pointer !important;
+}
+
+.modal input,
+.modal textarea {
+    cursor: text !important;
+}
+
 
 /* Custom Cursor */
 .cursor-dot,
@@ -88,7 +127,9 @@ body {
     transform: translate(-50%, -50%);
     border-radius: 50%;
     z-index: 99999;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    will-change: transform;
+    transition: opacity 0.3s ease;
+    /* Smooth fade in/out when hiding */
 }
 
 .cursor-dot {
@@ -104,13 +145,18 @@ body {
     border: 1.5px solid var(--accent-gold);
     box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
     backdrop-filter: blur(1px);
+    transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
 @media (max-width: 1024px) {
-    body {
-        cursor: auto;
+
+    /* Restore default cursor on mobile/tablet */
+    body,
+    body * {
+        cursor: auto !important;
     }
 
+    /* Hide custom cursor elements */
     .cursor-dot,
     .cursor-outline {
         display: none;
@@ -151,6 +197,19 @@ body {
 main {
     animation: pageReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* --- Scroll Reveal Animation --- */
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal].visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 
 .container {
     max-width: 1400px;
@@ -2019,6 +2078,8 @@ body.dark-theme .moon-icon {
     transition: 0.6s cubic-bezier(0.77, 0, 0.175, 1);
     display: flex;
     flex-direction: column;
+    cursor: auto;
+    /* Use default cursor in cart for better performance */
 }
 
 .cart-drawer.active {

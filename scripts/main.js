@@ -1,21 +1,65 @@
-// Custom Cursor Logic
+// Custom Cursor Logic - Optimized for Performance
 const dot = document.querySelector('.cursor-dot');
 const outline = document.querySelector('.cursor-outline');
 
+// Use requestAnimationFrame for smooth cursor movement
+let cursorX = 0;
+let cursorY = 0;
+let outlineX = 0;
+let outlineY = 0;
+
 window.addEventListener('mousemove', (e) => {
-    const posX = e.clientX;
-    const posY = e.clientY;
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+});
 
-    dot.style.left = `${posX}px`;
-    dot.style.top = `${posY}px`;
+// Smooth cursor animation loop
+function animateCursor() {
+    // Dot follows cursor immediately
+    dot.style.left = `${cursorX}px`;
+    dot.style.top = `${cursorY}px`;
 
-    // outline.style.left = `${posX}px`;
-    // outline.style.top = `${posY}px`;
+    // Outline follows with smooth delay (lerp effect)
+    outlineX += (cursorX - outlineX) * 0.15;
+    outlineY += (cursorY - outlineY) * 0.15;
 
-    outline.animate({
-        left: `${posX}px`,
-        top: `${posY}px`
-    }, { duration: 500, fill: "forwards" });
+    outline.style.left = `${outlineX}px`;
+    outline.style.top = `${outlineY}px`;
+
+    requestAnimationFrame(animateCursor);
+}
+
+animateCursor();
+
+// Function to hide/show custom cursor
+function hideCustomCursor() {
+    if (dot && outline) {
+        dot.style.opacity = '0';
+        outline.style.opacity = '0';
+    }
+}
+
+function showCustomCursor() {
+    if (dot && outline) {
+        dot.style.opacity = '1';
+        outline.style.opacity = '1';
+    }
+}
+
+// Hide cursor when mouse enters cart or modal
+document.addEventListener('DOMContentLoaded', () => {
+    const cartDrawer = document.getElementById('cart-drawer');
+    const modal = document.getElementById('booking-modal');
+
+    if (cartDrawer) {
+        cartDrawer.addEventListener('mouseenter', hideCustomCursor);
+        cartDrawer.addEventListener('mouseleave', showCustomCursor);
+    }
+
+    if (modal) {
+        modal.addEventListener('mouseenter', hideCustomCursor);
+        modal.addEventListener('mouseleave', showCustomCursor);
+    }
 });
 
 // Hover effect for interactive elements
