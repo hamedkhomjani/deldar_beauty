@@ -1,6 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Vazirmatn:wght@100;400;700&display=swap');
 
 :root {
+    /* Theme Colors - Light (Default) */
+    --bg-primary: #fdfaf5;
+    /* --soft-cream */
+    --bg-secondary: #fcfcfc;
+    /* --silk-white */
+    --text-primary: #050505;
+    /* --dark-charcoal */
+    --text-secondary: #555555;
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.5);
+
+    /* Permanent Colors */
     --gold-gradient: linear-gradient(135deg, #c5a059 0%, #f9e29f 50%, #8e6d31 100%);
     --gold-silk: linear-gradient(135deg, #b38b47 0%, #e0c28d 50%, #b38b47 100%);
     --gold-glow: 0 0 30px rgba(197, 160, 89, 0.4);
@@ -10,13 +22,22 @@
     --silk-white: #fcfcfc;
     --accent-gold: #c5a059;
     --accent-gold-light: #e0c28d;
-    --glass-bg: rgba(255, 255, 255, 0.45);
-    --glass-border: rgba(255, 255, 255, 0.5);
     --dark-glass-bg: rgba(5, 5, 5, 0.85);
     --dark-glass-border: rgba(255, 255, 255, 0.1);
     --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
     --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     --header-height: 110px;
+}
+
+/* Dark Theme Overrides */
+body.dark-theme {
+    --bg-primary: #050505;
+    --bg-secondary: #111111;
+    --text-primary: #fdfaf5;
+    --text-secondary: #cccccc;
+    --glass-bg: rgba(5, 5, 5, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -44,14 +65,15 @@ html {
 
 body {
     direction: rtl;
-    background-color: var(--soft-cream);
-    color: var(--dark-charcoal);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: 'Vazirmatn', sans-serif;
     line-height: 1.8;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: none;
+    transition: background-color 0.6s ease, color 0.6s ease;
     /* Hide default cursor for custom cursor */
 }
 
@@ -182,7 +204,7 @@ nav {
 
 .nav-links a {
     text-decoration: none;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
     font-weight: 600;
     font-size: 0.95rem;
     position: relative;
@@ -205,6 +227,49 @@ nav {
     width: 100%;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.theme-toggle {
+    background: var(--bg-secondary);
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--card-shadow);
+}
+
+.theme-toggle:hover {
+    transform: rotate(15deg) scale(1.1);
+    border-color: var(--accent-gold);
+}
+
+.sun-icon {
+    display: block;
+}
+
+.moon-icon {
+    display: none;
+}
+
+body.dark-theme .sun-icon {
+    display: none;
+}
+
+body.dark-theme .moon-icon {
+    display: block;
+}
+
 .menu-icon {
     display: none;
     cursor: pointer;
@@ -216,9 +281,10 @@ nav {
     padding-top: calc(var(--header-height) + 40px);
     display: flex;
     align-items: flex-start;
-    background: radial-gradient(circle at top right, #fff5f2 0%, #fdfaf5 100%);
+    background: radial-gradient(circle at top right, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     position: relative;
     overflow: hidden;
+    transition: background 0.6s ease;
 }
 
 .hero::before {
@@ -267,7 +333,7 @@ nav {
     font-family: 'Playfair Display', serif;
     font-size: 5.5rem;
     font-weight: 400;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
     line-height: 1.2;
     /* Increased from 1 to prevent clipping */
     margin-bottom: 30px;
@@ -276,7 +342,7 @@ nav {
 
 .hero-text p {
     font-size: 1.25rem;
-    color: #555;
+    color: var(--text-secondary);
     margin-bottom: 50px;
     max-width: 90%;
 }
@@ -427,7 +493,7 @@ nav {
 .floating-card-1 .label,
 .floating-card-2 .label {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -459,6 +525,7 @@ nav {
     font-weight: 400;
     margin-bottom: 20px;
     letter-spacing: -1px;
+    color: var(--text-primary);
 }
 
 .section-header p,
@@ -479,11 +546,11 @@ nav {
 }
 
 .service-card {
-    background: white;
+    background: var(--bg-secondary);
     padding: 80px 50px;
     border-radius: 40px;
     text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--glass-border);
     transition: var(--transition-smooth);
     cursor: pointer;
     position: relative;
@@ -520,7 +587,7 @@ nav {
 .icon-wrapper {
     width: 120px;
     height: 120px;
-    background: #fdfaf5;
+    background: var(--bg-primary);
     border-radius: 40px;
     display: flex;
     align-items: center;
@@ -541,11 +608,11 @@ nav {
 .service-card h3 {
     font-size: 1.8rem;
     margin-bottom: 20px;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
 }
 
 .service-card p {
-    color: #777;
+    color: var(--text-secondary);
     font-size: 1rem;
     line-height: 1.8;
 }
@@ -632,15 +699,15 @@ nav {
 }
 
 .info-item {
-    background: white;
+    background: var(--bg-secondary);
     padding: 60px;
     border-radius: 40px;
     display: flex;
     align-items: center;
     gap: 40px;
     margin-bottom: 30px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--glass-border);
     transition: var(--transition-smooth);
     position: relative;
     overflow: hidden;
@@ -670,12 +737,12 @@ nav {
     font-size: 2.5rem;
     min-width: 90px;
     height: 90px;
-    background: #fdfaf5;
+    background: var(--bg-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 30px;
-    border: 1px solid rgba(197, 160, 89, 0.1);
+    border: 1px solid var(--glass-border);
     transition: var(--transition-smooth);
 }
 
@@ -688,11 +755,11 @@ nav {
 .info-item h4 {
     font-size: 1.3rem;
     margin-bottom: 8px;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
 }
 
 .info-item p {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 1.1rem;
 }
 
@@ -901,7 +968,7 @@ nav {
     right: -100%;
     width: 100%;
     height: 100%;
-    background: var(--dark-charcoal);
+    background: var(--bg-primary);
     z-index: 3000;
     display: flex;
     flex-direction: column;
@@ -916,7 +983,7 @@ nav {
 }
 
 .mobile-menu a {
-    color: white;
+    color: var(--text-primary);
     text-decoration: none;
     font-size: 1.8rem;
     font-weight: 700;
@@ -931,7 +998,7 @@ nav {
     position: absolute;
     top: 40px;
     left: 40px;
-    color: white;
+    color: var(--text-primary);
     font-size: 3rem;
     cursor: pointer;
 }
@@ -1045,6 +1112,7 @@ nav {
     font-size: 1.8rem;
     margin-bottom: 50px;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 .booking-grid {
@@ -1059,16 +1127,16 @@ nav {
     text-align: center;
     font-size: 1rem;
     margin-bottom: 20px;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* Calendar Card */
 .calendar-card {
-    background: #fdfaf5;
+    background: var(--bg-secondary);
     border-radius: 30px;
     padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--glass-border);
 }
 
 .calendar-header {
@@ -1114,7 +1182,7 @@ nav {
     text-align: center;
     font-weight: 700;
     margin-bottom: 15px;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
 }
 
 .days-grid {
@@ -1136,8 +1204,8 @@ nav {
 }
 
 .days-grid span.active {
-    background: var(--dark-charcoal);
-    color: white;
+    background: var(--text-primary);
+    color: var(--bg-primary);
 }
 
 .days-grid span.past {
@@ -1172,10 +1240,10 @@ nav {
 
 .time-slot {
     padding: 15px 10px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--glass-border);
     border-radius: 15px;
-    background: white;
-    color: var(--dark-charcoal);
+    background: var(--bg-primary);
+    color: var(--text-primary);
     font-size: 0.9rem;
     cursor: pointer;
     transition: var(--transition-smooth);
@@ -1184,9 +1252,8 @@ nav {
 
 .time-slot:hover:not(:disabled) {
     border-color: var(--accent-gold);
-    background: #fdfaf5;
-    color: var(--dark-charcoal);
-    /* Ensure text is dark on light hover background */
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .time-slot.active:hover {
@@ -1196,10 +1263,9 @@ nav {
 }
 
 .time-slot.active {
-    background: var(--dark-charcoal);
-    color: white;
-    border-color: var(--dark-charcoal);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-gold);
 }
 
 .time-slot:disabled {
@@ -1217,7 +1283,7 @@ nav {
     gap: 20px;
     margin-top: 30px;
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .dot {

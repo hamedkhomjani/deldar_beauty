@@ -81,7 +81,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    console.log('Premium Beauty Salon UI Initialized');
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    // Check for saved theme in localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-theme');
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+
+            // Save theme preference
+            if (body.classList.contains('dark-theme')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    }
+
+    console.log('Premium Beauty Salon UI Initialized with Theme Support');
 
     // Header Scroll Effect
     const header = document.getElementById('main-header');
