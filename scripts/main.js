@@ -203,6 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function initCalendar() {
         const calendarDays = document.getElementById('calendar-days');
         const monthLabel = document.querySelector('.current-month');
+        if (!calendarDays || !monthLabel) return;
+
         calendarDays.innerHTML = '';
 
         monthLabel.textContent = `${JalaliDate.j_month_names[viewDate.month - 1]} ${viewDate.year}`;
@@ -265,23 +267,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Navigation
-    document.querySelector('.prev-month').addEventListener('click', () => {
-        viewDate.month--;
-        if (viewDate.month < 1) {
-            viewDate.month = 12;
-            viewDate.year--;
-        }
-        initCalendar();
-    });
+    const prevMonthBtn = document.querySelector('.prev-month');
+    const nextMonthBtn = document.querySelector('.next-month');
 
-    document.querySelector('.next-month').addEventListener('click', () => {
-        viewDate.month++;
-        if (viewDate.month > 12) {
-            viewDate.month = 1;
-            viewDate.year++;
-        }
-        initCalendar();
-    });
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            viewDate.month--;
+            if (viewDate.month < 1) {
+                viewDate.month = 12;
+                viewDate.year--;
+            }
+            initCalendar();
+        });
+    }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            viewDate.month++;
+            if (viewDate.month > 12) {
+                viewDate.month = 1;
+                viewDate.year++;
+            }
+            initCalendar();
+        });
+    }
 
     // --- Booking System Logic ---
     const bookingModal = document.getElementById('booking-modal');
@@ -294,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookButtons = document.querySelectorAll('.btn-premium, .service-card');
     bookButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
+            if (!bookingModal) return;
             e.preventDefault();
             bookingModal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -301,23 +311,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    closeBooking.addEventListener('click', () => {
-        bookingModal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-        resetBooking();
-    });
+    if (closeBooking) {
+        closeBooking.addEventListener('click', () => {
+            bookingModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetBooking();
+        });
+    }
 
-    bookingForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        bookingStep1.classList.add('hidden');
-        bookingStep2.classList.remove('hidden');
-    });
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            bookingStep1.classList.add('hidden');
+            bookingStep2.classList.remove('hidden');
+        });
+    }
 
-    btnReturnHome.addEventListener('click', () => {
-        bookingModal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-        resetBooking();
-    });
+    if (btnReturnHome) {
+        btnReturnHome.addEventListener('click', () => {
+            bookingModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetBooking();
+        });
+    }
 
     function resetBooking() {
         bookingStep1.classList.remove('hidden');
