@@ -97,10 +97,11 @@ body * {
 }
 
 /* Show default cursor in modals */
+/* Show default cursor in modals - REMOVED to keep custom cursor
 .modal,
 .modal * {
     cursor: auto !important;
-}
+} */
 
 /* Pointer cursor for interactive elements in modals */
 .modal button,
@@ -1165,14 +1166,14 @@ body.dark-theme .moon-icon {
 }
 
 .modal-content {
-    background: white;
+    background: var(--bg-primary);
     margin: 30px auto;
     padding: 80px;
     border-radius: 40px;
     position: relative;
     max-width: 1000px !important;
     box-shadow: 0 50px 100px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
 }
 
 .close-modal {
@@ -1181,17 +1182,17 @@ body.dark-theme .moon-icon {
     right: 30px;
     font-size: 2rem;
     cursor: pointer;
-    color: var(--dark-charcoal);
+    color: var(--text-primary);
     z-index: 10;
     transition: var(--transition-smooth);
     width: 60px;
     height: 60px;
-    background: #fdfaf5;
+    background: var(--bg-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--glass-border);
 }
 
 .close-modal:hover {
@@ -1428,10 +1429,12 @@ body.dark-theme .moon-icon {
 .form-group input {
     width: 100%;
     padding: 15px 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--glass-border);
     border-radius: 12px;
     font-size: 1rem;
     font-family: 'Vazirmatn';
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .required-star {

@@ -56,10 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cartDrawer.addEventListener('mouseleave', showCustomCursor);
     }
 
+    // Modal cursor logic removed to keep custom cursor active
+    /*
     if (modal) {
         modal.addEventListener('mouseenter', hideCustomCursor);
         modal.addEventListener('mouseleave', showCustomCursor);
     }
+    */
 });
 
 // Hover effect for interactive elements

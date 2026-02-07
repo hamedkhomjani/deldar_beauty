@@ -160,7 +160,20 @@ See `DOUBLE_CURSOR_FIX.md` for detailed technical documentation.
 
 ---
 
-## Status: ✅ All 7 Issues Resolved
+### 8. **Modal Dark Mode & Cursor Consistency** ✅ FIXED
+**Location:** `style.css` lines 1173-1430, `scripts/main.js` line 62  
+**Issue:** 
+1. Booking modal had hardcoded white backgrounds, breaking dark mode.
+2. Custom cursor was disabled in modal (system cursor shown), which the user found inconsistent.
+**Solution:** 
+- Updated `.modal-content` and inputs to use `var(--bg-primary)` and theme colors.
+- Removed `cursor: auto` rule for `.modal` to restore custom cursor.
+- Removed JS logic that hid custom cursor when entering modal.
+- Updated `.close-modal` button to use theme variables.
+
+---
+
+## Status: ✅ All 8 Issues Resolved
 
 The website should now work flawlessy:
 1. No broken images
@@ -168,5 +181,6 @@ The website should now work flawlessy:
 3. No console errors
 4. Smooth scroll animations
 5. 60fps custom cursor
-6. No double cursors
+6. No double cursors (except where intended)
 7. Functional booking modal
+8. Consistent dark mode in modals
