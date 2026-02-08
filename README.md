@@ -16,6 +16,3 @@ A high-end, luxury beauty salon website featuring a premium aesthetic, responsiv
 
 ## 🚀 How to Run
 Simply open `index.html` in any modern web browser.
-
----
-*Created by Antigravity AI for Deldar Beauty Salon.*
