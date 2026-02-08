@@ -1891,11 +1891,17 @@ body.dark-theme .moon-icon {
     }
 
     .whatsapp-float {
-        bottom: 100px;
-        /* Adjust to not overlap with dock */
+        bottom: 40px;
+        /* Default position */
         width: 55px;
         height: 55px;
         left: 25px;
+        transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
+    }
+
+    body.dock-active .whatsapp-float {
+        bottom: 120px;
+        /* Move up when dock is visible */
     }
 
     .whatsapp-float svg {

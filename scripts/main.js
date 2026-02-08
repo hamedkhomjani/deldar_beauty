@@ -567,8 +567,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('scroll', () => {
             if (window.scrollY > 200) {
                 mobileDock.classList.add('visible');
+                document.body.classList.add('dock-active');
             } else {
                 mobileDock.classList.remove('visible');
+                document.body.classList.remove('dock-active');
             }
         });
     }

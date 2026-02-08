@@ -192,7 +192,16 @@ See `DOUBLE_CURSOR_FIX.md` for detailed technical documentation.
 
 ---
 
-## Status: ✅ All 10 Issues Resolved/Features Added
+### 11. **Dynamic WhatsApp Button Positioning** ✅ ADDED
+**Location:** `style.css` lines 1891-1903, `scripts/main.js` lines 570-571  
+**Feature:** WhatsApp floating button moves up automatically when the mobile booking dock appears to prevent overlap.
+**Implementation:** 
+- JS: Toggles `.dock-active` class on `body` when scroll threshold is met.
+- CSS: Transitions `.whatsapp-float` `bottom` property from `40px` to `120px` smoothly.
+
+---
+
+## Status: ✅ All 11 Issues Resolved/Features Added
 
 The website should now work flawlessy:
 1. No broken images
@@ -205,3 +214,4 @@ The website should now work flawlessy:
 8. Consistent dark mode in modals
 9. Correct Persian typography on iOS
 10. Smart mobile booking button
+11. Adaptive WhatsApp button position
