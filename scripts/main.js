@@ -122,8 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dockBookingBtn.addEventListener('click', () => {
             const bookingModal = document.getElementById('booking-modal');
             if (bookingModal) {
-                bookingModal.style.display = 'block';
+                bookingModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                if (typeof initCalendar === 'function') {
+                    initCalendar();
+                }
             }
         });
     }
@@ -360,11 +363,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (closeBooking) {
         closeBooking.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent any default behavior
-            e.stopPropagation(); // Stop bubbling
-            console.log('Close button clicked');
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Closing booking modal...');
 
-            bookingModal.classList.remove('active');
+            if (bookingModal) {
+                bookingModal.classList.remove('active');
+                // Also clear any inline styles that might have been set previously
+                bookingModal.style.display = '';
+            }
             document.body.style.overflow = 'auto';
 
             try {
@@ -373,8 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Error resetting booking form:', err);
             }
         });
-    } else {
-        console.error('Close booking button not found!');
     }
 
     if (bookingForm) {

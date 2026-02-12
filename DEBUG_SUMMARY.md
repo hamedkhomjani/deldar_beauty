@@ -195,13 +195,22 @@ See `DOUBLE_CURSOR_FIX.md` for detailed technical documentation.
 ### 11. **Dynamic WhatsApp Button Positioning** ✅ ADDED
 **Location:** `style.css` lines 1891-1903, `scripts/main.js` lines 570-571  
 **Feature:** WhatsApp floating button moves up automatically when the mobile booking dock appears to prevent overlap.
-**Implementation:** 
-- JS: Toggles `.dock-active` class on `body` when scroll threshold is met.
-- CSS: Transitions `.whatsapp-float` `bottom` property from `40px` to `120px` smoothly.
 
 ---
 
-## Status: ✅ All 11 Issues Resolved/Features Added
+### 12. **Booking Modal Path Consistency & Initialization** ✅ FIXED
+**Location:** `scripts/main.js` lines 122-127, 361-378  
+**Issue:** 
+1. Opening the modal via the mobile dock button used `style.display = 'block'`, which conflicted with the close logic that only removed the `.active` class. This caused the modal to remain stuck on screen.
+2. Opening via mobile dock did not trigger `initCalendar()`, leaving the date as a static placeholder ("Khordad 1401").
+**Solution:** 
+- Standardized all modal opening paths to use `.classList.add('active')`.
+- Added `initCalendar()` call to the mobile dock button listener.
+- Improved close listener to clear any accidental inline styles and log closure.
+
+---
+
+## Status: ✅ All 12 Issues Resolved/Features Added
 
 The website should now work flawlessy:
 1. No broken images
@@ -210,8 +219,9 @@ The website should now work flawlessy:
 4. Smooth scroll animations
 5. 60fps custom cursor
 6. No double cursors
-7. Functional booking modal
+7. Functional booking modal (opens and closes correctly from all entry points)
 8. Consistent dark mode in modals
 9. Correct Persian typography on iOS
 10. Smart mobile booking button
 11. Adaptive WhatsApp button position
+12. Correct Jalali calendar initialization (e.g., Bahman 1404)
