@@ -10,10 +10,12 @@ const SALON = {
 };
 
 // Use requestAnimationFrame for smooth cursor movement
+// Positions applied via transform (GPU-composited, no layout thrash)
 let cursorX = 0;
 let cursorY = 0;
 let outlineX = 0;
 let outlineY = 0;
+let hoverScale = 1;
 
 window.addEventListener('mousemove', (e) => {
     cursorX = e.clientX;
@@ -23,20 +25,21 @@ window.addEventListener('mousemove', (e) => {
 // Smooth cursor animation loop
 function animateCursor() {
     // Dot follows cursor immediately
-    dot.style.left = `${cursorX}px`;
-    dot.style.top = `${cursorY}px`;
+    dot.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
     // Outline follows with smooth delay (lerp effect)
     outlineX += (cursorX - outlineX) * 0.15;
     outlineY += (cursorY - outlineY) * 0.15;
 
-    outline.style.left = `${outlineX}px`;
-    outline.style.top = `${outlineY}px`;
+    outline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0) translate(-50%, -50%) scale(${hoverScale})`;
 
     requestAnimationFrame(animateCursor);
 }
 
-animateCursor();
+// Only run the loop on devices with a fine pointer (skip mobile/touch)
+if (dot && outline && window.matchMedia('(pointer: fine)').matches) {
+    animateCursor();
+}
 
 // Function to hide/show custom cursor
 function hideCustomCursor() {
@@ -76,12 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
 const interactables = document.querySelectorAll('a, button, .service-card, .product-card');
 interactables.forEach(item => {
     item.addEventListener('mouseenter', () => {
-        outline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        hoverScale = 1.5;
         outline.style.backgroundColor = 'rgba(197, 160, 89, 0.1)';
         outline.style.borderColor = 'transparent';
     });
     item.addEventListener('mouseleave', () => {
-        outline.style.transform = 'translate(-50%, -50%) scale(1)';
+        hoverScale = 1;
         outline.style.backgroundColor = 'transparent';
         outline.style.borderColor = 'var(--accent-gold)';
     });

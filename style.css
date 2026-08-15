@@ -159,10 +159,17 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     opacity: 0.04;
     pointer-events: none;
     z-index: 9999;
+}
+
+/* Disable expensive grain effect on low-power/touch devices */
+@media (max-width: 1024px), (prefers-reduced-motion: reduce) {
+    .grain-overlay {
+        display: none;
+    }
 }
 
 body {
@@ -252,8 +259,8 @@ body * {
     height: 45px;
     border: 1.5px solid var(--accent-gold);
     box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
-    backdrop-filter: blur(1px);
-    transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    /* transform is driven by JS (RAF) - no CSS transition to avoid fighting it */
+    transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
 @media (max-width: 1024px) {
@@ -2212,7 +2219,6 @@ body.dark-theme .moon-icon {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
     z-index: 4000;
     opacity: 0;
     visibility: hidden;
@@ -2227,14 +2233,17 @@ body.dark-theme .moon-icon {
 .cart-drawer {
     position: fixed;
     top: 0;
-    left: -100%;
+    left: 0;
     width: 100%;
     max-width: var(--cart-width);
     height: 100%;
     background: var(--bg-primary);
     z-index: 4001;
     box-shadow: 40px 0 100px rgba(0, 0, 0, 0.2);
-    transition: 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    /* Animate transform (GPU) instead of 'left' to avoid layout thrash */
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    will-change: transform;
     display: flex;
     flex-direction: column;
     cursor: auto;
@@ -2242,7 +2251,7 @@ body.dark-theme .moon-icon {
 }
 
 .cart-drawer.active {
-    left: 0;
+    transform: translateX(0);
 }
 
 .cart-header {
