@@ -2,6 +2,13 @@
 const dot = document.querySelector('.cursor-dot');
 const outline = document.querySelector('.cursor-outline');
 
+// Salon contact handles - EDIT THESE for real accounts
+const SALON = {
+    telegram: 'deldar_beauty',
+    instagram: 'deldar_beauty',
+    whatsapp: '989123456789'
+};
+
 // Use requestAnimationFrame for smooth cursor movement
 let cursorX = 0;
 let cursorY = 0;
@@ -249,6 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentJalaliDate = JalaliDate.gregorianToJalali(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
     let viewDate = { year: currentJalaliDate[0], month: currentJalaliDate[1] };
+    let selectedDate = null;
+    let selectedTime = null;
 
     function initCalendar() {
         const calendarDays = document.getElementById('calendar-days');
@@ -305,6 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 span.addEventListener('click', () => {
                     document.querySelectorAll('.days-grid span').forEach(s => s.classList.remove('active'));
                     span.classList.add('active');
+                    selectedDate = `${i} ${JalaliDate.j_month_names[viewDate.month - 1]} ${viewDate.year}`;
                 });
             }
 
@@ -385,6 +395,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bookingForm) {
         bookingForm.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            if (!selectedDate) {
+                alert('لطفاً ابتدا روز مورد نظر را از تقویم انتخاب کنید.');
+                return;
+            }
+            if (!selectedTime) {
+                alert('لطفاً ساعت مورد نظر را انتخاب کنید.');
+                return;
+            }
+
+            const name = document.getElementById('booking-name').value.trim();
+            const phone = document.getElementById('booking-phone').value.trim();
+            const email = document.getElementById('booking-email').value.trim();
+            const service = document.getElementById('booking-service').value;
+
+            const msg = [
+                'رزرو نوبت - سالن زیبایی دلدار',
+                `👤 نام: ${name}`,
+                `📞 تماس: ${phone}`,
+                email ? `📧 ایمیل: ${email}` : '',
+                `💇 خدمت: ${service}`,
+                `📅 تاریخ: ${selectedDate}`,
+                `🕒 ساعت: ${selectedTime}`
+            ].filter(Boolean).join('\n');
+
+            window.open(`https://t.me/${SALON.telegram}?text=${encodeURIComponent(msg)}`, '_blank');
+
             bookingStep1.classList.add('hidden');
             bookingStep2.classList.remove('hidden');
         });
@@ -402,14 +439,19 @@ document.addEventListener('DOMContentLoaded', () => {
         bookingStep1.classList.remove('hidden');
         bookingStep2.classList.add('hidden');
         bookingForm.reset();
+        selectedDate = null;
+        selectedTime = null;
     }
 
     const timeSlots = document.querySelectorAll('.time-slot');
+    const activeTimeSlot = document.querySelector('.time-slot.active');
+    if (activeTimeSlot) selectedTime = activeTimeSlot.textContent.trim();
     timeSlots.forEach(slot => {
         slot.addEventListener('click', () => {
             if (!slot.disabled) {
                 timeSlots.forEach(s => s.classList.remove('active'));
                 slot.classList.add('active');
+                selectedTime = slot.textContent.trim();
             }
         });
     });

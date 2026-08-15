@@ -1,4 +1,105 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Vazirmatn:wght@100;400;700&display=swap');
+/* Self-hosted fonts (Google Fonts is blocked in Iran) */
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url('assets/fonts/vazirmatn-arabic-100-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('assets/fonts/vazirmatn-arabic-400-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('assets/fonts/vazirmatn-arabic-700-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url('assets/fonts/vazirmatn-latin-100-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('assets/fonts/vazirmatn-latin-400-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('assets/fonts/vazirmatn-latin-700-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('assets/fonts/outfit-latin-300-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('assets/fonts/outfit-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('assets/fonts/outfit-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('assets/fonts/outfit-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('assets/fonts/playfair-display-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('assets/fonts/playfair-display-latin-700-normal.woff2') format('woff2');
+}
 
 :root {
     /* Theme Colors - Light (Default) */
@@ -1443,6 +1544,23 @@ body.dark-theme .moon-icon {
     color: var(--text-primary);
 }
 
+.form-group select {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Vazirmatn';
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 15px center;
+    padding-left: 40px;
+}
+
 .required-star {
     position: absolute;
     right: 15px;
@@ -1859,6 +1977,16 @@ body.dark-theme .moon-icon {
 .whatsapp-float svg {
     width: 35px;
     height: 35px;
+}
+
+/* Instagram floating button (Iranian primary contact channel) */
+.instagram-float {
+    background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    box-shadow: 0 10px 25px rgba(214, 36, 159, 0.35);
+}
+
+.instagram-float:hover {
+    box-shadow: 0 15px 30px rgba(214, 36, 159, 0.5);
 }
 
 /* --- Mobile Booking Dock --- */
@@ -2500,6 +2628,43 @@ body.dark-theme .moon-icon {
     color: var(--text-secondary);
     margin-bottom: 40px;
     line-height: 1.8;
+}
+
+/* Checkout payment note (card-to-card / pay-on-delivery) */
+.payment-note {
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 30px;
+    color: var(--text-secondary);
+    line-height: 1.9;
+    font-size: 1rem;
+}
+
+.payment-note a {
+    color: var(--accent-gold);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.card-number {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark, var(--accent-gold)));
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 12px auto;
+    font-size: 1.15rem;
+}
+
+.sheba {
+    display: block;
+    font-size: 0.9rem;
+    direction: ltr;
+    margin-top: 4px;
 }
 
 @media (max-width: 992px) {

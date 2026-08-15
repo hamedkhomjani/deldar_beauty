@@ -7,11 +7,6 @@
     <title>تکمیل سفارش | سالن زیبایی دلدار</title>
     <meta name="description" content="تکمیل سفارش و پرداخت نهایی محصولات زیبایی و مراقبتی سالن دلدار.">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Vazirmatn:wght@100;400;700&display=swap"
-        rel="stylesheet">
 </head>
 
 <body class="checkout-page-body">
@@ -21,7 +16,7 @@
     <header id="main-header">
         <nav class="container">
             <div class="logo">
-                <a href="index.html"><img src="assets/images/logo.png" alt="سالن زیبایی دلدار"></a>
+                <a href="index.html"><img src="assets/images/logo.webp" alt="سالن زیبایی دلدار"></a>
             </div>
             <div class="nav-links desktop-only">
                 <a href="index.html">خانه</a>
@@ -85,8 +80,9 @@
                         <div class="form-group">
                             <label for="payment-method">روش پرداخت</label>
                             <select id="payment-method">
-                                <option value="gateway">درگاه آنلاین بانکی</option>
                                 <option value="card">کارت به کارت</option>
+                                <option value="cod">پرداخت در محل</option>
+                                <option value="gateway">درگاه آنلاین بانکی</option>
                             </select>
                         </div>
                     </div>
@@ -129,7 +125,8 @@
                 </svg>
             </div>
             <h2>سفارش شما با موفقیت ثبت شد!</h2>
-            <p>سپاس از انتخاب شما. کد پیگیری به زودی برای شما پیامک خواهد شد.</p>
+            <p id="success-order-code"></p>
+            <div id="payment-note" class="payment-note hidden"></div>
             <button class="btn-premium" onclick="window.location.href='index.html'">بازگشت به خانه</button>
         </div>
     </div>
@@ -150,6 +147,12 @@
                 return;
             }
 
+            // EDIT: salon bank details for card-to-card payments
+            const BANK_CARD = '۶۰۳۷-۷۵۷۲-۱۲۳۴-۵۶۷۸';
+            const BANK_SHEBA = 'IR۱۲-۰۱۵۰-۰۰۰۰-۰۰۰۰-۰۰۰۰-۰۰۰۰-۰۱';
+
+            let grandTotal = 0;
+
             function renderCheckoutSummary() {
                 let total = 0;
                 checkoutItemsList.innerHTML = '';
@@ -168,13 +171,35 @@
                     checkoutItemsList.appendChild(itemEl);
                 });
 
+                grandTotal = total;
                 subtotalEl.textContent = `${total.toLocaleString('fa-IR')} تومان`;
                 finalTotalEl.textContent = `${total.toLocaleString('fa-IR')} تومان`;
             }
 
             checkoutForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                // Simulate order processing
+
+                const method = document.getElementById('payment-method').value;
+                const orderCode = 'DL-' + Math.floor(100000 + Math.random() * 900000);
+                const orderCodeEl = document.getElementById('success-order-code');
+                const paymentNote = document.getElementById('payment-note');
+
+                orderCodeEl.textContent = `کد پیگیری سفارش شما: ${orderCode}`;
+
+                if (method === 'card') {
+                    paymentNote.innerHTML = `لطفاً مبلغ <strong>${grandTotal.toLocaleString('fa-IR')} تومان</strong> را کارت به کارت کنید:<br>
+                        <div class="card-number">${BANK_CARD}</div>
+                        <span class="sheba">شبا: ${BANK_SHEBA}</span><br><br>
+                        سپس تصویر فیش واریز را در
+                        <a href="https://t.me/deldar_beauty" target="_blank" rel="noopener">تلگرام</a> یا
+                        <a href="https://wa.me/989123456789" target="_blank" rel="noopener">واتس‌اپ</a> برای ما بفرستید تا سفارش شما ثبت و ارسال شود.`;
+                } else if (method === 'cod') {
+                    paymentNote.innerHTML = 'هزینه سفارش را هنگام دریافت محصول (پرداخت در محل) بپردازید.';
+                } else {
+                    paymentNote.innerHTML = 'پرداخت آنلاین از طریق درگاه بانکی به زودی فعال می‌شود.';
+                }
+
+                paymentNote.classList.remove('hidden');
                 localStorage.removeItem('deldar_cart');
                 successOverlay.classList.add('active');
             });
