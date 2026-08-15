@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hamedkhomjani.github.io/deldar_beauty/sitemap.xml
