@@ -1,0 +1,11 @@
+---
+/** Mobile slide-in menu. */
+import { NAV_LINKS, pageUrl } from '../config';
+---
+
+<div id="mobile-menu" class="mobile-menu">
+  <div class="close-btn" id="menu-close" aria-label="بستن منو">&times;</div>
+  {
+    NAV_LINKS.map((link) => <a href={pageUrl(link.href)}>{link.label}</a>)
+  }
+</div>

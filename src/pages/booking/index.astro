@@ -1,0 +1,131 @@
+---
+/**
+ * Booking page — standalone Jalali calendar + time slots + details form.
+ * Reuses the modal's markup and the logic in scripts/booking.ts.
+ */
+import Layout from '../../components/Layout.astro';
+import { BOOKING_SERVICE_NAMES } from '../../data/services';
+import { breadcrumbSchema } from '../../data/schema';
+import { asset, pageUrl } from '../../config';
+
+const jsonLd = [
+  breadcrumbSchema([
+    { name: 'خانه', item: '/' },
+    { name: 'رزرو نوبت', item: '/booking/' },
+  ]),
+];
+---
+
+<Layout
+  title="رزرو نوبت آنلاین | سالن زیبایی دلدار"
+  description="روز و ساعت مورد نظر خود را از تقویم انتخاب کنید و درخواست رزرو خود را برای سالن زیبایی دلدار ثبت کنید."
+  bodyClass="booking-page"
+  jsonLd={jsonLd}
+  noBookingModal
+>
+  <main class="booking-page-main">
+    <div class="booking-page-header container" data-reveal>
+      <img src={asset('assets/images/logo.webp')} alt="لوگوی سالن زیبایی دلدار" class="booking-page-logo" />
+      <h1>رزرو نوبت آنلاین</h1>
+      <p>از روی تقویم روز مورد نظرت رو انتخاب کن، ساعت مناسب رو مشخص کن و مشخصاتت رو وارد کن.</p>
+    </div>
+
+    <div id="booking-page" class="container">
+      <div class="booking-grid">
+        <div class="calendar-container">
+          <h3>انتخاب روز</h3>
+          <div class="calendar-card">
+            <div class="calendar-header">
+              <span class="prev-month" aria-label="ماه قبل">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </span>
+              <span class="current-month">خرداد ۱۴۰۱</span>
+              <span class="next-month" aria-label="ماه بعد">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
+            </div>
+            <div class="calendar-body">
+              <div class="days-header">
+                <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+              </div>
+              <div class="days-grid" id="calendar-days"></div>
+              <div class="quick-days">
+                <button type="button" class="quick-day" data-offset="0">امروز</button>
+                <button type="button" class="quick-day" data-offset="1">فردا</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="time-container">
+          <h3>انتخاب ساعت</h3>
+          <div class="time-slots" id="time-slots">
+            <button class="time-slot">09:00 صبح</button>
+            <button class="time-slot active">10:00 صبح</button>
+            <button class="time-slot">11:00 صبح</button>
+            <button class="time-slot">12:00 ظهر</button>
+            <button class="time-slot">01:00 بعد از ظهر</button>
+            <button class="time-slot">02:00 بعد از ظهر</button>
+            <button class="time-slot">03:00 بعد از ظهر</button>
+            <button class="time-slot">04:00 بعد از ظهر</button>
+            <button class="time-slot">05:00 بعد از ظهر</button>
+          </div>
+          <div class="time-legend">
+            <span><i class="dot reserved"></i> رزرو شده</span>
+            <span><i class="dot available"></i> در دسترس</span>
+          </div>
+          <p id="booking-summary" class="booking-summary">روز و ساعت مورد نظرت رو انتخاب کن</p>
+        </div>
+      </div>
+
+      <div class="details-section">
+        <h3>مشخصاتت رو وارد کن!</h3>
+        <form id="booking-form" class="booking-form">
+          <div class="form-group">
+            <select id="booking-service" required>
+              <option value="" disabled selected>خدمت مورد نظر را انتخاب کنید *</option>
+              {BOOKING_SERVICE_NAMES.map((name) => <option>{name}</option>)}
+              <option>مشاوره رایگان</option>
+            </select>
+            <span class="required-star">*</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="text" id="booking-name" placeholder="نام و نام خانوادگی" required />
+              <span class="required-star">*</span>
+            </div>
+            <div class="form-group">
+              <input type="tel" id="booking-phone" placeholder="شماره تماس" required />
+              <span class="required-star">*</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="email" id="booking-email" placeholder="ایمیل" />
+          </div>
+          <p id="booking-form-msg" class="form-msg"></p>
+          <button type="submit" class="btn-confirm">تایید و ارسال درخواست</button>
+        </form>
+      </div>
+
+      <div id="booking-success" class="booking-success hidden">
+        <div class="success-content">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h2>وقتت با موفقیت ثبت شد!</h2>
+          <p>
+            درخواست رزرو شما از طریق پیام‌رسان تلگرام برای ما ارسال شد. همکاران ما در سریع‌ترین زمان ممکن برای تایید
+            نهایی با شما تماس می‌گیرند.
+          </p>
+          <a class="btn-back" href={pageUrl('/')}>بازگشت به خانه</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

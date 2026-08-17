@@ -1,0 +1,96 @@
+---
+/**
+ * Checkout page — order form + summary; uses the minimal chrome variant.
+ */
+import Layout from '../../components/Layout.astro';
+import { pageUrl } from '../../config';
+---
+
+<Layout
+  title="تکمیل سفارش | سالن زیبایی دلدار"
+  description="تکمیل سفارش و پرداخت نهایی محصولات زیبایی و مراقبتی سالن دلدار."
+  bodyClass="checkout-page-body"
+  robots="noindex, nofollow"
+  checkout
+>
+  <main class="container checkout-container">
+    <div class="checkout-grid">
+      <!-- Form -->
+      <div class="checkout-form-section" data-reveal>
+        <h1 class="text-gradient">اطلاعات ارسال و پرداخت</h1>
+        <form id="checkout-form" class="premium-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="full-name">نام و نام خانوادگی</label>
+              <input type="text" id="full-name" required placeholder="مثال: سارا احمدی" />
+            </div>
+            <div class="form-group">
+              <label for="phone">شماره تماس</label>
+              <input type="tel" id="phone" required placeholder="۰۹۱۲۰۰۰۰۰۰۰" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">ایمیل (اختیاری)</label>
+            <input type="email" id="email" placeholder="example@mail.com" />
+          </div>
+          <div class="form-group">
+            <label for="address">آدرس دقیق پستی</label>
+            <textarea id="address" required placeholder="استان، شهر، خیابان..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="postal-code">کد پستی</label>
+              <input type="text" id="postal-code" placeholder="۱۲۳۴۵۶۷۸۹۰" />
+            </div>
+            <div class="form-group">
+              <label for="payment-method">روش پرداخت</label>
+              <select id="payment-method">
+                <option value="card">کارت به کارت</option>
+                <option value="cod">پرداخت در محل</option>
+                <option value="gateway">درگاه آنلاین بانکی</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-checkout-final">ثبت و پرداخت نهایی</button>
+        </form>
+      </div>
+
+      <!-- Summary -->
+      <div class="order-summary-section" data-reveal>
+        <div class="summary-card">
+          <h3>خلاصه سفارش</h3>
+          <div id="checkout-items-list" class="checkout-items"></div>
+          <div class="summary-details">
+            <div class="summary-line">
+              <span>قیمت محصولات:</span>
+              <span id="subtotal">۰ تومان</span>
+            </div>
+            <div class="summary-line">
+              <span>هزینه ارسال:</span>
+              <span class="free">رایگان</span>
+            </div>
+            <div class="divider"></div>
+            <div class="summary-line total">
+              <span>جمع کل نهایی:</span>
+              <span id="final-total">۰ تومان</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="success-overlay" class="success-overlay">
+    <div class="success-content">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2>سفارش شما با موفقیت ثبت شد!</h2>
+      <p id="success-order-code"></p>
+      <div id="payment-note" class="payment-note hidden"></div>
+      <a class="btn-premium" href={pageUrl('/')}>بازگشت به خانه</a>
+    </div>
+  </div>
+</Layout>

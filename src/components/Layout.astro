@@ -1,0 +1,96 @@
+---
+/**
+ * Page shell — head, chrome (header/footer/cart), global styles and scripts.
+ * All pages share this; only <slot> content differs.
+ *
+ * Checkout page uses `checkout={true}`: booking modal, cart drawer, mobile
+ * dock and menu are omitted, and scripts are limited to cursor/ui/checkout.
+ */
+import Head from './Head.astro';
+import Header from './Header.astro';
+import MobileMenu from './MobileMenu.astro';
+import Footer from './Footer.astro';
+import CartDrawer from './CartDrawer.astro';
+import BookingModal from './BookingModal.astro';
+import Cursor from './Cursor.astro';
+import GrainOverlay from './GrainOverlay.astro';
+import FloatingButton from './FloatingButton.astro';
+import MobileDock from './MobileDock.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Extra classes on <body> (e.g. "home-page") */
+  bodyClass?: string;
+  /** JSON-LD blocks for this page */
+  jsonLd?: Record<string, unknown>[];
+  canonical?: string;
+  ogImage?: string;
+  preloadHero?: boolean;
+  robots?: 'index, follow' | 'noindex, nofollow';
+  /** Minimal chrome + checkout scripts (checkout page only) */
+  checkout?: boolean;
+  /** Hide the booking modal (the standalone booking page provides its own) */
+  noBookingModal?: boolean;
+}
+
+const {
+  title,
+  description,
+  bodyClass = '',
+  jsonLd = [],
+  canonical,
+  ogImage,
+  preloadHero = false,
+  robots,
+  checkout = false,
+  noBookingModal = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <Head
+      title={title}
+      description={description}
+      canonical={canonical}
+      ogImage={ogImage}
+      jsonLd={jsonLd}
+      preloadHero={preloadHero}
+      robots={robots}
+    />
+  </head>
+
+  <body class:list={[bodyClass]}>
+    <Cursor />
+    {!checkout && <GrainOverlay />}
+    {!checkout && <FloatingButton />}
+    {!checkout && <MobileDock />}
+
+    <Header minimal={checkout} />
+    {!checkout && <MobileMenu />}
+
+    <slot />
+
+    {!checkout && <Footer />}
+    {!checkout && <CartDrawer />}
+    {!checkout && !noBookingModal && <BookingModal />}
+
+    {checkout ? (
+      <>
+        <script src="../scripts/cursor.ts" />
+        <script src="../scripts/ui.ts" />
+        <script src="../scripts/checkout.ts" />
+      </>
+    ) : (
+      <>
+        <script src="../scripts/cursor.ts" />
+        <script src="../scripts/ui.ts" />
+        <script src="../scripts/booking.ts" />
+        <script src="../scripts/cart.ts" />
+      </>
+    )}
+  </body>
+</html>

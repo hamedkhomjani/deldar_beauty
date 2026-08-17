@@ -1,0 +1,76 @@
+---
+/**
+ * SEO head — every page passes its meta + JSON-LD through this component.
+ */
+import { SITE, asset } from '../config';
+import { abs } from '../data/schema';
+import vazirFontUrl from '../assets/fonts/vazirmatn-arabic-400-normal.woff2';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Defaults to the page's own URL */
+  canonical?: string;
+  /** Defaults to the branded share image */
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  /** Structured-data objects rendered as JSON-LD blocks */
+  jsonLd?: Record<string, unknown>[];
+  /** Preloads the hero image for faster LCP (homepage only) */
+  preloadHero?: boolean;
+  robots?: 'index, follow' | 'noindex, nofollow';
+}
+
+const {
+  title,
+  description,
+  canonical = Astro.url.pathname.replace(import.meta.env.BASE_URL, '/'),
+  ogImage = asset('assets/images/og-image.png'),
+  ogType = 'website',
+  jsonLd = [],
+  preloadHero = false,
+  robots = 'index, follow',
+} = Astro.props;
+
+const canonicalUrl = abs(canonical);
+const ogImageUrl = abs(ogImage);
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={robots} />
+<link rel="canonical" href={canonicalUrl} />
+
+<link rel="icon" type="image/png" sizes="32x32" href={asset('assets/images/favicon.png')} />
+<link rel="apple-touch-icon" sizes="180x180" href={asset('assets/images/apple-touch-icon.png')} />
+
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:site_name" content={SITE.name} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalUrl} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+
+{
+  jsonLd.map((schema) => (
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />
+  ))
+}
+
+<meta name="theme-color" content={SITE.themeColor} />
+
+{
+  preloadHero && <link rel="preload" as="image" href={asset('assets/images/hero.webp')} fetchpriority="high" />
+}
+<link rel="preload" as="font" type="font/woff2" crossorigin href={vazirFontUrl} />

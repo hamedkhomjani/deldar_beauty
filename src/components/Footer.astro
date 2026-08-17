@@ -1,0 +1,55 @@
+---
+/**
+ * Shared footer with brand, quick links and social icons.
+ */
+import { NAV_LINKS, SOCIAL_LINKS, asset, pageUrl } from '../config';
+
+const SOCIAL_ICONS: Record<string, string> = {
+  instagram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`,
+  telegram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>`,
+  whatsapp: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`,
+};
+---
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-col footer-brand">
+      <img src={asset('assets/images/logo.webp')} alt="لوگوی سالن زیبایی دلدار" class="footer-logo" />
+      <p>
+        سالن زیبایی دلدار، جایی که هنر و زیبایی به هم می‌پیوندند. ما تجربه‌ای لوکس و منحصر به فرد را برای شما
+        خلق می‌کنیم.
+      </p>
+    </div>
+
+    <div class="footer-col footer-links">
+      <h4>دسترسی سریع</h4>
+      {
+        NAV_LINKS.map((link) => <a href={pageUrl(link.href)}>{link.label}</a>)
+      }
+    </div>
+
+    <div class="footer-col footer-social">
+      <h4>ما را دنبال کنید</h4>
+      <div class="social-links-v2">
+        {
+          SOCIAL_LINKS.map((social) => (
+            <a
+              href={social.href}
+              class="social-box"
+              aria-label={social.label}
+              target="_blank"
+              rel="noopener"
+              set:html={SOCIAL_ICONS[social.icon] ?? ''}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container">
+      <p>&copy; ۲۰۲۴ تمامی حقوق برای سالن زیبایی دلدار محفوظ است.</p>
+    </div>
+  </div>
+</footer>
