@@ -33,6 +33,8 @@ interface Props {
   checkout?: boolean;
   /** Hide the booking modal (the standalone booking page provides its own) */
   noBookingModal?: boolean;
+  /** Hide the mobile booking dock (the standalone booking page has its own confirm button) */
+  hideBookingDock?: boolean;
 }
 
 const {
@@ -46,6 +48,7 @@ const {
   robots,
   checkout = false,
   noBookingModal = false,
+  hideBookingDock = false,
 } = Astro.props;
 ---
 
@@ -67,7 +70,7 @@ const {
     <Cursor />
     {!checkout && <GrainOverlay />}
     {!checkout && <FloatingButton />}
-    {!checkout && <MobileDock />}
+    {!checkout && !hideBookingDock && <MobileDock />}
 
     <Header minimal={checkout} />
     {!checkout && <MobileMenu />}

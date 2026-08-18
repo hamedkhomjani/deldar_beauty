@@ -50,7 +50,7 @@ export const SOCIAL_LINKS = [
 
 /**
  * Build a site-relative URL that works under the GitHub Pages subpath.
- * Usage: asset('assets/images/logo.webp') → "/deldar_beauty/assets/images/logo.webp"
+ * Usage: asset('assets/images/logo.svg') → "/deldar_beauty/assets/images/logo.svg"
  */
 export function asset(path: string): string {
   const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');

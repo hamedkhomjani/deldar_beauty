@@ -94,14 +94,4 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
   document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
-
-  // Mobile booking dock visibility
-  const mobileDock = $('.mobile-booking-dock');
-  if (mobileDock) {
-    window.addEventListener('scroll', () => {
-      const visible = window.scrollY > 200;
-      mobileDock.classList.toggle('visible', visible);
-      document.body.classList.toggle('dock-active', visible);
-    });
-  }
 });
