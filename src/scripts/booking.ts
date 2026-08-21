@@ -194,6 +194,7 @@ function selectDate(date: Date, dayNumber: number): void {
   document.querySelectorAll('.days-grid span').forEach((s) => {
     if (s.textContent === String(dayNumber)) s.classList.add('active');
   });
+  refreshTimeSlots();
   clearFormMessage();
   updateSummary();
 }
@@ -220,6 +221,67 @@ function updateSummary(): void {
   if (selectedDate) parts.push(`${S.summaryDateLabel} ${formatSelectedDate(selectedDate)}`);
   if (selectedTime) parts.push(`${S.summaryTimeLabel} ${selectedTime}`);
   el.textContent = parts.length ? parts.join('  •  ') : S.summaryPlaceholder;
+}
+
+// --- Past-slot disabling (salon local time = Asia/Tehran) ---
+
+/** Minutes since midnight right now in Tehran, regardless of visitor timezone */
+function tehranMinutesNow(): number {
+  const formatted = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Tehran',
+    hourCycle: 'h23',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date());
+  const [h, m] = formatted.split(':').map(Number);
+  return h * 60 + m;
+}
+
+/** Slot label ("09:00 صبح" / "01:00 PM") → start-of-slot minutes since midnight */
+function slotStartMinutes(label: string): number | null {
+  const normalized = label
+    .replace(/[۰-۹]/g, (c) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)))
+    .toLowerCase();
+  const match = /(\d{1,2}):(\d{2})/.exec(normalized);
+  if (!match) return null;
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const isPm = normalized.includes('pm') || normalized.includes('بعد از ظهر');
+  const isAm = normalized.includes('am') || normalized.includes('صبح');
+  if (isPm && hours < 12) hours += 12;
+  if (isAm && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+/** On today's date, disable slots that have already started */
+function refreshTimeSlots(): void {
+  const slots = document.querySelectorAll<HTMLButtonElement>('.time-slot');
+  if (!slots.length || !selectedDate) return;
+
+  const isToday =
+    selectedDate.getFullYear() === now.getFullYear() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getDate() === now.getDate();
+
+  if (!isToday) {
+    slots.forEach((s) => {
+      s.disabled = false;
+    });
+    return;
+  }
+
+  const minutesNow = tehranMinutesNow();
+  slots.forEach((s) => {
+    const start = slotStartMinutes(s.textContent ?? '');
+    s.disabled = start !== null && start <= minutesNow;
+  });
+
+  // Drop the selection if it landed on an already-passed slot
+  const active = document.querySelector<HTMLButtonElement>('.time-slot.active');
+  if (active?.disabled) {
+    active.classList.remove('active');
+    selectedTime = null;
+  }
 }
 
 function showFormMessage(msg: string): void {
