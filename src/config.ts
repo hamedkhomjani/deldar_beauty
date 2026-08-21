@@ -16,19 +16,26 @@ export const SITE = {
 
 export const SALON = {
   /** WhatsApp number in international format (no +) */
-  whatsapp: '989123456789',
+  whatsapp: '46762573273',
+  /**
+   * Automatic booking delivery (both fire when set; wa.me fallback when not).
+   * - callmebotKey: activate at callmebot.com ("I allow callmebot...") → key sent to you
+   * - web3FormsKey: create at web3forms.com with your email → access key
+   */
+  callmebotKey: '',
+  web3FormsKey: '',
   telegram: 'deldar_beauty',
   instagram: 'deldarhaircutt',
   phoneDisplay: {
-    fa: '۰۲۱-۱۲۳۴۵۶۷۸ | ۰۹۱۲-۳۴۵۶۷۸۹',
-    en: '021-12345678 | 0912-3456789',
+    fa: '۰۲۱-۱۲۳۴۵۶۷۸ | ۰۹۱۲-۴۹۸۷۸۱۰',
+    en: '021-12345678 | 0912-4987810',
   } satisfies Localized,
   address: {
     fa: 'تهران، خیابان ظفر، پلاک ۱۲۳، واحد ۵',
     en: 'Tehran, Zafar St., No. 123, Unit 5',
   } satisfies Localized,
   /** Keep the phone field of schema.org in sync with whatsapp */
-  schemaPhone: '+989123456789',
+  schemaPhone: '+989124987810',
   /** Hours shown on the site */
   hoursDisplay: {
     fa: 'شنبه تا پنجشنبه: ۱۰:۰۰ الی ۱۹:۰۰',

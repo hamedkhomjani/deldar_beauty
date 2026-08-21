@@ -97,10 +97,15 @@ let selectedDate: Date | null = null;
 let selectedTime: string | null = null;
 
 /** Format the selected date for the summary line */
-function formatSelectedDate(d: Date): string {
+/** Pure-Jalali date string (used in the Persian message sent to the salon) */
+function jalaliDateString(d: Date): string {
   const [jy, jm, jd] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  return `${jd} ${J_MONTH_NAMES_FA[jm - 1]} ${jy}`;
+}
+
+function formatSelectedDate(d: Date): string {
   if (LANG === 'fa') {
-    return `${jd} ${J_MONTH_NAMES_FA[jm - 1]} ${jy}`;
+    return jalaliDateString(d);
   }
   const gregorian = d.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -451,19 +456,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = $('#booking-email') as HTMLInputElement | null;
     const service = $('#booking-service') as HTMLSelectElement | null;
 
+    // Automatic delivery: CallMeBot → WhatsApp text, Web3Forms → email.
+    // Both fire in the background when their key is configured; if neither
+    // is set up yet, fall back to opening a prefilled WhatsApp chat that
+    // the client sends manually so requests are never lost.
+    const F = BOOKING_STRINGS.fa;
+    const slotMinutes = selectedTime ? slotStartMinutes(selectedTime) : null;
+    const time24 =
+      slotMinutes !== null
+        ? `${String(Math.floor(slotMinutes / 60)).padStart(2, '0')}:${String(slotMinutes % 60).padStart(2, '0')}`
+        : (selectedTime ?? '');
+
     const msg = [
-      S.tgTitle,
-      `${S.tgName} ${name?.value.trim() ?? ''}`,
-      `${S.tgPhone} ${phone?.value.trim() ?? ''}`,
-      email?.value.trim() ? `${S.tgEmail} ${email.value.trim()}` : '',
-      `${S.tgService} ${service?.value ?? ''}`,
-      `${S.tgDate} ${formatSelectedDate(selectedDate)}`,
-      `${S.tgTime} ${selectedTime}`,
+      F.tgTitle,
+      `${F.tgName} ${name?.value.trim() ?? ''}`,
+      `${F.tgPhone} ${phone?.value.trim() ?? ''}`,
+      email?.value.trim() ? `${F.tgEmail} ${email.value.trim()}` : '',
+      `${F.tgService} ${service?.value ?? ''}`,
+      `${F.tgDate} ${jalaliDateString(selectedDate)}`,
+      `${F.tgTime} ${time24}`,
     ]
       .filter(Boolean)
       .join('\n');
 
-    window.open(`https://t.me/${SALON.telegram}?text=${encodeURIComponent(msg)}`, '_blank');
+    let delivered = false;
+
+    if (SALON.callmebotKey) {
+      const callmebotUrl = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(
+        `+${SALON.whatsapp}`,
+      )}&text=${encodeURIComponent(msg)}&apikey=${SALON.callmebotKey}`;
+      fetch(callmebotUrl, { mode: 'no-cors' }).catch(() => {});
+      delivered = true;
+    }
+
+    if (SALON.web3FormsKey) {
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: SALON.web3FormsKey,
+          subject: F.tgTitle,
+          message: msg,
+        }),
+      }).catch(() => {});
+      delivered = true;
+    }
+
+    if (!delivered) {
+      window.open(`https://wa.me/${SALON.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
 
     $('#booking-step-1')?.classList.add('hidden');
     $('#booking-step-2')?.classList.remove('hidden');
