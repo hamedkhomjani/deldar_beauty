@@ -18,7 +18,7 @@ export const SALON = {
   /** WhatsApp number in international format (no +) */
   whatsapp: '989123456789',
   telegram: 'deldar_beauty',
-  instagram: 'deldar_beauty',
+  instagram: 'deldarhaircutt',
   phoneDisplay: {
     fa: '۰۲۱-۱۲۳۴۵۶۷۸ | ۰۹۱۲-۳۴۵۶۷۸۹',
     en: '021-12345678 | 0912-3456789',

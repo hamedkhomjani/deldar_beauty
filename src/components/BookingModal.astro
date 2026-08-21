@@ -4,7 +4,7 @@
  * Logic lives in scripts/booking.ts; service list comes from data/services.ts.
  */
 import { bookingServiceNames } from '../data/services';
-import { asset } from '../config';
+import { asset, SALON } from '../config';
 import { t, type Lang } from '../i18n';
 
 interface Props {
@@ -129,7 +129,7 @@ const shareText = encodeURIComponent(dict.shareText);
             >
               <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" width="30" />
             </a>
-            <a href="https://instagram.com/deldar_beauty" target="_blank" rel="noopener">
+            <a href={`https://instagram.com/${SALON.instagram}`} target="_blank" rel="noopener">
               <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" width="30" />
             </a>
             <a
