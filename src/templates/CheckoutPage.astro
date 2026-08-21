@@ -1,0 +1,105 @@
+---
+/**
+ * Checkout page template — order form + summary; uses the minimal chrome variant.
+ */
+import Layout from '../components/Layout.astro';
+import { t, localizedPath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const dict = t(lang);
+const zero = lang === 'en' ? '0 Toman' : '۰ تومان';
+---
+
+<Layout
+  title={dict.checkoutTitle}
+  description={dict.checkoutDescription}
+  lang={lang}
+  bodyClass="checkout-page-body"
+  robots="noindex, nofollow"
+  checkout
+>
+  <main class="container checkout-container">
+    <div class="checkout-grid">
+      <!-- Form -->
+      <div class="checkout-form-section" data-reveal>
+        <h1 class="text-gradient">{dict.checkoutH1}</h1>
+        <form id="checkout-form" class="premium-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="full-name">{dict.labelFullName}</label>
+              <input type="text" id="full-name" required placeholder={dict.phFullName} />
+            </div>
+            <div class="form-group">
+              <label for="phone">{dict.labelPhone}</label>
+              <input type="tel" id="phone" required placeholder={dict.phPhone} />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">{dict.labelEmail}</label>
+            <input type="email" id="email" placeholder="example@mail.com" />
+          </div>
+          <div class="form-group">
+            <label for="address">{dict.labelAddress}</label>
+            <textarea id="address" required placeholder={dict.phAddress}></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="postal-code">{dict.labelPostalCode}</label>
+              <input type="text" id="postal-code" placeholder={dict.phPostalCode} />
+            </div>
+            <div class="form-group">
+              <label for="payment-method">{dict.labelPaymentMethod}</label>
+              <select id="payment-method">
+                <option value="card">{dict.payCard}</option>
+                <option value="cod">{dict.payCod}</option>
+                <option value="gateway">{dict.payGateway}</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-checkout-final">{dict.checkoutSubmitBtn}</button>
+        </form>
+      </div>
+
+      <!-- Summary -->
+      <div class="order-summary-section" data-reveal>
+        <div class="summary-card">
+          <h3>{dict.summaryTitle}</h3>
+          <div id="checkout-items-list" class="checkout-items"></div>
+          <div class="summary-details">
+            <div class="summary-line">
+              <span>{dict.summarySubtotal}</span>
+              <span id="subtotal">{zero}</span>
+            </div>
+            <div class="summary-line">
+              <span>{dict.summaryShipping}</span>
+              <span class="free">{dict.free}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="summary-line total">
+              <span>{dict.summaryTotal}</span>
+              <span id="final-total">{zero}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="success-overlay" class="success-overlay">
+    <div class="success-content">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2>{dict.checkoutSuccessHeading}</h2>
+      <p id="success-order-code"></p>
+      <div id="payment-note" class="payment-note hidden"></div>
+      <a class="btn-premium" href={localizedPath('/', lang)}>{dict.bookingBackHome}</a>
+    </div>
+  </div>
+</Layout>

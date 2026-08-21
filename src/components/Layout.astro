@@ -3,6 +3,9 @@
  * Page shell — head, chrome (header/footer/cart), global styles and scripts.
  * All pages share this; only <slot> content differs.
  *
+ * `lang` switches the document language/direction ('fa' → rtl at the root,
+ * 'en' → ltr under /en/) and is forwarded to every chrome component.
+ *
  * Checkout page uses `checkout={true}`: booking modal, cart drawer, mobile
  * dock and menu are omitted, and scripts are limited to cursor/ui/checkout.
  */
@@ -16,11 +19,14 @@ import Cursor from './Cursor.astro';
 import GrainOverlay from './GrainOverlay.astro';
 import FloatingButton from './FloatingButton.astro';
 import MobileDock from './MobileDock.astro';
+import type { Lang } from '../i18n';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
+  /** Page locale — drives <html lang/dir> and all chrome text */
+  lang?: Lang;
   /** Extra classes on <body> (e.g. "home-page") */
   bodyClass?: string;
   /** JSON-LD blocks for this page */
@@ -40,6 +46,7 @@ interface Props {
 const {
   title,
   description,
+  lang = 'fa',
   bodyClass = '',
   jsonLd = [],
   canonical,
@@ -50,14 +57,17 @@ const {
   noBookingModal = false,
   hideBookingDock = false,
 } = Astro.props;
+
+const dir = lang === 'en' ? 'ltr' : 'rtl';
 ---
 
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang={lang} dir={dir}>
   <head>
     <Head
       title={title}
       description={description}
+      lang={lang}
       canonical={canonical}
       ogImage={ogImage}
       jsonLd={jsonLd}
@@ -70,16 +80,16 @@ const {
     <Cursor />
     {!checkout && <GrainOverlay />}
     {!checkout && <FloatingButton />}
-    {!checkout && !hideBookingDock && <MobileDock />}
+    {!checkout && !hideBookingDock && <MobileDock lang={lang} />}
 
-    <Header minimal={checkout} />
-    {!checkout && <MobileMenu />}
+    <Header minimal={checkout} lang={lang} />
+    {!checkout && <MobileMenu lang={lang} />}
 
     <slot />
 
-    {!checkout && <Footer />}
-    {!checkout && <CartDrawer />}
-    {!checkout && !noBookingModal && <BookingModal />}
+    {!checkout && <Footer lang={lang} />}
+    {!checkout && <CartDrawer lang={lang} />}
+    {!checkout && !noBookingModal && <BookingModal lang={lang} />}
 
     {checkout ? (
       <>

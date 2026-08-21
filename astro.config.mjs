@@ -9,4 +9,13 @@ export default defineConfig({
   build: {
     format: 'directory',
   },
+  // Persian (default) at the root, English under /en/
+  i18n: {
+    defaultLocale: 'fa',
+    locales: ['fa', 'en'],
+    routing: {
+      prefixDefaultLocale: false,
+      redirectToDefaultLocale: false,
+    },
+  },
 });

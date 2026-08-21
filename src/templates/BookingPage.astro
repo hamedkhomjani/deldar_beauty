@@ -1,35 +1,50 @@
 ---
 /**
- * Booking modal with calendar + time slots + details form.
- * Logic lives in scripts/booking.ts; service list comes from data/services.ts.
+ * Booking page template — standalone calendar + time slots + details form.
+ * Reuses the modal's markup and the logic in scripts/booking.ts.
  */
+import Layout from '../components/Layout.astro';
 import { bookingServiceNames } from '../data/services';
+import { breadcrumbSchema } from '../data/schema';
 import { asset } from '../config';
-import { t, type Lang } from '../i18n';
+import { t, localizedPath, type Lang } from '../i18n';
 
 interface Props {
-  lang?: Lang;
+  lang: Lang;
 }
 
-const { lang = 'fa' } = Astro.props;
+const { lang } = Astro.props;
 const dict = t(lang);
 const services = bookingServiceNames(lang);
 
-const siteUrl = 'https%3A%2F%2Fhamedkhomjani.github.io%2Fdeldar_beauty%2F';
-const shareText = encodeURIComponent(dict.shareText);
+const jsonLd = [
+  breadcrumbSchema([
+    { name: lang === 'en' ? 'Home' : 'خانه', item: lang === 'en' ? '/en/' : '/' },
+    {
+      name: lang === 'en' ? 'Book Online' : 'رزرو نوبت',
+      item: lang === 'en' ? '/en/booking/' : '/booking/',
+    },
+  ]),
+];
 ---
 
-<div id="booking-modal" class="modal" role="dialog" aria-modal="true" aria-label={dict.bookingDialogAria}>
-  <div class="modal-content container">
-    <span class="close-modal" id="close-booking" aria-label={dict.bookingCloseAria}>&times;</span>
+<Layout
+  title={dict.bookingPageTitle}
+  description={dict.bookingPageDescription}
+  lang={lang}
+  bodyClass="booking-page"
+  jsonLd={jsonLd}
+  noBookingModal
+  hideBookingDock
+>
+  <main class="booking-page-main">
+    <div class="booking-page-header container" data-reveal>
+      <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} class="booking-page-logo" />
+      <h1>{dict.bookingPageH1}</h1>
+      <p>{dict.bookingPageSub}</p>
+    </div>
 
-    <!-- Step 1: Calendar & Details -->
-    <div id="booking-step-1" class="booking-step">
-      <div class="modal-header">
-        <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} class="modal-logo" />
-        <h2>{dict.bookingModalHeading}</h2>
-      </div>
-
+    <div id="booking-page" class="container">
       <div class="booking-grid">
         <div class="calendar-container">
           <h3>{dict.chooseDay}</h3>
@@ -103,45 +118,21 @@ const shareText = encodeURIComponent(dict.shareText);
           <button type="submit" class="btn-confirm">{dict.bookingSubmitBtn}</button>
         </form>
       </div>
-    </div>
 
-    <!-- Step 2: Confirmation -->
-    <div id="booking-step-2" class="booking-step hidden">
-      <div class="success-content">
-        <div class="success-icon">
-          <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </div>
-        <h2>{dict.bookingSuccessHeading}</h2>
-        <p>
-          {dict.bookingSuccessText}
-        </p>
-        <button class="btn-back" id="btn-return-home">{dict.bookingBackBtn}</button>
-
-        <div class="social-share">
-          <p>{dict.sharePrompt}</p>
-          <div class="share-icons">
-            <a
-              href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`}
-              target="_blank"
-              rel="noopener"
-            >
-              <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" width="30" />
-            </a>
-            <a href="https://instagram.com/deldar_beauty" target="_blank" rel="noopener">
-              <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" width="30" />
-            </a>
-            <a
-              href={`https://wa.me/?text=${shareText}%20-%20${siteUrl}`}
-              target="_blank"
-              rel="noopener"
-            >
-              <img src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png" alt="Share" width="30" />
-            </a>
+      <div id="booking-success" class="booking-success hidden">
+        <div class="success-content">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
           </div>
+          <h2>{dict.bookingSuccessHeading}</h2>
+          <p>
+            {dict.bookingSuccessText}
+          </p>
+          <a class="btn-back" href={localizedPath('/', lang)}>{dict.bookingBackHome}</a>
         </div>
       </div>
     </div>
-  </div>
-</div>
+  </main>
+</Layout>

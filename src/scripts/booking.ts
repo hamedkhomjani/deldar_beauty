@@ -1,9 +1,17 @@
 /**
- * Booking modal: Jalali calendar + time slots + details form.
+ * Booking modal: calendar + time slots + details form.
  * On submit, the request is delivered to the salon via Telegram.
+ *
+ * Calendar per locale (from <html lang>):
+ * - fa: pure Jalali (Persian) calendar, Saturday-first week.
+ * - en: Gregorian calendar, Sunday-first week, with the equivalent
+ *   Jalali month/date shown underneath (`.month-sub` / summary).
  */
 import { SALON } from '../config';
 import { showToast } from './toast';
+import { BOOKING_STRINGS, G_MONTH_NAMES_EN, J_MONTH_NAMES_EN, LANG } from './lang';
+
+const S = BOOKING_STRINGS[LANG];
 
 function $<T extends Element>(sel: string): T | null {
   return document.querySelector<T>(sel);
@@ -11,7 +19,7 @@ function $<T extends Element>(sel: string): T | null {
 
 // --- Jalali (Persian) calendar conversion ---
 const J_DAYS_IN_MONTH = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
-const J_MONTH_NAMES = [
+const J_MONTH_NAMES_FA = [
   'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
   'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
 ];
@@ -76,11 +84,33 @@ function isLeapYear(jy: number): boolean {
 }
 
 // --- Calendar state ---
+// viewDate holds Jalali year/month in fa mode, Gregorian year/month in en mode.
 const now = new Date();
-const [todayJY, todayJM, todayJD] = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
-let viewDate = { year: todayJY, month: todayJM };
-let selectedDate: string | null = null;
+let viewDate =
+  LANG === 'fa'
+    ? (() => {
+        const [jy, jm] = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+        return { year: jy, month: jm };
+      })()
+    : { year: now.getFullYear(), month: now.getMonth() + 1 };
+let selectedDate: Date | null = null;
 let selectedTime: string | null = null;
+
+/** Format the selected date for the summary line */
+function formatSelectedDate(d: Date): string {
+  const [jy, jm, jd] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  if (LANG === 'fa') {
+    return `${jd} ${J_MONTH_NAMES_FA[jm - 1]} ${jy}`;
+  }
+  const gregorian = d.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  // Jalali equivalent shown underneath/beside the Gregorian date
+  return `${gregorian} (${jd} ${J_MONTH_NAMES_EN[jm - 1]} ${jy})`;
+}
 
 function renderCalendar(): void {
   const calendarDays = $('#calendar-days');
@@ -88,16 +118,40 @@ function renderCalendar(): void {
   if (!calendarDays || !monthLabel) return;
 
   calendarDays.innerHTML = '';
-  monthLabel.textContent = `${J_MONTH_NAMES[viewDate.month - 1]} ${viewDate.year}`;
 
-  // First weekday of the month (0=Sunday) → shift to Saturday-based Persian week
-  const [gY, gM, gD] = jalaliToGregorian(viewDate.year, viewDate.month, 1);
-  const startDay = new Date(gY, gM - 1, gD).getDay();
-  const jalaliStartDay = (startDay + 1) % 7;
+  let startOffset: number; // empty cells before day 1
+  let totalDays: number;
 
-  const totalDays = J_DAYS_IN_MONTH[viewDate.month - 1] + (viewDate.month === 12 && isLeapYear(viewDate.year) ? 1 : 0);
+  if (LANG === 'fa') {
+    monthLabel.textContent = `${J_MONTH_NAMES_FA[viewDate.month - 1]} ${viewDate.year}`;
 
-  for (let i = 0; i < jalaliStartDay; i++) {
+    // First weekday of the month (0=Sunday) → shift to Saturday-based Persian week
+    const [gY, gM, gD] = jalaliToGregorian(viewDate.year, viewDate.month, 1);
+    const startDay = new Date(gY, gM - 1, gD).getDay();
+    startOffset = (startDay + 1) % 7;
+
+    totalDays =
+      J_DAYS_IN_MONTH[viewDate.month - 1] +
+      (viewDate.month === 12 && isLeapYear(viewDate.year) ? 1 : 0);
+  } else {
+    // Jalali months spanned by this Gregorian month (secondary line)
+    const lastDay = new Date(viewDate.year, viewDate.month, 0).getDate();
+    const [jy1, jm1] = gregorianToJalali(viewDate.year, viewDate.month, 1);
+    const [jy2, jm2] = gregorianToJalali(viewDate.year, viewDate.month, lastDay);
+    const jalaliRange =
+      jm1 === jm2
+        ? `${J_MONTH_NAMES_EN[jm1 - 1]} ${jy1}`
+        : `${J_MONTH_NAMES_EN[jm1 - 1]} – ${J_MONTH_NAMES_EN[jm2 - 1]} ${jy2}`;
+    monthLabel.innerHTML = `${G_MONTH_NAMES_EN[viewDate.month - 1]} ${viewDate.year}<span class="month-sub">${jalaliRange}</span>`;
+
+    startOffset = new Date(viewDate.year, viewDate.month - 1, 1).getDay(); // Sunday-first
+    totalDays = lastDay;
+  }
+
+  /** Day-of-month → grid column index */
+  const columnOf = (day: number): number => (startOffset + day - 1) % 7;
+
+  for (let i = 0; i < startOffset; i++) {
     calendarDays.appendChild(Object.assign(document.createElement('span'), { className: 'muted' }));
   }
 
@@ -105,20 +159,28 @@ function renderCalendar(): void {
     const span = document.createElement('span');
     span.textContent = String(i);
 
-    const isPast =
-      viewDate.year < todayJY ||
-      (viewDate.year === todayJY && viewDate.month < todayJM) ||
-      (viewDate.year === todayJY && viewDate.month === todayJM && i < todayJD);
+    const cellDate =
+      LANG === 'fa'
+        ? (() => {
+            const [gY, gM, gD] = jalaliToGregorian(viewDate.year, viewDate.month, i);
+            return new Date(gY, gM - 1, gD);
+          })()
+        : new Date(viewDate.year, viewDate.month - 1, i);
+
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const isPast = cellDate < todayStart;
+    const isToday = cellDate.getTime() === todayStart.getTime();
 
     if (isPast) span.classList.add('past');
-    if (viewDate.year === todayJY && viewDate.month === todayJM && i === todayJD) {
-      span.classList.add('today');
-    }
-    if ((i + jalaliStartDay) % 7 === 0) span.classList.add('holiday');
+    if (isToday) span.classList.add('today');
+
+    // Holiday (red) column: Friday in the Persian week, Sunday in the English week
+    const holidayColumn = LANG === 'fa' ? 6 : 0;
+    if (columnOf(i) === holidayColumn) span.classList.add('holiday');
 
     if (!isPast) {
       span.addEventListener('click', () => {
-        selectDate(i, viewDate.month, viewDate.year);
+        selectDate(cellDate, i);
       });
     }
 
@@ -126,27 +188,38 @@ function renderCalendar(): void {
   }
 }
 
-function selectDate(day: number, month: number, year: number): void {
-  selectedDate = `${day} ${J_MONTH_NAMES[month - 1]} ${year}`;
+function selectDate(date: Date, dayNumber: number): void {
+  selectedDate = date;
   document.querySelectorAll('.days-grid span').forEach((s) => s.classList.remove('active'));
   document.querySelectorAll('.days-grid span').forEach((s) => {
-    if (s.textContent === String(day)) s.classList.add('active');
+    if (s.textContent === String(dayNumber)) s.classList.add('active');
   });
   clearFormMessage();
   updateSummary();
 }
 
+function todayInfo(): { date: Date; dayNumber: number } {
+  if (LANG === 'fa') {
+    const [, , jd] = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    return { date: now, dayNumber: jd };
+  }
+  return { date: now, dayNumber: now.getDate() };
+}
+
 function selectToday(): void {
-  if (!selectedDate) selectDate(todayJD, todayJM, todayJY);
+  if (!selectedDate) {
+    const { date, dayNumber } = todayInfo();
+    selectDate(date, dayNumber);
+  }
 }
 
 function updateSummary(): void {
   const el = $('#booking-summary');
   if (!el) return;
   const parts: string[] = [];
-  if (selectedDate) parts.push(`📅 ${selectedDate}`);
-  if (selectedTime) parts.push(`🕒 ${selectedTime}`);
-  el.textContent = parts.length ? parts.join('  •  ') : 'روز و ساعت مورد نظرت رو انتخاب کن';
+  if (selectedDate) parts.push(`${S.summaryDateLabel} ${formatSelectedDate(selectedDate)}`);
+  if (selectedTime) parts.push(`${S.summaryTimeLabel} ${selectedTime}`);
+  el.textContent = parts.length ? parts.join('  •  ') : S.summaryPlaceholder;
 }
 
 function showFormMessage(msg: string): void {
@@ -206,7 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Escape closes the booking modal
   document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') closeBooking();
+    if (e.key !== 'Escape') return;
+    closeBooking();
   });
 
   // Service cards open the modal. CTAs and the mobile dock link to the
@@ -257,10 +331,16 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const offset = Number((btn as HTMLButtonElement).dataset.offset ?? 0);
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
-      const [y, m, day] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
-      viewDate = { year: y, month: m };
-      renderCalendar();
-      selectDate(day, m, y);
+      if (LANG === 'fa') {
+        const [jy, jm, jd] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        viewDate = { year: jy, month: jm };
+        renderCalendar();
+        selectDate(d, jd);
+      } else {
+        viewDate = { year: d.getFullYear(), month: d.getMonth() + 1 };
+        renderCalendar();
+        selectDate(d, d.getDate());
+      }
     });
   });
 
@@ -277,29 +357,29 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-// Submit → compose message + open Telegram
+
+  // Submit → compose message + open Telegram
   $('#booking-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
 
     if (!selectedDate) {
-      showFormMessage('لطفاً ابتدا روز مورد نظر را از تقویم انتخاب کنید.');
-      showToast('لطفاً روز مورد نظر را انتخاب کنید');
+      showFormMessage(S.errPickDay);
+      showToast(S.errPickDayToast);
       return;
     }
     if (!selectedTime) {
-      showFormMessage('لطفاً ساعت مورد نظر را انتخاب کنید.');
-      showToast('لطفاً ساعت مورد نظر را انتخاب کنید');
+      showFormMessage(S.errPickTime);
+      showToast(S.errPickTimeToast);
       return;
     }
 
     const phoneInput = $('#booking-phone') as HTMLInputElement | null;
-    const phoneDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
     const phoneNormalized = (phoneInput?.value ?? '')
       .replace(/\s/g, '')
-      .replace(/[۰-۹]/g, (c) => String(phoneDigits.indexOf(c)));
+      .replace(/[۰-۹]/g, (c) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
     if (phoneNormalized && !/^09\d{9}$/.test(phoneNormalized)) {
-      showFormMessage('شماره تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.');
-      showToast('شماره تماس معتبر نیست');
+      showFormMessage(S.errPhone);
+      showToast(S.errPhoneToast);
       phoneInput?.focus();
       return;
     }
@@ -310,13 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const service = $('#booking-service') as HTMLSelectElement | null;
 
     const msg = [
-      'رزرو نوبت - سالن زیبایی دلدار',
-      `👤 نام: ${name?.value.trim() ?? ''}`,
-      `📞 تماس: ${phone?.value.trim() ?? ''}`,
-      email?.value.trim() ? `📧 ایمیل: ${email.value.trim()}` : '',
-      `💇 خدمت: ${service?.value ?? ''}`,
-      `📅 تاریخ: ${selectedDate}`,
-      `🕒 ساعت: ${selectedTime}`,
+      S.tgTitle,
+      `${S.tgName} ${name?.value.trim() ?? ''}`,
+      `${S.tgPhone} ${phone?.value.trim() ?? ''}`,
+      email?.value.trim() ? `${S.tgEmail} ${email.value.trim()}` : '',
+      `${S.tgService} ${service?.value ?? ''}`,
+      `${S.tgDate} ${formatSelectedDate(selectedDate)}`,
+      `${S.tgTime} ${selectedTime}`,
     ]
       .filter(Boolean)
       .join('\n');

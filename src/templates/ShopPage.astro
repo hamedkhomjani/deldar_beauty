@@ -1,0 +1,62 @@
+---
+/**
+ * Shop page template — product grid with add-to-cart buttons (handled by cart.ts).
+ * Cards carry data-id/data-price so the cart can resolve bilingual names.
+ */
+import Layout from '../components/Layout.astro';
+import { PRODUCTS } from '../data/products';
+import { productListSchema, breadcrumbSchema } from '../data/schema';
+import { asset } from '../config';
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const dict = t(lang);
+
+const priceLocale = lang === 'en' ? 'en-US' : 'fa-IR';
+
+const jsonLd = [
+  productListSchema(PRODUCTS, lang),
+  breadcrumbSchema([
+    { name: lang === 'en' ? 'Home' : 'خانه', item: lang === 'en' ? '/en/' : '/' },
+    { name: lang === 'en' ? 'Shop' : 'فروشگاه', item: lang === 'en' ? '/en/shop' : '/shop' },
+  ]),
+];
+---
+
+<Layout
+  title={dict.shopTitle}
+  description={dict.shopDescription}
+  lang={lang}
+  jsonLd={jsonLd}
+>
+  <main class="shop-page container">
+    <header class="shop-header" data-reveal>
+      <p class="section-tagline">{dict.shopTagline}</p>
+      <h1>{dict.shopH1a} <span class="text-gradient">{dict.shopH1b}</span></h1>
+      <p>{dict.shopSub}</p>
+    </header>
+
+    <div class="product-grid">
+      {
+        PRODUCTS.map((product) => (
+          <div class="product-card" data-reveal data-product-id={product.id} data-product-price={product.price}>
+            {product.badge && <span class="product-badge">{product.badge[lang]}</span>}
+            <div class="product-image">
+              <img src={asset(product.image)} alt={product.alt[lang]} loading="lazy" />
+            </div>
+            <div class="product-info">
+              <span class="product-category">{product.category[lang]}</span>
+              <h3 class="product-title">{product.name[lang]}</h3>
+              <p class="product-price">{product.price.toLocaleString(priceLocale)} {dict.currency}</p>
+              <button class="btn-add-cart">{dict.addToCart}</button>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </main>
+</Layout>

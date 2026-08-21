@@ -1,24 +1,32 @@
 ---
 /** Slide-in shopping cart drawer — rendered by cart.ts. */
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'fa' } = Astro.props;
+const dict = t(lang);
 ---
 
 <div id="cart-overlay" class="cart-overlay"></div>
 
-<div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-label="سبد خرید">
+<div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-label={dict.cartDrawerAria}>
   <div class="cart-header">
-    <h2>سبد خرید</h2>
-    <button class="close-cart" id="close-cart" aria-label="بستن سبد خرید">&times;</button>
+    <h2>{dict.cartTitle}</h2>
+    <button class="close-cart" id="close-cart" aria-label={dict.cartCloseAria}>&times;</button>
   </div>
 
   <div class="cart-items-container" id="cart-items">
-    <div class="cart-empty-msg">سبد خرید شما فعلاً خالی است.</div>
+    <div class="cart-empty-msg">{dict.cartEmpty}</div>
   </div>
 
-  <div class="cart-footer">
+  <div class="cart-footer" id="cart-footer">
     <div class="cart-total">
-      <span>جمع کل:</span>
-      <span class="amount" id="cart-total-amount">۰ تومان</span>
+      <span>{dict.cartTotalLabel}</span>
+      <span class="amount" id="cart-total-amount">{dict.cartZero}</span>
     </div>
-    <button class="btn-checkout">تایید و پرداخت نهایی</button>
+    <button class="btn-checkout">{dict.cartCheckoutBtn}</button>
   </div>
 </div>

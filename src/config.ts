@@ -1,7 +1,9 @@
 /**
  * Single source of truth for all salon business data.
  * EDIT THIS FILE when phone/address/handles/bank details change.
+ * User-facing strings are bilingual ({ fa, en }) — see src/i18n/index.ts.
  */
+import type { Localized } from './i18n';
 
 export const SITE = {
   name: 'سالن زیبایی دلدار',
@@ -9,7 +11,6 @@ export const SITE = {
   base: import.meta.env.BASE_URL ?? '/',
   /** Absolute URL of the live site */
   url: 'https://hamedkhomjani.github.io/deldar_beauty/',
-  locale: 'fa_IR',
   themeColor: '#fdfaf5',
 };
 
@@ -18,28 +19,43 @@ export const SALON = {
   whatsapp: '989123456789',
   telegram: 'deldar_beauty',
   instagram: 'deldar_beauty',
-  phoneDisplay: '۰۲۱-۱۲۳۴۵۶۷۸ | ۰۹۱۲-۳۴۵۶۷۸۹',
-  address: 'تهران، خیابان ظفر، پلاک ۱۲۳، واحد ۵',
+  phoneDisplay: {
+    fa: '۰۲۱-۱۲۳۴۵۶۷۸ | ۰۹۱۲-۳۴۵۶۷۸۹',
+    en: '021-12345678 | 0912-3456789',
+  } satisfies Localized,
+  address: {
+    fa: 'تهران، خیابان ظفر، پلاک ۱۲۳، واحد ۵',
+    en: 'Tehran, Zafar St., No. 123, Unit 5',
+  } satisfies Localized,
   /** Keep the phone field of schema.org in sync with whatsapp */
   schemaPhone: '+989123456789',
   /** Hours shown on the site */
-  hoursDisplay: 'شنبه تا پنجشنبه: ۱۰:۰۰ الی ۱۹:۰۰',
+  hoursDisplay: {
+    fa: 'شنبه تا پنجشنبه: ۱۰:۰۰ الی ۱۹:۰۰',
+    en: 'Saturday to Thursday: 10:00 – 19:00',
+  } satisfies Localized,
 };
 
 export const BANK = {
   /** Card-to-card payment details (placeholder – replace with real numbers) */
-  card: '۶۰۳۷-۷۵۷۲-۱۲۳۴-۵۶۷۸',
-  sheba: 'IR۱۲-۰۱۵۰-۰۰۰۰-۰۰۰۰-۰۰۰۰-۰۰۰۰-۰۱',
+  card: {
+    fa: '۶۰۳۷-۷۵۷۲-۱۲۳۴-۵۶۷۸',
+    en: '6037-7572-1234-5678',
+  } satisfies Localized,
+  sheba: {
+    fa: 'IR۱۲-۰۱۵۰-۰۰۰۰-۰۰۰۰-۰۰۰۰-۰۰۰۰-۰۱',
+    en: 'IR12-0150-0000-0000-0000-0000-01',
+  } satisfies Localized,
 };
 
 export const NAV_LINKS = [
-  { href: '/', label: 'خانه' },
-  { href: '/about', label: 'درباره ما' },
-  { href: '/shop', label: 'فروشگاه' },
-  { href: '/#services', label: 'خدمات ما' },
-  { href: '/#consultation', label: 'مشاوره تخصصی' },
-  { href: '/#contact', label: 'تماس با ما' },
-] as const;
+  { href: '/', label: { fa: 'خانه', en: 'Home' } },
+  { href: '/about', label: { fa: 'درباره ما', en: 'About Us' } },
+  { href: '/shop', label: { fa: 'فروشگاه', en: 'Shop' } },
+  { href: '/#services', label: { fa: 'خدمات ما', en: 'Our Services' } },
+  { href: '/#consultation', label: { fa: 'مشاوره تخصصی', en: 'Consultation' } },
+  { href: '/#contact', label: { fa: 'تماس با ما', en: 'Contact Us' } },
+] as const satisfies readonly { href: string; label: Localized }[];
 
 /** Icon key matches the <svg> map in Footer.astro */
 export const SOCIAL_LINKS = [

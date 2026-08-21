@@ -2,18 +2,21 @@
 /**
  * Shared header/nav. The current page is highlighted automatically.
  * `minimal` renders the checkout variant: nav links + theme toggle only.
+ * Includes the fa/en language switcher (links to the same page in the other locale).
  */
-import { NAV_LINKS, asset, pageUrl } from '../config';
+import { NAV_LINKS, asset } from '../config';
+import { localizedPath, altLangPath, t, type Lang } from '../i18n';
 
 interface Props {
   minimal?: boolean;
+  lang?: Lang;
 }
 
-const { minimal = false } = Astro.props;
+const { minimal = false, lang = 'fa' } = Astro.props;
+const dict = t(lang);
 
-const pathname = Astro.url.pathname
-  .replace(import.meta.env.BASE_URL, '/')
-  .replace(/\/$/, '') || '/';
+const pathname =
+  Astro.url.pathname.replace(import.meta.env.BASE_URL, '/').replace(/\/$/, '') || '/';
 
 function isActive(link: string): boolean {
   // Page links (/, /about, /shop) highlight on exact match;
@@ -21,21 +24,24 @@ function isActive(link: string): boolean {
   if (link.startsWith('/#') || link === '/') return link === '/' ? pathname === '/' : false;
   return pathname === link;
 }
+
+const otherLang: Lang = lang === 'en' ? 'fa' : 'en';
+const langSwitchHref = altLangPath(pathname, otherLang);
 ---
 
 <header id="main-header">
   <nav class="container">
     <div class="logo">
-      <a href={pageUrl('/')} aria-label="صفحه اصلی سالن زیبایی دلدار">
-        <img src={asset('assets/images/logo.svg')} alt="لوگوی سالن زیبایی دلدار" />
+      <a href={localizedPath('/', lang)} aria-label={dict.logoAria}>
+        <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} />
       </a>
     </div>
 
     <div class="nav-links desktop-only">
       {
         NAV_LINKS.map((link) => (
-          <a href={pageUrl(link.href)} class:list={[{ active: isActive(link.href) }]}>
-            {link.label}
+          <a href={localizedPath(link.href, lang)} class:list={[{ active: isActive(link.href) }]}>
+            {link.label[lang]}
           </a>
         ))
       }
@@ -44,18 +50,22 @@ function isActive(link: string): boolean {
     <div class="header-actions">
       {
         !minimal && (
-          <button id="cart-toggle" class="cart-toggle" aria-label="باز کردن سبد خرید">
+          <button id="cart-toggle" class="cart-toggle" aria-label={dict.cartAria}>
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
-            <span class="cart-count">۰</span>
+            <span class="cart-count">{lang === 'en' ? '0' : '۰'}</span>
           </button>
         )
       }
 
-      <button id="theme-toggle" class="theme-toggle" aria-label="تغییر حالت روشن و تاریک">
+      <a href={langSwitchHref} class="lang-toggle" aria-label={dict.langSwitchAria} hreflang={otherLang}>
+        {dict.langSwitchTo}
+      </a>
+
+      <button id="theme-toggle" class="theme-toggle" aria-label={dict.themeAria}>
         <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -74,13 +84,13 @@ function isActive(link: string): boolean {
 
       {
         !minimal && (
-          <div class="menu-icon" id="menu-toggle" aria-label="باز کردن منو">
+          <button type="button" class="menu-icon" id="menu-toggle" aria-label={dict.menuOpenAria}>
             <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
               <rect y="4" width="24" height="2" rx="1" />
               <rect y="11" width="24" height="2" rx="1" />
               <rect y="18" width="24" height="2" rx="1" />
             </svg>
-          </div>
+          </button>
         )
       }
     </div>

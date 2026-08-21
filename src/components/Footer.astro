@@ -2,7 +2,15 @@
 /**
  * Shared footer with brand, quick links and social icons.
  */
-import { NAV_LINKS, SOCIAL_LINKS, asset, pageUrl } from '../config';
+import { NAV_LINKS, SOCIAL_LINKS, asset } from '../config';
+import { localizedPath, t, type Lang } from '../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'fa' } = Astro.props;
+const dict = t(lang);
 
 const SOCIAL_ICONS: Record<string, string> = {
   instagram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`,
@@ -14,22 +22,21 @@ const SOCIAL_ICONS: Record<string, string> = {
 <footer class="footer">
   <div class="container footer-grid">
     <div class="footer-col footer-brand">
-      <img src={asset('assets/images/logo.svg')} alt="لوگوی سالن زیبایی دلدار" class="footer-logo" />
+      <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} class="footer-logo" />
       <p>
-        سالن زیبایی دلدار، جایی که هنر و زیبایی به هم می‌پیوندند. ما تجربه‌ای لوکس و منحصر به فرد را برای شما
-        خلق می‌کنیم.
+        {dict.footerBrand}
       </p>
     </div>
 
     <div class="footer-col footer-links">
-      <h4>دسترسی سریع</h4>
+      <h4>{dict.footerQuickTitle}</h4>
       {
-        NAV_LINKS.map((link) => <a href={pageUrl(link.href)}>{link.label}</a>)
+        NAV_LINKS.map((link) => <a href={localizedPath(link.href, lang)}>{link.label[lang]}</a>)
       }
     </div>
 
     <div class="footer-col footer-social">
-      <h4>ما را دنبال کنید</h4>
+      <h4>{dict.footerFollowTitle}</h4>
       <div class="social-links-v2">
         {
           SOCIAL_LINKS.map((social) => (
@@ -49,7 +56,7 @@ const SOCIAL_ICONS: Record<string, string> = {
 
   <div class="footer-bottom">
     <div class="container">
-      <p>&copy; ۲۰۲۴ تمامی حقوق برای سالن زیبایی دلدار محفوظ است.</p>
+      <p>{dict.copyright}</p>
     </div>
   </div>
 </footer>

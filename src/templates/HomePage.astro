@@ -1,0 +1,247 @@
+---
+/**
+ * Homepage template — hero, services, lookbook/testimonials, consultation,
+ * FAQ, contact. Rendered for both locales via thin route files.
+ */
+import Layout from '../components/Layout.astro';
+import ServiceIcon from '../components/ServiceIcon.astro';
+import { SERVICES } from '../data/services';
+import { FAQS } from '../data/faq';
+import { beautySalonSchema, webSiteSchema, faqSchema, breadcrumbSchema } from '../data/schema';
+import { SALON, asset } from '../config';
+import { t, localizedPath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const dict = t(lang);
+
+const jsonLd = [
+  beautySalonSchema(SERVICES, lang),
+  breadcrumbSchema([{ name: lang === 'en' ? 'Home' : 'خانه', item: lang === 'en' ? '/en/' : '/' }]),
+  webSiteSchema(lang),
+  faqSchema(FAQS, lang),
+];
+
+const mapQuery = encodeURIComponent(SALON.address.fa);
+const mapEmbedUrl = `https://maps.google.com/maps?q=${mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+const mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapQuery}`;
+---
+
+<Layout
+  title={dict.homeTitle}
+  description={dict.homeDescription}
+  lang={lang}
+  bodyClass="home-page"
+  jsonLd={jsonLd}
+  preloadHero
+>
+  <div id="preloader" class="preloader">
+    <div class="preloader-content">
+      <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} class="preloader-logo" />
+      <div class="preloader-bar"></div>
+    </div>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+      <div class="hero-bg-accent"></div>
+      <div class="container hero-content">
+        <div class="hero-text" data-reveal>
+          <h1>{dict.heroH1a} <br /><span class="text-gradient">{dict.heroH1b}</span></h1>
+          <p>{dict.heroP}</p>
+          <div class="hero-btns" data-reveal>
+            <a href={localizedPath('/booking', lang)} class="btn-premium go-booking">
+              {dict.heroCtaBooking}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d={dict.arrowForwardD} />
+              </svg>
+            </a>
+            <a href="#services" class="btn-outline">
+              {dict.heroCtaServices}
+            </a>
+          </div>
+        </div>
+        <div class="hero-image-wrapper" data-reveal>
+          <div class="hero-image">
+            <img src={asset('assets/images/hero.webp')} alt={dict.heroImgAlt} />
+            <div class="image-gradient-overlay"></div>
+          </div>
+          <div class="floating-card-1">
+            <span class="count">10k+</span>
+            <span class="label">{dict.floatCard1Label}</span>
+          </div>
+          <div class="floating-card-2">
+            <div class="stars">★★★★★</div>
+            <span class="label">{dict.floatCard2Label}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services-section container">
+      <div class="section-header" data-reveal>
+        <h2>{dict.servicesH2}</h2>
+        <p>{dict.servicesSub}</p>
+      </div>
+      <div class="services">
+        {
+          SERVICES.map((service) => (
+            <div class="service-card" data-reveal>
+              <ServiceIcon icon={service.icon} />
+              <h3>{service.name[lang]}</h3>
+              <p>{service.description[lang]}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Lookbook & Testimonials Section -->
+    <section id="lookbook" class="lookbook-section container">
+      <div class="section-header" data-reveal>
+        <p class="section-tagline">{dict.lookbookTagline}</p>
+        <h2>{dict.lookbookH2}</h2>
+        <p>{dict.lookbookSub}</p>
+      </div>
+
+      <div class="lookbook-grid">
+        <div class="lookbook-item card-large" data-reveal>
+          <img src={asset('assets/images/hero.webp')} alt={dict.testimonials[0].imgAlt} loading="lazy" />
+          <div class="testimonial-overlay">
+            <div class="testimonial-content">
+              <p>{dict.testimonials[0].text}</p>
+              <span class="client-name">{dict.testimonials[0].name}</span>
+            </div>
+          </div>
+        </div>
+        <div class="lookbook-item" data-reveal>
+          <img src={asset('assets/images/product-hair-oil.png')} alt={dict.testimonials[1].imgAlt} loading="lazy" />
+          <div class="testimonial-overlay">
+            <div class="testimonial-content">
+              <p>{dict.testimonials[1].text}</p>
+              <span class="client-name">{dict.testimonials[1].name}</span>
+            </div>
+          </div>
+        </div>
+        <div class="lookbook-item" data-reveal>
+          <img src={asset('assets/images/hair_tools_hands.webp')} alt={dict.testimonials[2].imgAlt} loading="lazy" />
+          <div class="testimonial-overlay">
+            <div class="testimonial-content">
+              <p>{dict.testimonials[2].text}</p>
+              <span class="client-name">{dict.testimonials[2].name}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consultation Section -->
+    <section id="consultation" class="consultation">
+      <div class="consultation-content" data-reveal>
+        <h2>{dict.consultH2a} <br /> {dict.consultH2b}</h2>
+        <p>{dict.consultP}</p>
+        <a href={localizedPath('/booking', lang)} class="btn-premium go-booking" style="background:var(--gold-gradient); color:var(--dark-charcoal)">
+          {dict.consultBtn}
+        </a>
+      </div>
+      <div class="consultation-image" data-reveal>
+        <img src={asset('assets/images/consultation.webp')} alt={dict.consultImgAlt} loading="lazy" />
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section container">
+      <div class="section-header" data-reveal>
+        <p class="section-tagline">{dict.faqTagline}</p>
+        <h2>{dict.faqH2}</h2>
+        <p>{dict.faqSub}</p>
+      </div>
+      <div class="faq-list">
+        {
+          FAQS.map((faq) => (
+            <details class="faq-item" data-reveal>
+              <summary>
+                <span>{faq.question[lang]}</span>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <div class="faq-answer"><p>{faq.answer[lang]}</p></div>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section container">
+      <div class="section-header" data-reveal>
+        <h2>{dict.contactH2}</h2>
+        <p>{dict.contactSub}</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <div class="info-item" data-reveal>
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <div>
+              <h4>{dict.contactAddrTitle}</h4>
+              <a class="info-link" href={mapDirectionsUrl} target="_blank" rel="noopener">{SALON.address[lang]}</a>
+            </div>
+          </div>
+          <div class="info-item" data-reveal>
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </div>
+            <div>
+              <h4>{dict.contactPhoneTitle}</h4>
+              <p>
+                <a class="info-link" href="tel:+989123456789" dir="ltr">۰۲۱-۱۲۳۴۵۶۷۸</a>
+                <span class="info-sep">|</span>
+                <a class="info-link" href={`https://wa.me/${SALON.whatsapp}`} target="_blank" rel="noopener" dir="ltr">۰۹۱۲-۳۴۵۶۷۸۹</a>
+              </p>
+            </div>
+          </div>
+          <div class="info-item" data-reveal>
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h4>{dict.contactHoursTitle}</h4>
+              <p>{SALON.hoursDisplay[lang]}</p>
+            </div>
+          </div>
+        </div>
+        <div class="contact-map" data-reveal>
+          <iframe
+            src={mapEmbedUrl}
+            title={dict.mapIframeTitle}
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+          <a href={mapDirectionsUrl} class="btn-outline map-btn" target="_blank" rel="noopener">
+            {dict.mapBtn}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

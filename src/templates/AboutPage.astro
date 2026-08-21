@@ -1,0 +1,47 @@
+---
+/**
+ * About page template — brand story, values and an image of the salon tools.
+ */
+import Layout from '../components/Layout.astro';
+import { aboutPageSchema } from '../data/schema';
+import { asset } from '../config';
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const dict = t(lang);
+---
+
+<Layout
+  title={dict.aboutTitle}
+  description={dict.aboutDescription}
+  lang={lang}
+  jsonLd={[aboutPageSchema(lang)]}
+>
+  <div class="container about-page-content">
+    <h1 class="about-title">
+      <span class="text-gradient">{dict.aboutH1}</span>
+    </h1>
+
+    <div class="about-content-box">
+      <p class="about-text">
+        {dict.aboutP1}
+      </p>
+      <div class="about-image-container" style="border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.1);">
+        <img
+          src={asset('assets/images/hair_tools_hands.webp')}
+          alt={dict.aboutImgAlt}
+          loading="lazy"
+          style="transition: transform 0.6s ease;"
+        />
+      </div>
+    </div>
+
+    <p class="about-extra-text">
+      {dict.aboutP2}
+    </p>
+  </div>
+</Layout>

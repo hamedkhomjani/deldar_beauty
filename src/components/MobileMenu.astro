@@ -1,11 +1,23 @@
 ---
 /** Mobile slide-in menu. */
-import { NAV_LINKS, pageUrl } from '../config';
+import { NAV_LINKS } from '../config';
+import { localizedPath, altLangPath, t, type Lang } from '../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'fa' } = Astro.props;
+const dict = t(lang);
+const otherLang: Lang = lang === 'en' ? 'fa' : 'en';
 ---
 
-<div id="mobile-menu" class="mobile-menu">
-  <div class="close-btn" id="menu-close" aria-label="بستن منو">&times;</div>
+<div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="true" aria-label={dict.mobileMenuAria}>
+  <button type="button" class="close-btn" id="menu-close" aria-label={dict.menuCloseAria}>&times;</button>
   {
-    NAV_LINKS.map((link) => <a href={pageUrl(link.href)}>{link.label}</a>)
+    NAV_LINKS.map((link) => <a href={localizedPath(link.href, lang)}>{link.label[lang]}</a>)
   }
+  <a href={altLangPath(Astro.url.pathname.replace(import.meta.env.BASE_URL, '/'), otherLang)} class="lang-toggle" hreflang={otherLang}>
+    {dict.langSwitchTo}
+  </a>
 </div>

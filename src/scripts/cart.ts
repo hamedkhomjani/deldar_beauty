@@ -1,14 +1,22 @@
 /**
  * Shopping cart — drawer, quantity controls, badge, checkout redirect.
  * State persists in localStorage under `deldar_cart`.
+ * Product names are resolved from the bilingual catalog via product id,
+ * so the drawer always renders in the current page language.
  */
 import { showToast } from './toast';
-export {};
+import { PRODUCTS } from '../data/products';
+import { CART_STRINGS, LANG, fmt } from './lang';
+
+const S = CART_STRINGS[LANG];
 
 const CART_KEY = 'deldar_cart';
 
 interface CartItem {
-  name: string;
+  /** Product id from the catalog (preferred) */
+  id?: string;
+  /** Legacy/plain fallback name (carts saved before ids existed) */
+  name?: string;
   price: number;
   image: string;
   quantity: number;
@@ -25,11 +33,19 @@ function loadCart(): CartItem[] {
     const raw = localStorage.getItem(CART_KEY);
     const parsed = raw ? (JSON.parse(raw) as StoredItem[]) : [];
     return parsed.filter(
-      (item): item is CartItem => typeof item.name === 'string' && typeof item.price === 'number',
+      (item): item is CartItem => typeof item.price === 'number' && (typeof item.name === 'string' || typeof item.id === 'string'),
     );
   } catch {
     return [];
   }
+}
+
+function productName(item: CartItem): string {
+  if (item.id) {
+    const product = PRODUCTS.find((p) => p.id === item.id);
+    if (product) return product.name[LANG];
+  }
+  return item.name ?? S.fallbackProduct;
 }
 
 let cart: CartItem[] = loadCart();
@@ -41,10 +57,10 @@ const cartOverlay = $('#cart-overlay');
 const cartItemsContainer = $('#cart-items');
 const cartTotalAmount = $('#cart-total-amount');
 const cartCountBadge = $('.cart-count');
+const cartFooter = $('#cart-footer');
 
-function faNumber(n: number): string {
-  return n.toLocaleString('fa-IR');
-}
+const basePath = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const shopPath = `${basePath}${LANG === 'en' ? '/en' : ''}/shop/`;
 
 function updateCart(): void {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
@@ -55,11 +71,23 @@ function renderCart(): void {
   if (!cartItemsContainer) return;
 
   if (cart.length === 0) {
-    cartItemsContainer.innerHTML = '<div class="cart-empty-msg">سبد خرید شما فعلاً خالی است.</div>';
-    if (cartTotalAmount) cartTotalAmount.textContent = '۰ تومان';
-    if (cartCountBadge) cartCountBadge.textContent = '۰';
+    cartItemsContainer.innerHTML = `
+      <div class="cart-empty-msg">
+        <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <p>${S.emptyMsg}</p>
+        <a class="btn-empty-shop" href="${shopPath}">${S.viewShop}</a>
+      </div>`;
+    if (cartTotalAmount) cartTotalAmount.textContent = S.zero;
+    if (cartCountBadge) cartCountBadge.textContent = LANG === 'en' ? '0' : '۰';
+    cartFooter?.classList.add('hidden');
     return;
   }
+
+  cartFooter?.classList.remove('hidden');
 
   let total = 0;
   let count = 0;
@@ -69,22 +97,24 @@ function renderCart(): void {
     total += item.price * item.quantity;
     count += item.quantity;
 
+    const name = productName(item);
+
     const itemEl = document.createElement('div');
     itemEl.className = 'cart-item';
     itemEl.innerHTML = `
         <div class="cart-item-img">
-          <img src="${item.image}" alt="${item.name}">
+          <img src="${item.image}" alt="${name}">
         </div>
         <div class="cart-item-info">
-          <h4>${item.name}</h4>
-          <p class="price">${faNumber(item.price)} تومان</p>
+          <h4>${name}</h4>
+          <p class="price">${fmt(item.price)} ${S.currency}</p>
           <div class="cart-item-controls">
             <div class="qty-controls">
-              <button class="qty-btn minus" data-index="${index}" aria-label="کم کردن">&minus;</button>
-              <span>${faNumber(item.quantity)}</span>
-              <button class="qty-btn plus" data-index="${index}" aria-label="زیاد کردن">&plus;</button>
+              <button class="qty-btn minus" data-index="${index}" aria-label="${S.minusAria}">&minus;</button>
+              <span>${fmt(item.quantity)}</span>
+              <button class="qty-btn plus" data-index="${index}" aria-label="${S.plusAria}">&plus;</button>
             </div>
-            <button class="remove-item" data-index="${index}" aria-label="حذف از سبد">
+            <button class="remove-item" data-index="${index}" aria-label="${S.removeAria}">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -96,8 +126,8 @@ function renderCart(): void {
     cartItemsContainer.appendChild(itemEl);
   });
 
-  if (cartTotalAmount) cartTotalAmount.textContent = `${faNumber(total)} تومان`;
-  if (cartCountBadge) cartCountBadge.textContent = faNumber(count);
+  if (cartTotalAmount) cartTotalAmount.textContent = `${fmt(total)} ${S.currency}`;
+  if (cartCountBadge) cartCountBadge.textContent = fmt(count);
 }
 
 function openCart(): void {
@@ -112,8 +142,10 @@ function toggleCart(): void {
   document.body.style.overflow = isActive ? 'hidden' : 'auto';
 }
 
-function addToCart(product: { name: string; price: number; image: string }): void {
-  const existingItem = cart.find((item) => item.name === product.name);
+function addToCart(product: { id?: string; name?: string; price: number; image: string }): void {
+  const existingItem = cart.find(
+    (item) => (product.id && item.id === product.id) || (!product.id && item.name === product.name),
+  );
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
@@ -123,10 +155,10 @@ function addToCart(product: { name: string; price: number; image: string }): voi
   openCart();
 }
 
-/** Persian (۰-۹) digits → English (0-9) */
+/** Persian/Arabic digits → English (0-9), for legacy price parsing */
 function persianToEnglish(str: string): string {
-  const pChars = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-  return str.replace(/[۰-۹]/g, (c) => pChars.indexOf(c).toString());
+  const digits = '۰۱۲۳۴۵۶۷۸۹';
+  return str.replace(/[۰-۹]/g, (c) => String(digits.indexOf(c)));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -162,25 +194,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Add-to-cart buttons (shop page) — reads the card DOM, like before
+  // Add-to-cart buttons (shop page) — prefer data attributes, fall back to DOM text
   document.querySelectorAll<HTMLButtonElement>('.btn-add-cart').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const card = btn.closest('.product-card');
+      const card = btn.closest('.product-card') as HTMLElement | null;
       if (!card || !cartItemsContainer) return;
 
-      const priceText = card.querySelector('.product-price')?.textContent ?? '';
-      const cleanPrice = persianToEnglish(priceText).replace(/[^\d]/g, '');
+      const id = card.dataset.productId;
+      let price = Number(card.dataset.productPrice ?? NaN);
+
+      if (!Number.isFinite(price)) {
+        const priceText = card.querySelector('.product-price')?.textContent ?? '';
+        const cleanPrice = persianToEnglish(priceText).replace(/[^\d]/g, '');
+        price = parseInt(cleanPrice, 10) || 0;
+      }
 
       addToCart({
-        name: card.querySelector('.product-title')?.textContent?.trim() ?? 'محصول',
-        price: parseInt(cleanPrice, 10) || 0,
+        id,
+        name: card.querySelector('.product-title')?.textContent?.trim() ?? undefined,
+        price,
         image: (card.querySelector('.product-image img') as HTMLImageElement | null)?.src ?? '',
       });
 
-      // Button feedback: flip to "✓ اضافه شد" briefly
+      // Button feedback: flip to "added" briefly
       const original = btn.textContent;
       btn.disabled = true;
-      btn.textContent = '✓ اضافه شد';
+      btn.textContent = S.addedFeedback;
       window.setTimeout(() => {
         if (btn.isConnected) {
           btn.disabled = false;
@@ -195,9 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
   checkoutBtn?.addEventListener('click', () => {
     if (cart.length > 0) {
       const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-      window.location.href = `${base}/checkout/`;
+      window.location.href = `${base}${LANG === 'en' ? '/en' : ''}/checkout/`;
     } else {
-      showToast('سبد خرید شما خالی است');
+      showToast(S.emptyToast);
     }
   });
 

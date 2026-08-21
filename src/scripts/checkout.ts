@@ -3,11 +3,16 @@
  * Runs only on the checkout page (not via Layout).
  */
 import { SALON, BANK } from '../config';
+import { PRODUCTS } from '../data/products';
+import { CHECKOUT_STRINGS, LANG, fmt } from './lang';
+
+const S = CHECKOUT_STRINGS[LANG];
 
 const CART_KEY = 'deldar_cart';
 
 interface CartItem {
-  name: string;
+  id?: string;
+  name?: string;
   price: number;
   image: string;
   quantity: number;
@@ -17,8 +22,12 @@ function $<T extends Element>(sel: string): T | null {
   return document.querySelector<T>(sel);
 }
 
-function faNumber(n: number): string {
-  return n.toLocaleString('fa-IR');
+function itemName(item: CartItem): string {
+  if (item.id) {
+    const product = PRODUCTS.find((p) => p.id === item.id);
+    if (product) return product.name[LANG];
+  }
+  return item.name ?? '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -43,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (cart.length === 0) {
     const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-    window.location.href = `${base}/shop/`;
+    window.location.href = `${base}${LANG === 'en' ? '/en' : ''}/shop/`;
     return;
   }
 
@@ -60,17 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
       itemEl.className = 'summary-item';
       itemEl.innerHTML = `
           <div class="item-info">
-            <span class="name">${item.name}</span>
-            <span class="qty">(${faNumber(item.quantity)} عدد)</span>
+            <span class="name">${itemName(item)}</span>
+            <span class="qty">(${fmt(item.quantity)} ${S.qtySuffix})</span>
           </div>
-          <span class="price">${faNumber(item.price * item.quantity)} تومان</span>
+          <span class="price">${fmt(item.price * item.quantity)} ${S.currency}</span>
         `;
       checkoutItemsList.appendChild(itemEl);
     });
 
     grandTotal = total;
-    if (subtotalEl) subtotalEl.textContent = `${faNumber(total)} تومان`;
-    if (finalTotalEl) finalTotalEl.textContent = `${faNumber(total)} تومان`;
+    if (subtotalEl) subtotalEl.textContent = `${fmt(total)} ${S.currency}`;
+    if (finalTotalEl) finalTotalEl.textContent = `${fmt(total)} ${S.currency}`;
   }
 
   checkoutForm?.addEventListener('submit', (e) => {
@@ -82,20 +91,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderCodeEl = $('#success-order-code');
     const paymentNote = $('#payment-note');
 
-    if (orderCodeEl) orderCodeEl.textContent = `کد پیگیری سفارش شما: ${orderCode}`;
+    if (orderCodeEl) orderCodeEl.textContent = `${S.orderCodePrefix} ${orderCode}`;
 
     if (paymentNote) {
       if (method === 'card') {
-        paymentNote.innerHTML = `لطفاً مبلغ <strong>${faNumber(grandTotal)} تومان</strong> را کارت به کارت کنید:<br>
-          <div class="card-number">${BANK.card}</div>
-          <span class="sheba">شبا: ${BANK.sheba}</span><br><br>
-          سپس تصویر فیش واریز را در
-          <a href="https://t.me/${SALON.telegram}" target="_blank" rel="noopener">تلگرام</a> یا
-          <a href="https://wa.me/${SALON.whatsapp}" target="_blank" rel="noopener">واتس‌اپ</a> برای ما بفرستید تا سفارش شما ثبت و ارسال شود.`;
+        paymentNote.innerHTML = `${S.cardNoteIntro} <strong>${fmt(grandTotal)} ${S.currency}</strong> ${S.cardNoteOutro}<br>
+          <div class="card-number">${BANK.card[LANG]}</div>
+          <span class="sheba">${S.shebaLabel} ${BANK.sheba[LANG]}</span><br><br>
+          <a href="https://t.me/${SALON.telegram}" target="_blank" rel="noopener">Telegram</a> ·
+          <a href="https://wa.me/${SALON.whatsapp}" target="_blank" rel="noopener">WhatsApp</a>`;
       } else if (method === 'cod') {
-        paymentNote.innerHTML = 'هزینه سفارش را هنگام دریافت محصول (پرداخت در محل) بپردازید.';
+        paymentNote.innerHTML = S.codNote;
       } else {
-        paymentNote.innerHTML = 'پرداخت آنلاین از طریق درگاه بانکی به زودی فعال می‌شود.';
+        paymentNote.innerHTML = S.gatewayNote;
       }
       paymentNote.classList.remove('hidden');
     }

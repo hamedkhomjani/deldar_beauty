@@ -1,42 +1,6 @@
 ---
-/**
- * About page — brand story, values and an image of the salon tools.
- */
-import Layout from '../../components/Layout.astro';
-import { aboutPageSchema } from '../../data/schema';
-import { asset } from '../../config';
+/** About page (Persian) — content lives in templates/AboutPage.astro */
+import AboutPage from '../../templates/AboutPage.astro';
 ---
 
-<Layout
-  title="درباره ما | داستان و تیم سالن زیبایی دلدار در تهران"
-  description="با تیم متخصص و هنرمند سالن زیبایی دلدار در تهران آشنا شوید؛ سالنی لوکس با تخصص در آرایش عروس، رنگ و لایت، کاشت ناخن و مراقبت از پوست و مو."
-  jsonLd={[aboutPageSchema()]}
->
-  <div class="container about-page-content">
-    <h1 class="about-title">
-      <span class="text-gradient">کمی درباره ما</span>
-    </h1>
-
-    <div class="about-content-box">
-      <p class="about-text">
-        در سالن زیبایی دلدار، ما معتقدیم که هر فردی دارای زیبایی منحصر به فردی است که شایسته درخشش است. از زمان
-        تأسیس، هدف ما ارائه خدماتی فراتر از یک تغییر ظاهر ساده بوده است؛ ما به دنبال خلق تجربه‌ای هستیم که در آن
-        شما احساس آرامش، اعتماد به نفس و تجدید قوا کنید. تیم متخصص و هنرمند ما با بهره‌گیری از آخرین تکنیک‌های
-        جهانی و بهترین محصولات باکیفیت، آماده است تا آنچه را که در ذهن دارید به واقعیت تبدیل کند.
-      </p>
-      <div class="about-image-container" style="border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.1);">
-        <img
-          src={asset('assets/images/hair_tools_hands.webp')}
-          alt="تجهیزات و ابزار مدرن سالن زیبایی دلدار"
-          loading="lazy"
-          style="transition: transform 0.6s ease;"
-        />
-      </div>
-    </div>
-
-    <p class="about-extra-text">
-      تعهد ما به کیفیت و رضایت مشتری، سنگ بنای فعالیت‌های ماست. محیطی لوکس، آرام و بهداشتی فراهم آورده‌ایم تا
-      دقایقی که در کنار ما هستید، از دغدغه‌های روزمره دور باشید.
-    </p>
-  </div>
-</Layout>
+<AboutPage lang="fa" />

@@ -1,14 +1,20 @@
 ---
 /**
  * SEO head — every page passes its meta + JSON-LD through this component.
+ * Renders hreflang alternates for the fa/en pair and preloads the font
+ * subset matching the page language.
  */
 import { SITE, asset } from '../config';
 import { abs } from '../data/schema';
-import vazirFontUrl from '../assets/fonts/vazirmatn-arabic-400-normal.woff2';
+import { LOCALE_TAGS, altLangPath, type Lang } from '../i18n';
+import vazirArabicFontUrl from '../assets/fonts/vazirmatn-arabic-400-normal.woff2';
+import vazirLatinFontUrl from '../assets/fonts/vazirmatn-latin-400-normal.woff2';
 
 interface Props {
   title: string;
   description: string;
+  /** Page locale */
+  lang?: Lang;
   /** Defaults to the page's own URL */
   canonical?: string;
   /** Defaults to the branded share image */
@@ -24,6 +30,7 @@ interface Props {
 const {
   title,
   description,
+  lang = 'fa',
   canonical = Astro.url.pathname.replace(import.meta.env.BASE_URL, '/'),
   ogImage = asset('assets/images/og-image.png'),
   ogType = 'website',
@@ -33,8 +40,26 @@ const {
 } = Astro.props;
 
 const canonicalUrl = abs(canonical);
-const ogImageUrl = abs(ogImage);
+/** abs() for inputs that may already carry the base prefix (asset()/altLangPath()) */
+function toAbs(path: string): string {
+  if (path.startsWith('http')) return path;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return abs(path.startsWith(base) ? path.slice(base.length) || '/' : path);
+}
+const ogImageUrl = toAbs(ogImage);
+const otherLang: Lang = lang === 'en' ? 'fa' : 'en';
+const alternateUrl = toAbs(altLangPath(canonical, otherLang));
 ---
+
+<script is:inline>
+  (function () {
+    try {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark-theme');
+      }
+    } catch (e) {}
+  })();
+</script>
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,6 +67,10 @@ const ogImageUrl = abs(ogImage);
 <meta name="description" content={description} />
 <meta name="robots" content={robots} />
 <link rel="canonical" href={canonicalUrl} />
+
+<link rel="alternate" hreflang={lang} href={canonicalUrl} />
+<link rel="alternate" hreflang={otherLang} href={alternateUrl} />
+<link rel="alternate" hreflang="x-default" href={toAbs(altLangPath(canonical, 'fa'))} />
 
 <link rel="icon" type="image/png" sizes="32x32" href={asset('assets/images/favicon.png')} />
 <link rel="apple-touch-icon" sizes="180x180" href={asset('assets/images/apple-touch-icon.png')} />
@@ -53,7 +82,8 @@ const ogImageUrl = abs(ogImage);
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:locale" content={SITE.locale} />
+<meta property="og:locale" content={LOCALE_TAGS[lang]} />
+<meta property="og:locale:alternate" content={LOCALE_TAGS[otherLang]} />
 <meta property="og:site_name" content={SITE.name} />
 
 <meta name="twitter:card" content="summary_large_image" />
@@ -73,4 +103,10 @@ const ogImageUrl = abs(ogImage);
 {
   preloadHero && <link rel="preload" as="image" href={asset('assets/images/hero.webp')} fetchpriority="high" />
 }
-<link rel="preload" as="font" type="font/woff2" crossorigin href={vazirFontUrl} />
+<link
+  rel="preload"
+  as="font"
+  type="font/woff2"
+  crossorigin
+  href={lang === 'en' ? vazirLatinFontUrl : vazirArabicFontUrl}
+/>
