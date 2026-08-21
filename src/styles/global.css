@@ -3237,3 +3237,92 @@ html.dark-theme .moon-icon {
                 padding: 30px;
             }
         }
+
+/* --- Mobile UX refinements --- */
+
+/* Cleaner taps: suppress the grey flash on touch devices */
+body {
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+    /* Keep page content clear of the fixed booking dock */
+    .footer {
+        padding-bottom: 96px;
+    }
+
+    /* Dock respects iPhone home-indicator safe area */
+    .mobile-booking-dock {
+        padding-bottom: 15px;
+        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+
+    .whatsapp-float {
+        bottom: calc(120px + env(safe-area-inset-bottom));
+    }
+
+    /* Overlay panels follow the dynamic viewport (URL bar collapse) */
+    .mobile-menu {
+        height: auto;
+        height: 100dvh;
+    }
+}
+
+@media (max-width: 576px) {
+    .cart-drawer {
+        height: auto;
+        height: 100dvh;
+    }
+}
+
+/* iOS Safari auto-zooms into focused inputs smaller than 16px */
+@media (pointer: coarse) {
+    .form-group input,
+    .form-group select,
+    .form-group textarea,
+    .booking-form input,
+    .booking-form select {
+        font-size: 16px;
+    }
+
+    /* Comfortable touch targets inside cart line items */
+    .qty-btn {
+        padding: 6px;
+    }
+
+    .remove-item {
+        padding: 10px;
+    }
+
+    /* Pressed feedback replaces hover on touch */
+    .btn-premium:active,
+    .btn-outline:active,
+    .btn-dock-booking:active,
+    .btn-checkout:active,
+    .btn-checkout-final:active,
+    .btn-confirm:active {
+        transform: scale(0.97);
+    }
+
+    .btn-add-cart:active,
+    .quick-day:active,
+    .time-slot:not(:disabled):active {
+        border-color: var(--accent-gold);
+        background: rgba(197, 160, 89, 0.15);
+    }
+
+    .days-grid span:not(.past):active {
+        background: rgba(197, 160, 89, 0.3);
+    }
+
+    .social-box:active {
+        transform: scale(0.94);
+    }
+}
+
+/* Tighten header actions on narrow phones so nothing crowds the logo */
+@media (max-width: 420px) {
+    .header-actions {
+        gap: 12px;
+    }
+}
