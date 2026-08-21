@@ -79,8 +79,8 @@
     --dark-glass-border: rgba(255, 255, 255, 0.1);
     --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
     --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    --header-height: 110px;
-    --cart-width: 450px;
+    --header-height: 100px;
+    --cart-width: 400px;
 }
 
 /* Dark Theme Overrides */
@@ -120,6 +120,8 @@ html.dark-theme .product-category {
 
 html {
     scroll-behavior: smooth;
+    /* Global scale: slightly more compact than the 16px browser default */
+    font-size: 15px;
 }
 
 /* --- Grain Overlay --- */
@@ -254,7 +256,7 @@ body * {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--soft-cream);
+    background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -340,7 +342,7 @@ main {
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 60px;
+    padding: 0 48px;
 }
 
 /* --- Header --- */
@@ -366,7 +368,7 @@ body:not(.home-page) #main-header {
 }
 
 #main-header.scrolled {
-    height: 90px;
+    height: 82px;
     background: var(--glass-bg);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
@@ -388,7 +390,7 @@ nav {
 }
 
 .logo img {
-    height: 50px;
+    height: 44px;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
@@ -411,7 +413,7 @@ nav {
     content: '';
     position: absolute;
     bottom: 0;
-    right: 0;
+    inset-inline-start: 0;
     width: 0;
     height: 2px;
     background: var(--accent-gold);
@@ -435,8 +437,8 @@ nav {
     border: 1px solid var(--glass-border);
     cursor: pointer;
     color: var(--text-primary);
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     transition: var(--transition-smooth);
     display: flex;
@@ -465,7 +467,7 @@ nav {
 .cart-count {
     position: absolute;
     top: -5px;
-    right: -5px;
+    inset-inline-start: -5px;
     background: var(--accent-gold);
     color: white;
     font-size: 0.7rem;
@@ -595,7 +597,7 @@ html.dark-theme .moon-icon {
     color: #ffffff;
     /* Keep white text for primary dark buttons */
     border: none;
-    padding: 22px 45px;
+    padding: 18px 38px;
     border-radius: 50px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -661,11 +663,16 @@ html.dark-theme .moon-icon {
     transform: translateX(-5px);
 }
 
+/* Arrow points forward per direction */
+[dir='ltr'] .btn-premium:hover svg {
+    transform: translateX(5px);
+}
+
 .btn-outline {
     border: 1px solid var(--accent-gold);
     color: var(--text-primary);
     /* Changed to variable for dark mode visibility */
-    padding: 22px 45px;
+    padding: 18px 38px;
     border-radius: 50px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -771,12 +778,12 @@ html.dark-theme .moon-icon {
 
 /* --- Services --- */
 .services-section {
-    padding: 150px 0;
+    padding: 128px 0;
 }
 
 .section-header {
     text-align: center;
-    margin-bottom: 80px;
+    margin-bottom: 64px;
 }
 
 .section-header h2 {
@@ -809,7 +816,7 @@ html.dark-theme .moon-icon {
 
 .service-card {
     background: var(--bg-secondary);
-    padding: 80px 50px;
+    padding: 64px 40px;
     border-radius: 40px;
     text-align: center;
     border: 1px solid var(--glass-border);
@@ -848,14 +855,14 @@ html.dark-theme .moon-icon {
 }
 
 .icon-wrapper {
-    width: 120px;
-    height: 120px;
+    width: 104px;
+    height: 104px;
     background: var(--bg-primary);
-    border-radius: 40px;
+    border-radius: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 40px;
+    margin: 0 auto 32px;
     color: var(--accent-gold);
     transition: var(--transition-smooth);
     border: 1px solid rgba(197, 160, 89, 0.1);
@@ -884,11 +891,11 @@ html.dark-theme .moon-icon {
 .consultation {
     background: var(--dark-charcoal);
     border-radius: 60px;
-    margin: 0 40px 150px;
-    padding: 100px;
+    margin: 0 32px 128px;
+    padding: 80px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 100px;
+    gap: 76px;
     align-items: center;
     color: white;
     position: relative;
@@ -952,7 +959,7 @@ html.dark-theme .moon-icon {
 
 /* --- FAQ Section --- */
 .faq-section {
-    padding-bottom: 150px;
+    padding-bottom: 128px;
 }
 
 .faq-list {
@@ -1038,12 +1045,12 @@ html.dark-theme .moon-icon {
 
 /* --- Contact & Info --- */
 .contact-section {
-    padding-bottom: 150px;
+    padding-bottom: 128px;
 }
 
 /* --- Standalone Booking Page --- */
 .booking-page-main {
-    padding: 120px 0 150px;
+    padding: 104px 0 128px;
 }
 
 .booking-page-header {
@@ -1161,11 +1168,11 @@ html.dark-theme .moon-icon {
 
 .info-item {
     background: var(--bg-secondary);
-    padding: 60px;
+    padding: 48px;
     border-radius: 40px;
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 32px;
     margin-bottom: 30px;
     box-shadow: var(--card-shadow);
     border: 1px solid var(--glass-border);
@@ -1178,7 +1185,7 @@ html.dark-theme .moon-icon {
     content: '';
     position: absolute;
     bottom: 0;
-    right: 0;
+    inset-inline-start: 0;
     width: 0;
     height: 4px;
     background: var(--gold-gradient);
@@ -1190,19 +1197,24 @@ html.dark-theme .moon-icon {
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
 }
 
+/* Slide "forward" relative to reading direction */
+[dir='ltr'] .info-item:hover {
+    transform: translateX(15px) translateY(-5px);
+}
+
 .info-item:hover::after {
     width: 100%;
 }
 
 .info-icon {
     font-size: 2.5rem;
-    min-width: 90px;
-    height: 90px;
+    min-width: 78px;
+    height: 78px;
     background: var(--bg-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 30px;
+    border-radius: 26px;
     border: 1px solid var(--glass-border);
     transition: var(--transition-smooth);
 }
@@ -1287,14 +1299,14 @@ html.dark-theme .moon-icon {
 .footer {
     background: #080808;
     color: rgba(255, 255, 255, 0.5);
-    padding: 120px 0 0;
+    padding: 100px 0 0;
 }
 
 .footer-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    gap: 100px;
-    padding-bottom: 80px;
+    gap: 72px;
+    padding-bottom: 64px;
 }
 
 .footer-col h4 {
@@ -1310,14 +1322,14 @@ html.dark-theme .moon-icon {
     content: '';
     position: absolute;
     bottom: -10px;
-    right: 0;
+    inset-inline-start: 0;
     width: 40px;
     height: 2px;
     background: var(--gold-gradient);
 }
 
 .footer-brand .footer-logo {
-    height: 80px;
+    height: 68px;
     margin-bottom: 35px;
     transition: var(--transition-smooth);
 }
@@ -1351,14 +1363,18 @@ html.dark-theme .moon-icon {
     transform: translateX(-10px);
 }
 
+[dir='ltr'] .footer-links a:hover {
+    transform: translateX(10px);
+}
+
 .social-links-v2 {
     display: flex;
     gap: 20px;
 }
 
 .social-box {
-    width: 55px;
-    height: 55px;
+    width: 48px;
+    height: 48px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 18px;
     display: flex;
@@ -1393,8 +1409,8 @@ html.dark-theme .moon-icon {
     }
 
     .footer-col h4::after {
-        right: 50%;
-        transform: translateX(50%);
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .footer-brand p {
@@ -1485,7 +1501,7 @@ html.dark-theme .moon-icon {
 .mobile-menu {
     position: fixed;
     top: 0;
-    right: -100%;
+    inset-inline-start: -100%;
     width: 100%;
     height: 100%;
     background: var(--bg-primary);
@@ -1499,7 +1515,7 @@ html.dark-theme .moon-icon {
 }
 
 .mobile-menu.active {
-    right: 0;
+    inset-inline-start: 0;
 }
 
 .mobile-menu a {
@@ -1517,7 +1533,7 @@ html.dark-theme .moon-icon {
 .mobile-menu .close-btn {
     position: absolute;
     top: 40px;
-    left: 40px;
+    inset-inline-end: 40px;
     color: var(--text-primary);
     font-size: 3rem;
     cursor: pointer;
@@ -1619,7 +1635,7 @@ html.dark-theme .moon-icon {
 .modal-content {
     background: var(--bg-primary);
     margin: 30px auto;
-    padding: 80px;
+    padding: 64px;
     border-radius: 40px;
     position: relative;
     max-width: 1000px !important;
@@ -1636,8 +1652,8 @@ html.dark-theme .moon-icon {
     color: var(--text-primary);
     z-index: 10;
     transition: var(--transition-smooth);
-    width: 60px;
-    height: 60px;
+    width: 54px;
+    height: 54px;
     background: var(--bg-primary);
     border-radius: 50%;
     display: flex;
@@ -1685,7 +1701,7 @@ html.dark-theme .moon-icon {
 .calendar-card {
     background: var(--bg-secondary);
     border-radius: 30px;
-    padding: 30px;
+    padding: 26px;
     box-shadow: var(--card-shadow);
     border: 1px solid var(--glass-border);
 }
@@ -1722,6 +1738,12 @@ html.dark-theme .moon-icon {
     border-color: transparent;
 }
 
+/* RTL calendars flow right-to-left: prev points right, next points left */
+[dir='rtl'] .calendar-header .prev-month svg,
+[dir='rtl'] .calendar-header .next-month svg {
+    transform: scaleX(-1);
+}
+
 .current-month {
     font-weight: 700;
     font-size: 1.1rem;
@@ -1753,8 +1775,8 @@ html.dark-theme .moon-icon {
 }
 
 .days-grid span {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1857,7 +1879,7 @@ html.dark-theme .moon-icon {
     height: 10px;
     border-radius: 50%;
     display: inline-block;
-    margin-left: 5px;
+    margin-inline-end: 5px;
 }
 
 .dot.reserved {
@@ -1919,11 +1941,18 @@ html.dark-theme .moon-icon {
     padding-left: 40px;
 }
 
+/* Chevron sits at the reading-end side in LTR */
+[dir='ltr'] .form-group select {
+    background-position: right 15px center;
+    padding-left: 20px;
+    padding-right: 40px;
+}
+
 .required-star {
     position: absolute;
-    right: 15px;
+    inset-inline-start: 15px;
     top: 15px;
-    color: orange;
+    color: var(--accent-gold);
     pointer-events: none;
 }
 
@@ -1952,18 +1981,6 @@ html.dark-theme .moon-icon {
 .success-content {
     text-align: center;
     padding: 40px 0;
-}
-
-.success-icon {
-    width: 100px;
-    height: 100px;
-    background: #f2d4cd;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 40px;
-    color: white;
 }
 
 .success-content h2 {
@@ -2036,8 +2053,8 @@ html.dark-theme .moon-icon {
 
 /* --- Shop Styles --- */
 .shop-page {
-    padding-top: 150px;
-    padding-bottom: 100px;
+    padding-top: 128px;
+    padding-bottom: 84px;
 }
 
 .shop-header {
@@ -2076,7 +2093,7 @@ html.dark-theme .moon-icon {
 .product-card {
     background: var(--bg-secondary);
     border-radius: 40px;
-    padding: 40px;
+    padding: 34px;
     transition: var(--transition-smooth);
     border: 1px solid var(--glass-border);
     position: relative;
@@ -2181,8 +2198,8 @@ html.dark-theme .moon-icon {
 .product-badge {
     position: absolute;
     top: 30px;
-    left: 30px;
-    /* Moved to left for better RTL balance */
+    inset-inline-end: 30px;
+    /* Mirrors per direction (left in RTL, right in LTR) */
     background: var(--gold-gradient);
     color: var(--dark-charcoal);
     padding: 10px 20px;
@@ -2326,8 +2343,8 @@ html.dark-theme .moon-icon {
     position: fixed;
     bottom: 40px;
     left: 40px;
-    width: 65px;
-    height: 65px;
+    width: 56px;
+    height: 56px;
     background-color: #25d366;
     color: white;
     border-radius: 50%;
@@ -2346,8 +2363,8 @@ html.dark-theme .moon-icon {
 }
 
 .whatsapp-float svg {
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
 }
 
 /* Instagram floating button (Iranian primary contact channel) */
@@ -2385,15 +2402,15 @@ html.dark-theme .moon-icon {
     .whatsapp-float {
         bottom: 120px;
         /* Above the dock */
-        width: 55px;
-        height: 55px;
+        width: 48px;
+        height: 48px;
         left: 25px;
         transition: transform 0.3s ease;
     }
 
     .whatsapp-float svg {
-        width: 30px;
-        height: 30px;
+        width: 26px;
+        height: 26px;
     }
 }
 
@@ -2444,7 +2461,7 @@ html.dark-theme .moon-icon {
 }
 
 .preloader-logo {
-    height: 100px;
+    height: 88px;
     margin-bottom: 30px;
     animation: preloaderPulse 2s ease-in-out infinite;
 }
@@ -2586,7 +2603,8 @@ html.dark-theme .moon-icon {
 .cart-drawer {
     position: fixed;
     top: 0;
-    left: 0;
+    /* Pinned to the inline-end edge: left in RTL, right in LTR */
+    inset-inline-end: 0;
     width: 100%;
     max-width: var(--cart-width);
     height: 100%;
@@ -2594,7 +2612,7 @@ html.dark-theme .moon-icon {
     z-index: 4001;
     box-shadow: 40px 0 100px rgba(0, 0, 0, 0.2);
     /* Animate transform (GPU) instead of 'left' to avoid layout thrash */
-    transform: translateX(-100%);
+    transform: translateX(100%);
     transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
     will-change: transform;
     display: flex;
@@ -2603,12 +2621,23 @@ html.dark-theme .moon-icon {
     /* Use default cursor in cart for better performance */
 }
 
+/* RTL: drawer sits on the left and hides toward the left */
+[dir='rtl'] .cart-drawer {
+    transform: translateX(-100%);
+    box-shadow: 40px 0 100px rgba(0, 0, 0, 0.2);
+}
+
+/* LTR: drawer sits on the right and casts its shadow inward */
+[dir='ltr'] .cart-drawer {
+    box-shadow: -40px 0 100px rgba(0, 0, 0, 0.2);
+}
+
 .cart-drawer.active {
     transform: translateX(0);
 }
 
 .cart-header {
-    padding: 30px 40px;
+    padding: 24px 32px;
     border-bottom: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-between;
@@ -2639,7 +2668,7 @@ html.dark-theme .moon-icon {
 .cart-items-container {
     flex: 1;
     overflow-y: auto;
-    padding: 30px 40px;
+    padding: 24px 32px;
 }
 
 .cart-empty-msg {
@@ -2773,7 +2802,7 @@ html.dark-theme .moon-icon {
 }
 
 .cart-footer {
-    padding: 30px 40px;
+    padding: 24px 32px;
     background: var(--bg-secondary);
     border-top: 1px solid var(--glass-border);
 }
@@ -2834,8 +2863,8 @@ html.dark-theme .moon-icon {
 }
 
 .checkout-container {
-    padding-top: 150px;
-    padding-bottom: 100px;
+    padding-top: 128px;
+    padding-bottom: 84px;
 }
 
 .checkout-grid {
@@ -2854,7 +2883,7 @@ html.dark-theme .moon-icon {
 
 .premium-form {
     background: var(--bg-secondary);
-    padding: 50px;
+    padding: 42px;
     border-radius: 40px;
     border: 1px solid var(--glass-border);
     box-shadow: var(--card-shadow);
@@ -2926,7 +2955,7 @@ html.dark-theme .moon-icon {
 .summary-card {
     background: var(--dark-charcoal);
     color: white;
-    padding: 40px;
+    padding: 34px;
     border-radius: 40px;
     position: sticky;
     top: 130px;
@@ -2951,7 +2980,7 @@ html.dark-theme .moon-icon {
 
 .summary-item .item-info .qty {
     color: #888;
-    margin-right: 5px;
+    margin-inline-start: 5px;
 }
 
 .summary-details {
@@ -3012,8 +3041,8 @@ html.dark-theme .moon-icon {
 }
 
 .success-icon {
-    width: 100px;
-    height: 100px;
+    width: 88px;
+    height: 88px;
     background: var(--accent-gold);
     color: white;
     border-radius: 50%;
@@ -3100,8 +3129,8 @@ html.dark-theme .moon-icon {
 /* --- About Page (moved from inline styles) --- */
 /* Specific Styles for About Page to match the provided design */
         .about-page-content {
-            padding-top: 150px;
-            padding-bottom: 100px;
+            padding-top: 128px;
+            padding-bottom: 84px;
             background-color: var(--bg-primary);
         }
 
@@ -3117,8 +3146,8 @@ html.dark-theme .moon-icon {
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 50px;
-            text-align: left;
-            padding-left: 20px;
+            text-align: start;
+            padding-inline-start: 20px;
         }
 
         .about-content-box {
