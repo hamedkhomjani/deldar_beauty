@@ -7,6 +7,7 @@ import Layout from '../components/Layout.astro';
 import ServiceIcon from '../components/ServiceIcon.astro';
 import { SERVICES } from '../data/services';
 import { FAQS } from '../data/faq';
+import { REVIEWS } from '../data/reviews';
 import { beautySalonSchema, webSiteSchema, faqSchema, breadcrumbSchema } from '../data/schema';
 import { SALON, asset } from '../config';
 import { t, localizedPath, type Lang } from '../i18n';
@@ -151,6 +152,46 @@ const mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${m
       </div>
       <div class="consultation-image" data-reveal>
         <img src={asset('assets/images/consultation.webp')} alt={dict.consultImgAlt} loading="lazy" />
+      </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="reviews-section container" aria-label={dict.reviewsTagline}>
+      <div class="section-header" data-reveal>
+        <p class="section-tagline">{dict.reviewsTagline}</p>
+        <h2>{dict.reviewsH2}</h2>
+        <p>{dict.reviewsSub}</p>
+      </div>
+      <div class="reviews-grid">
+        {
+          REVIEWS.map((review) => (
+            <article class="review-card" data-reveal>
+              <div class="review-stars" role="img" aria-label={`${review.rating} / 5`}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <svg
+                    class:list={['star', { full: i <= review.rating }]}
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                ))}
+              </div>
+              <blockquote class="review-text">{review.text[lang]}</blockquote>
+              <footer class="review-footer">
+                <span class="review-avatar" aria-hidden="true">{review.name[lang].trim().charAt(0)}</span>
+                <span class="review-meta">
+                  <strong class="review-name">{review.name[lang]}</strong>
+                  <span class="review-service">{review.service[lang]}</span>
+                </span>
+              </footer>
+            </article>
+          ))
+        }
       </div>
     </section>
 

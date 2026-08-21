@@ -88,6 +88,9 @@ const fa = {
   weekdays: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
   today: 'امروز',
   tomorrow: 'فردا',
+  reviewsTagline: 'نظر مشتریان',
+  reviewsH2: 'دلدار از نگاه شما',
+  reviewsSub: 'تجربه‌ی واقعی خانم‌هایی که به ما اعتماد کردن',
   timeSlots: [
     '09:00 صبح',
     '10:00 صبح',
@@ -257,6 +260,9 @@ const en: Dictionary = {
   weekdays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
   today: 'Today',
   tomorrow: 'Tomorrow',
+  reviewsTagline: 'Client Stories',
+  reviewsH2: 'Loved by Our Clients',
+  reviewsSub: 'Real experiences from the women who trust us',
   timeSlots: [
     '09:00 AM',
     '10:00 AM',

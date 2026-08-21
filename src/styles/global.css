@@ -3238,6 +3238,124 @@ html.dark-theme .moon-icon {
             }
         }
 
+/* --- Client Reviews --- */
+.reviews-section {
+    padding-bottom: 128px;
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.review-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 40px;
+    padding: 40px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition: var(--transition-smooth);
+}
+
+.review-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+    border-color: rgba(197, 160, 89, 0.45);
+}
+
+.review-stars {
+    display: flex;
+    gap: 4px;
+    color: var(--accent-gold);
+}
+
+.review-stars .star polygon {
+    fill: none;
+    stroke: currentColor;
+}
+
+.review-stars .star.full polygon {
+    fill: currentColor;
+}
+
+.review-text {
+    font-size: 1rem;
+    line-height: 2;
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+.review-footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.review-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--gold-gradient);
+    color: var(--dark-charcoal);
+    font-weight: 700;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.review-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5;
+}
+
+.review-name {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.review-service {
+    font-size: 0.8rem;
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+@media (max-width: 992px) {
+    .reviews-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .reviews-section {
+        padding-bottom: 96px;
+    }
+
+    /* Swipeable snap carousel */
+    .reviews-grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 16px;
+        padding-bottom: 8px;
+        scrollbar-width: none;
+    }
+
+    .reviews-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .review-card {
+        min-width: 84%;
+        scroll-snap-align: center;
+    }
+}
+
 /* --- Mobile UX refinements --- */
 
 /* Cleaner taps: suppress the grey flash on touch devices */

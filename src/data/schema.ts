@@ -9,6 +9,7 @@ import type { Product } from './products';
 import { tomanToRial } from './products';
 import type { Service } from './services';
 import type { Faq } from './faq';
+import { REVIEWS_AGGREGATE } from './reviews';
 
 export function abs(url: string): string {
   return url.startsWith('http') ? url : SITE.url.replace(/\/$/, '') + url;
@@ -61,6 +62,12 @@ export function beautySalonSchema(services: Service[], lang: Lang) {
       addressCountry: 'IR',
     },
     geo: { '@type': 'GeoCoordinates', latitude: 35.7812, longitude: 51.412 },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: REVIEWS_AGGREGATE.ratingValue,
+      reviewCount: REVIEWS_AGGREGATE.reviewCount,
+      bestRating: REVIEWS_AGGREGATE.bestRating,
+    },
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
