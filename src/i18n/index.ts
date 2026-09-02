@@ -112,6 +112,8 @@ const fa = {
   phonePlaceholder: 'شماره تماس',
   emailPlaceholder: 'ایمیل',
   bookingSubmitBtn: 'تایید و ارسال درخواست',
+  bookingSuccessAria: 'ثبت موفق نوبت',
+  closeLabel: 'بستن',
   bookingSuccessHeading: 'وقتت با موفقیت ثبت شد!',
   bookingSuccessText:
     'درخواست رزرو شما از طریق پیام‌رسان تلگرام برای ما ارسال شد. همکاران ما در سریع‌ترین زمان ممکن برای تایید نهایی با شما تماس می‌گیرند.',
@@ -284,6 +286,8 @@ const en: Dictionary = {
   phonePlaceholder: 'Phone number',
   emailPlaceholder: 'Email',
   bookingSubmitBtn: 'Confirm & Send Request',
+  bookingSuccessAria: 'Appointment booked successfully',
+  closeLabel: 'Close',
   bookingSuccessHeading: 'Your appointment has been booked!',
   bookingSuccessText:
     'Your booking request was sent to us via Telegram. Our team will contact you as soon as possible to confirm your appointment.',

@@ -91,19 +91,14 @@ const dir = lang === 'en' ? 'ltr' : 'rtl';
     {!checkout && <CartDrawer lang={lang} />}
     {!checkout && !noBookingModal && <BookingModal lang={lang} />}
 
-    {checkout ? (
-      <>
-        <script src="../scripts/cursor.ts" />
-        <script src="../scripts/ui.ts" />
-        <script src="../scripts/checkout.ts" />
-      </>
-    ) : (
-      <>
-        <script src="../scripts/cursor.ts" />
-        <script src="../scripts/ui.ts" />
-        <script src="../scripts/booking.ts" />
-        <script src="../scripts/cart.ts" />
-      </>
-    )}
+    {/* All scripts load unconditionally as one fixed, stable set. Each script
+        self-guards against missing page elements (see checkout.ts comment), so
+        this avoids Astro's per-branch script-stub bundling confusion where the
+        wrong module set was served on some pages. */}
+    <script src="../scripts/cursor.ts" />
+    <script src="../scripts/ui.ts" />
+    <script src="../scripts/booking.ts" />
+    <script src="../scripts/cart.ts" />
+    <script src="../scripts/checkout.ts" />
   </body>
 </html>

@@ -114,6 +114,7 @@ function formatSelectedDate(d: Date): string {
     day: 'numeric',
   });
   // Jalali equivalent shown underneath/beside the Gregorian date
+  const [jy, jm, jd] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
   return `${gregorian} (${jd} ${J_MONTH_NAMES_EN[jm - 1]} ${jy})`;
 }
 
@@ -508,16 +509,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $('#booking-step-1')?.classList.add('hidden');
     $('#booking-step-2')?.classList.remove('hidden');
+
+    // Standalone booking page: show the success popup dialog after submit
+    if (standalonePage) {
+      const success = $('#booking-success');
+      if (success) {
+        success.classList.remove('hidden');
+        success.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        $('#booking-form')?.classList.add('hidden');
+      }
+    }
   });
 
-  // Standalone booking page: reveal the inline success panel after submit
+  // Standalone booking page: popup close handlers
   if (standalonePage) {
-    $('#booking-form')?.addEventListener('submit', () => {
+    const closeSuccess = () => {
       const success = $('#booking-success');
-      if (!success) return;
-      success.classList.remove('hidden');
-      success.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      $('#booking-form')?.classList.add('hidden');
+      if (!success || !success.classList.contains('active')) return;
+      success.classList.remove('active');
+      success.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    };
+    $('#success-close')?.addEventListener('click', closeSuccess);
+    $('#booking-success')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeSuccess();
     });
   }
 });

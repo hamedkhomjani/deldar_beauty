@@ -22,7 +22,7 @@ export const SALON = {
    * - callmebotKey: activate at callmebot.com ("I allow callmebot...") → key sent to you
    * - web3FormsKey: create at web3forms.com with your email → access key
    */
-  callmebotKey: '',
+  callmebotKey: '9463194',
   web3FormsKey: '',
   telegram: 'deldar_beauty',
   instagram: 'deldarhaircutt',

@@ -13,6 +13,10 @@ if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 
+// Signal that JS is active so scroll-reveal styling can hide elements safely
+// (see `html.js [data-reveal]` in global.css). Without this, content stays visible.
+document.documentElement.classList.add('js');
+
 // Aggressive scroll-to-top on load
 window.addEventListener('load', () => {
   setTimeout(() => {
@@ -44,13 +48,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = $('#theme-toggle');
   const rootEl = document.documentElement;
 
+  function applyThemeColor(dark: boolean): void {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (meta) meta.content = dark ? '#050505' : '#fdfaf5';
+  }
+
   if (localStorage.getItem('theme') === 'dark') {
     rootEl.classList.add('dark-theme');
   }
+  applyThemeColor(rootEl.classList.contains('dark-theme'));
 
   themeToggle?.addEventListener('click', () => {
     rootEl.classList.toggle('dark-theme');
     localStorage.setItem('theme', rootEl.classList.contains('dark-theme') ? 'dark' : 'light');
+    applyThemeColor(rootEl.classList.contains('dark-theme'));
   });
 
   // Header scroll effect
