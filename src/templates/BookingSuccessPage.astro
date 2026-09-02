@@ -45,12 +45,37 @@ const dict = t(lang);
           <div class="summary-row"><dt>{dict.summaryTime}</dt><dd data-field="time"></dd></div>
         </dl>
       </div>
+      <div class="calendar-actions" id="calendar-actions" hidden>
+        <p class="calendar-title">{dict.addToCalendar}</p>
+        <div class="calendar-buttons">
+          <a class="cal-btn" id="cal-google" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>{dict.calendarGoogle}</span>
+          </a>
+          <a class="cal-btn" id="cal-apple" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>{dict.calendarApple}</span>
+          </a>
+          <button type="button" class="cal-btn" id="cal-download">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>{dict.calendarDownload}</span>
+          </button>
+        </div>
+      </div>
       <a class="btn-back" href={localizedPath('/', lang)}>{dict.bookingBackHome}</a>
     </div>
   </main>
 </Layout>
 
 <script>
+  import { SITE, SALON } from '../config';
+  import { t } from '../i18n';
+
+  const pageLang = document.documentElement.lang === 'en' ? 'en' : 'fa';
+  const dict = t(pageLang);
+  const SALON_NAME = pageLang === 'en' ? SITE.nameEn : SITE.name;
+  const SALON_ADDRESS = SALON.address[pageLang];
+  const REF_PREFIX = dict.bookingRefLabel;
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('ref');
   const box = document.getElementById('booking-ref');
@@ -71,5 +96,91 @@ const dict = t(lang);
       }
     });
     if (filled > 0) summary.hidden = false;
+  }
+
+  // --- Add to calendar ---
+  const iso = params.get('iso');
+  const timeStr = params.get('time') || '10:00';
+  const service = params.get('service') || '';
+  const nameValue = params.get('name') || '';
+  const actions = document.getElementById('calendar-actions');
+
+  function toICStime(d: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return (
+      `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}` +
+      `T${pad(d.getHours())}${pad(d.getMinutes())}00`
+    );
+  }
+
+  function buildEvent(): { title: string; startStr: string; endStr: string; icsUrl: string } {
+    if (!iso || !timeStr) return { title: '', startStr: '', endStr: '', icsUrl: '' };
+    const [hour, minute] = timeStr.split(':').map((n) => parseInt(n, 10) || 0);
+    const start = new Date(`${iso}T00:00:00`);
+    start.setHours(hour, minute, 0, 0);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const title = `${service ? service + ' - ' : ''}${SALON_NAME}`;
+    const startStr = toICStime(start);
+    const endStr = toICStime(end);
+
+    const details = [service, nameValue, ref ? `${REF_PREFIX}: ${ref}` : '', '']
+      .filter(Boolean)
+      .join('\n');
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//deldar//booking//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${ref || iso}-${Date.now()}@deldar`,
+      `DTSTAMP:${toICStime(new Date())}`,
+      `DTSTART:${startStr}`,
+      `DTEND:${endStr}`,
+      `SUMMARY:${title}`,
+      `DESCRIPTION:${details.replace(/\n/g, '\\n')}`,
+      `LOCATION:${SALON_ADDRESS}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+      '',
+    ].join('\r\n');
+    const icsUrl = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    return { title, startStr, endStr, icsUrl };
+  }
+
+  if (actions && iso && timeStr) {
+    const event = buildEvent();
+    const fileName = `deldar-booking-${ref || 'appointment'}.ics`;
+
+    // Google Calendar (Android + desktop)
+    const google = document.getElementById('cal-google') as HTMLAnchorElement | null;
+    if (google && event.title) {
+      google.href =
+        'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+        `&text=${encodeURIComponent(event.title)}` +
+        `&dates=${event.startStr}/${event.endStr}` +
+        `&details=${encodeURIComponent(`${service} - ${REF_PREFIX}: ${ref ?? ''}`)}` +
+        `&location=${encodeURIComponent(SALON_ADDRESS)}`;
+    }
+
+    // Apple/iOS (downloads .ics -> prompts "Add to Calendar")
+    const apple = document.getElementById('cal-apple') as HTMLAnchorElement | null;
+    if (apple) {
+      apple.href = event.icsUrl;
+      apple.setAttribute('download', fileName);
+    }
+
+    // Universal download
+    const download = document.getElementById('cal-download');
+    if (download) {
+      download.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = event.icsUrl;
+        a.download = fileName;
+        a.click();
+      });
+    }
+
+    actions.hidden = false;
   }
 </script>

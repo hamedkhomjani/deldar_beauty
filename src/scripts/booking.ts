@@ -541,6 +541,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
       const isEn = document.documentElement.lang === 'en';
       const successPath = isEn ? `${base}/en/booking/success/` : `${base}/booking/success/`;
+      const isoDate = selectedDate
+        ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(
+            selectedDate.getDate(),
+          ).padStart(2, '0')}`
+        : '';
       const params = new URLSearchParams({
         ref,
         service: serviceValue,
@@ -548,6 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
         phone: phoneValue,
         date: jalaliDateString(selectedDate),
         time: time24,
+        iso: isoDate,
       });
       window.location.href = `${successPath}?${params.toString()}`;
     }
