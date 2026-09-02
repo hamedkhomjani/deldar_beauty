@@ -1068,87 +1068,121 @@ html.dark-theme .moon-icon {
     font-size: 1.05rem;
 }
 
-/* Success popup dialog (shown after a booking is submitted) */
-.booking-success {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 5000;
-    padding: 24px;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
-    text-align: center;
-    /* centering is applied only when active so it doesn't conflict with display:none */
-}
-
-.booking-success.active {
-    display: flex !important;
+/* Booking success page */
+.booking-success-page .booking-success-main {
+    display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 1;
-    visibility: visible;
+    min-height: 80vh;
+    padding: 48px 24px;
+    text-align: center;
 }
 
-.booking-success-content {
-    position: relative;
+.booking-success-card {
     background: var(--bg-primary);
     border: 1px solid var(--glass-border);
     border-radius: 32px;
-    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     padding: 60px 48px 48px;
     max-width: 480px;
     width: 100%;
     animation: modalPop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.booking-success-content h2 {
+.booking-success-card h1 {
     font-size: 2.2rem;
     margin-bottom: 18px;
     color: var(--text-primary);
     font-weight: 700;
 }
 
-.booking-success-content p {
+.booking-success-card p {
     font-size: 1.05rem;
     color: var(--text-secondary);
     line-height: 1.9;
     margin-bottom: 36px;
 }
 
-.booking-success-content .btn-back {
-    display: inline-block;
-}
-
-.success-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--bg-secondary);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    font-size: 1.6rem;
-    line-height: 1;
-    cursor: pointer;
+.booking-success-card .booking-ref {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
     align-items: center;
-    justify-content: center;
-    transition: var(--transition-smooth);
+    margin-bottom: 36px;
+    padding: 18px 24px;
+    border: 1px dashed var(--glass-border);
+    border-radius: 16px;
+    background: var(--bg-secondary);
 }
 
-.success-close:hover {
-    background: var(--dark-charcoal);
-    color: #fff;
-    transform: rotate(90deg);
+.booking-success-card .booking-ref-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.booking-success-card .booking-ref-code {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent-gold);
+}
+
+/* Booking summary block */
+.booking-success-card .booking-summary {
+    margin-bottom: 36px;
+    padding: 24px;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    background: var(--bg-secondary);
+    text-align: right;
+}
+
+.booking-success-card .booking-summary h2 {
+    font-size: 1.15rem;
+    margin-bottom: 18px;
+    color: var(--text-primary);
+    font-weight: 700;
+    text-align: center;
+}
+
+.booking-success-card .summary-list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.booking-success-card .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.booking-success-card .summary-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.booking-success-card .summary-row dt {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.booking-success-card .summary-row dd {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.booking-success-card .btn-back {
+    display: inline-block;
 }
 
 /* Quick day chips (امروز/فردا) */

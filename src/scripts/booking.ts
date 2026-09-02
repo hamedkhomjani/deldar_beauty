@@ -468,17 +468,43 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `${String(Math.floor(slotMinutes / 60)).padStart(2, '0')}:${String(slotMinutes % 60).padStart(2, '0')}`
         : (selectedTime ?? '');
 
+    // Unique booking reference for follow-up (easy to remember, unique).
+    let ref = `DLD-${String(Math.floor(10000 + Math.random() * 90000))}`;
+    // Guard against accidental duplicates within this session.
+    const usedRefs = new Set<string>(
+      JSON.parse(sessionStorage.getItem('deldar_used_refs') ?? '[]') as string[],
+    );
+    while (usedRefs.has(ref)) {
+      ref = `DLD-${String(Math.floor(10000 + Math.random() * 90000))}`;
+    }
+    usedRefs.add(ref);
+    sessionStorage.setItem('deldar_used_refs', JSON.stringify([...usedRefs]));
+
+    const nameValue = name?.value.trim() ?? '';
+    const phoneValue = phone?.value.trim() ?? '';
+    const emailValue = email?.value.trim() ?? '';
+    const serviceValue = service?.value ?? '';
+
+    const group = (label: string, value: string) => [label, value];
+
+    const fieldSets: string[][] = [
+      group(F.tgName, nameValue),
+      group(F.tgPhone, phoneValue),
+      ...(emailValue ? [group(F.tgEmail, emailValue)] : []),
+      group(F.tgService, serviceValue),
+      group(F.tgDate, jalaliDateString(selectedDate)),
+      group(F.tgTime, time24),
+    ];
+
     const msg = [
-      F.tgTitle,
-      `${F.tgName} ${name?.value.trim() ?? ''}`,
-      `${F.tgPhone} ${phone?.value.trim() ?? ''}`,
-      email?.value.trim() ? `${F.tgEmail} ${email.value.trim()}` : '',
-      `${F.tgService} ${service?.value ?? ''}`,
-      `${F.tgDate} ${jalaliDateString(selectedDate)}`,
-      `${F.tgTime} ${time24}`,
+      `📅 *${F.tgTitle}*`,
+      '',
+      `🆔 *${F.tgRef}:* ${ref}`,
+      '',
+      ...fieldSets.flatMap((g) => [...g, '']),
     ]
-      .filter(Boolean)
-      .join('\n');
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n');
 
     let delivered = false;
 
@@ -510,30 +536,20 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#booking-step-1')?.classList.add('hidden');
     $('#booking-step-2')?.classList.remove('hidden');
 
-    // Standalone booking page: show the success popup dialog after submit
+    // Standalone booking page: redirect to the success page
     if (standalonePage) {
-      const success = $('#booking-success');
-      if (success) {
-        success.classList.remove('hidden');
-        success.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        $('#booking-form')?.classList.add('hidden');
-      }
+      const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+      const isEn = document.documentElement.lang === 'en';
+      const successPath = isEn ? `${base}/en/booking/success/` : `${base}/booking/success/`;
+      const params = new URLSearchParams({
+        ref,
+        service: serviceValue,
+        name: nameValue,
+        phone: phoneValue,
+        date: jalaliDateString(selectedDate),
+        time: time24,
+      });
+      window.location.href = `${successPath}?${params.toString()}`;
     }
   });
-
-  // Standalone booking page: popup close handlers
-  if (standalonePage) {
-    const closeSuccess = () => {
-      const success = $('#booking-success');
-      if (!success || !success.classList.contains('active')) return;
-      success.classList.remove('active');
-      success.classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    };
-    $('#success-close')?.addEventListener('click', closeSuccess);
-    $('#booking-success')?.addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) closeSuccess();
-    });
-  }
 });

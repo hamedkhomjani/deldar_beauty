@@ -7,7 +7,7 @@ import Layout from '../components/Layout.astro';
 import { bookingServiceNames } from '../data/services';
 import { breadcrumbSchema } from '../data/schema';
 import { asset } from '../config';
-import { t, localizedPath, type Lang } from '../i18n';
+import { t, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -117,22 +117,6 @@ const jsonLd = [
           <p id="booking-form-msg" class="form-msg"></p>
           <button type="submit" class="btn-confirm">{dict.bookingSubmitBtn}</button>
         </form>
-      </div>
-
-      <div id="booking-success" class="booking-success hidden" role="dialog" aria-modal="true" aria-label={dict.bookingSuccessAria}>
-        <div class="booking-success-content">
-          <button type="button" class="success-close" id="success-close" aria-label={dict.closeLabel}>×</button>
-          <div class="success-icon">
-            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          <h2>{dict.bookingSuccessHeading}</h2>
-          <p>
-            {dict.bookingSuccessText}
-          </p>
-          <a class="btn-back" href={localizedPath('/', lang)}>{dict.bookingBackHome}</a>
-        </div>
       </div>
     </div>
   </main>

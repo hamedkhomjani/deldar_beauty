@@ -1,0 +1,75 @@
+---
+/**
+ * Booking success page — shown after a booking is submitted.
+ * Replaces the old popup overlay with a proper standalone page.
+ */
+import Layout from '../components/Layout.astro';
+import { t, localizedPath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const dict = t(lang);
+---
+
+<Layout
+  title={dict.bookingSuccessHeading}
+  description={dict.bookingSuccessText}
+  lang={lang}
+  bodyClass="booking-success-page"
+  noBookingModal
+  hideBookingDock
+>
+  <main class="booking-success-main">
+    <div class="booking-success-card" data-reveal>
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h1>{dict.bookingSuccessHeading}</h1>
+      <p>{dict.bookingSuccessText}</p>
+      <div class="booking-ref" id="booking-ref" hidden>
+        <span class="booking-ref-label">{dict.bookingRefLabel}</span>
+        <span class="booking-ref-code" id="booking-ref-code"></span>
+      </div>
+      <div class="booking-summary" id="booking-summary" hidden>
+        <h2>{dict.bookingSummaryHeading}</h2>
+        <dl class="summary-list" id="summary-list">
+          <div class="summary-row"><dt>{dict.summaryService}</dt><dd data-field="service"></dd></div>
+          <div class="summary-row"><dt>{dict.summaryName}</dt><dd data-field="name"></dd></div>
+          <div class="summary-row"><dt>{dict.summaryPhone}</dt><dd data-field="phone"></dd></div>
+          <div class="summary-row"><dt>{dict.summaryDate}</dt><dd data-field="date"></dd></div>
+          <div class="summary-row"><dt>{dict.summaryTime}</dt><dd data-field="time"></dd></div>
+        </dl>
+      </div>
+      <a class="btn-back" href={localizedPath('/', lang)}>{dict.bookingBackHome}</a>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  const box = document.getElementById('booking-ref');
+  const code = document.getElementById('booking-ref-code');
+  if (ref && box && code) {
+    box.hidden = false;
+    code.textContent = ref;
+  }
+
+  const summary = document.getElementById('booking-summary');
+  let filled = 0;
+  if (summary) {
+    summary.querySelectorAll('[data-field]').forEach((el) => {
+      const value = params.get(el.getAttribute('data-field') || '');
+      if (value) {
+        el.textContent = value;
+        filled++;
+      }
+    });
+    if (filled > 0) summary.hidden = false;
+  }
+</script>
