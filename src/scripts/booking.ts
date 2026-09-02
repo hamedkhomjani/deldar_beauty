@@ -345,6 +345,50 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   }
 
+  // --- Remember & resume booking form ---
+  const DRAFT_KEY = 'deldar_booking_draft';
+  const loadDraft = (): Record<string, string> => {
+    try {
+      return JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}') || {};
+    } catch {
+      return {};
+    }
+  };
+  const saveDraft = (data: Record<string, string>) => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+    } catch {
+      /* storage unavailable */
+    }
+  };
+  const nameInput = $('#booking-name') as HTMLInputElement | null;
+  const phoneInput = $('#booking-phone') as HTMLInputElement | null;
+  const emailInput = $('#booking-email') as HTMLInputElement | null;
+  const serviceSelect = $('#booking-service') as HTMLSelectElement | null;
+
+  const draft = loadDraft();
+  const hasDraft = !!(draft.name || draft.phone);
+  if (nameInput && draft.name) nameInput.value = draft.name;
+  if (phoneInput && draft.phone) phoneInput.value = draft.phone;
+  if (emailInput && draft.email) emailInput.value = draft.email;
+  if (serviceSelect && draft.service) serviceSelect.value = draft.service;
+  if (hasDraft && standalonePage) {
+    showToast(S.draftRestored);
+  }
+
+  const persistDraft = () => {
+    saveDraft({
+      name: nameInput?.value ?? '',
+      phone: phoneInput?.value ?? '',
+      email: emailInput?.value ?? '',
+      service: serviceSelect?.value ?? '',
+    });
+  };
+  nameInput?.addEventListener('input', persistDraft);
+  phoneInput?.addEventListener('input', persistDraft);
+  emailInput?.addEventListener('input', persistDraft);
+  serviceSelect?.addEventListener('change', persistDraft);
+
   // Escape closes the booking modal
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
@@ -456,6 +500,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const phone = $('#booking-phone') as HTMLInputElement | null;
     const email = $('#booking-email') as HTMLInputElement | null;
     const service = $('#booking-service') as HTMLSelectElement | null;
+
+    // Remember the customer's contact details for next time (pre-fill), but
+    // clear the chosen service so a fresh booking starts clean.
+    saveDraft({
+      name: name?.value.trim() ?? '',
+      phone: phone?.value.trim() ?? '',
+      email: email?.value.trim() ?? '',
+      service: '',
+    });
 
     // Automatic delivery: CallMeBot → WhatsApp text, Web3Forms → email.
     // Both fire in the background when their key is configured; if neither
