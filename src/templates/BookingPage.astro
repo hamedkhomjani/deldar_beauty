@@ -45,6 +45,11 @@ const jsonLd = [
     </div>
 
     <div id="booking-page" class="container">
+      <ol class="booking-steps" aria-label="booking progress">
+        <li data-step="1" class="step"><span class="step-num">{lang === 'fa' ? '۱' : '1'}</span><span class="step-label">{dict.stepPickTitle}</span></li>
+        <li data-step="2" class="step"><span class="step-num">{lang === 'fa' ? '۲' : '2'}</span><span class="step-label">{dict.stepDetailsTitle}</span></li>
+        <li data-step="3" class="step"><span class="step-num">{lang === 'fa' ? '۳' : '3'}</span><span class="step-label">{dict.stepConfirmTitle}</span></li>
+      </ol>
       <div class="booking-grid">
         <div class="calendar-container">
           <h3>{dict.chooseDay}</h3>
@@ -93,26 +98,29 @@ const jsonLd = [
       <div class="details-section">
         <h3>{dict.detailsHeading}</h3>
         <form id="booking-form" class="booking-form">
-          <div class="form-group">
-            <select id="booking-service" required>
+          <div class="form-group" data-field-group="service">
+            <select id="booking-service" required autocomplete="off">
               <option value="" disabled selected>{dict.servicePlaceholder}</option>
               {services.map((name) => <option>{name}</option>)}
               <option>{dict.freeConsultOption}</option>
             </select>
             <span class="required-star">*</span>
+            <p class="field-error" data-error-for="service"></p>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <input type="text" id="booking-name" placeholder={dict.namePlaceholder} required />
+            <div class="form-group" data-field-group="name">
+              <input type="text" id="booking-name" placeholder={dict.namePlaceholder} required autocomplete="name" />
               <span class="required-star">*</span>
+              <p class="field-error" data-error-for="name"></p>
             </div>
-            <div class="form-group">
-              <input type="tel" id="booking-phone" placeholder={dict.phonePlaceholder} required />
+            <div class="form-group" data-field-group="phone">
+              <input type="tel" id="booking-phone" placeholder={dict.phonePlaceholder} required autocomplete="tel" />
               <span class="required-star">*</span>
+              <p class="field-error" data-error-for="phone"></p>
             </div>
           </div>
           <div class="form-group">
-            <input type="email" id="booking-email" placeholder={dict.emailPlaceholder} />
+            <input type="email" id="booking-email" placeholder={dict.emailPlaceholder} autocomplete="email" />
           </div>
           <p id="booking-form-msg" class="form-msg"></p>
           <button type="submit" class="btn-confirm">{dict.bookingSubmitBtn}</button>

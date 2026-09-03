@@ -185,6 +185,9 @@ function renderCalendar(): void {
     if (columnOf(i) === holidayColumn) span.classList.add('holiday');
 
     if (!isPast) {
+      span.setAttribute('tabindex', '0');
+      span.setAttribute('role', 'button');
+      span.setAttribute('aria-label', `${formatSelectedDate(cellDate)}`);
       span.addEventListener('click', () => {
         selectDate(cellDate, i);
       });
@@ -203,7 +206,62 @@ function selectDate(date: Date, dayNumber: number): void {
   refreshTimeSlots();
   clearFormMessage();
   updateSummary();
+  updateBookingSteps();
   saveCurrentDraft();
+}
+
+// Keyboard-calendar helper state
+let cursorDay = 0; // 1-based day within viewDate month; 0 = none
+
+function dateForDay(day: number): Date {
+  if (LANG === 'fa') {
+    const [gY, gM, gD] = jalaliToGregorian(viewDate.year, viewDate.month, day);
+    return new Date(gY, gM - 1, gD);
+  }
+  return new Date(viewDate.year, viewDate.month - 1, day);
+}
+
+function daysInViewMonth(): number {
+  if (LANG === 'fa') {
+    return (
+      J_DAYS_IN_MONTH[viewDate.month - 1] +
+      (viewDate.month === 12 && isLeapYear(viewDate.year) ? 1 : 0)
+    );
+  }
+  return new Date(viewDate.year, viewDate.month, 0).getDate();
+}
+
+function isPastDay(day: number): boolean {
+  const d = dateForDay(day);
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return d < todayStart;
+}
+
+function focusCalDay(day: number): void {
+  cursorDay = day;
+  const cells = document.querySelectorAll<HTMLElement>('.days-grid span');
+  cells.forEach((c) => {
+    if (c.textContent === String(day)) c.focus();
+  });
+}
+
+function moveToMonth(delta: number, anchorDay: number): void {
+  viewDate.month += delta;
+  if (viewDate.month < 1) {
+    viewDate.month = 12;
+    viewDate.year--;
+  } else if (viewDate.month > 12) {
+    viewDate.month = 1;
+    viewDate.year++;
+  }
+  // find nearest non-past day in the new month
+  const max = daysInViewMonth();
+  let target = Math.min(anchorDay, max);
+  while (target >= 1 && isPastDay(target)) target--;
+  if (target < 1) target = 1;
+  renderCalendar();
+  cursorDay = target;
+  focusCalDay(cursorDay);
 }
 
 function todayInfo(): { date: Date; dayNumber: number } {
@@ -228,6 +286,44 @@ function updateSummary(): void {
   if (selectedDate) parts.push(`${S.summaryDateLabel} ${formatSelectedDate(selectedDate)}`);
   if (selectedTime) parts.push(`${S.summaryTimeLabel} ${selectedTime}`);
   el.textContent = parts.length ? parts.join('  •  ') : S.summaryPlaceholder;
+}
+
+// --- Progress indicator + inline validation ---
+function updateBookingSteps(): void {
+  const steps = document.querySelectorAll('.booking-steps .step');
+  if (!steps.length) return;
+  const service = ($('#booking-service') as HTMLSelectElement | null)?.value.trim() ?? '';
+  const name = ($('#booking-name') as HTMLInputElement | null)?.value.trim() ?? '';
+  const phone = ($('#booking-phone') as HTMLInputElement | null)?.value.trim() ?? '';
+  const pickDone = !!(selectedDate && selectedTime);
+  const detailsFilled = !!(service && name && phone);
+  const confirmDone = pickDone && detailsFilled;
+
+  steps.forEach((step) => {
+    const n = Number((step as HTMLElement).dataset.step);
+    const done =
+      (n === 1 && pickDone) || (n === 2 && detailsFilled) || (n === 3 && confirmDone);
+    const isActive =
+      (n === 1 && !pickDone) ||
+      (n === 2 && pickDone && !detailsFilled);
+    step.classList.toggle('done', done);
+    step.classList.toggle('active', isActive && !done);
+  });
+}
+
+function setFieldError(group: string, message: string): void {
+  const g = $(`[data-field-group="${group}"]`);
+  if (!g) return;
+  g.classList.add('invalid');
+  const msg = g.querySelector<HTMLElement>(`[data-error-for="${group}"]`);
+  if (msg) msg.textContent = message;
+}
+
+function clearFieldErrors(...groups: string[]): void {
+  (groups.length ? groups : ['service', 'name', 'phone']).forEach((group) => {
+    const g = $(`[data-field-group="${group}"]`);
+    g?.classList.remove('invalid');
+  });
 }
 
 // --- Past-slot disabling (salon local time = Asia/Tehran) ---
@@ -473,11 +569,21 @@ document.addEventListener('DOMContentLoaded', () => {
       email: emailInput?.value ?? '',
       service: serviceSelect?.value ?? '',
     });
+    updateBookingSteps();
   };
-  nameInput?.addEventListener('input', persistDraft);
-  phoneInput?.addEventListener('input', persistDraft);
+  nameInput?.addEventListener('input', () => {
+    persistDraft();
+    clearFieldErrors('name');
+  });
+  phoneInput?.addEventListener('input', () => {
+    persistDraft();
+    clearFieldErrors('phone');
+  });
   emailInput?.addEventListener('input', persistDraft);
-  serviceSelect?.addEventListener('change', persistDraft);
+  serviceSelect?.addEventListener('change', () => {
+    persistDraft();
+    clearFieldErrors('service');
+  });
 
   // Escape closes the booking modal
   document.addEventListener('keydown', (e) => {
@@ -556,6 +662,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Keyboard navigation for the calendar grid
+  ($('#calendar-days') as HTMLElement | null)?.addEventListener('keydown', (e) => {
+    const active = document.activeElement as HTMLElement | null;
+    const day = active && active.matches('.days-grid span') ? Number(active.textContent) : NaN;
+    if (isNaN(day)) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const d = dateForDay(day);
+      if (!isPastDay(day)) {
+        cursorDay = day;
+        selectDate(d, day);
+      }
+      return;
+    }
+
+    const total = daysInViewMonth();
+    let target: number;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') target = day + 1;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') target = day - 1;
+    else return;
+
+    e.preventDefault();
+    if (target < 1 || target > total) {
+      if (target < 1) {
+        moveToMonth(-1, total);
+      } else {
+        moveToMonth(1, 1);
+      }
+      return;
+    }
+    cursorDay = target;
+    selectDate(dateForDay(target), target);
+    focusCalDay(target);
+  });
+
   // Time slots
   const timeSlots = document.querySelectorAll('.time-slot');
   timeSlots.forEach((slot) => {
@@ -566,6 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedTime = slot.textContent?.trim() ?? null;
         clearFormMessage();
         updateSummary();
+        updateBookingSteps();
         saveCurrentDraft();
       }
     });
@@ -574,6 +717,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Submit → compose message + open Telegram
   $('#booking-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const name = $('#booking-name') as HTMLInputElement | null;
+    const phone = $('#booking-phone') as HTMLInputElement | null;
+    const service = $('#booking-service') as HTMLSelectElement | null;
+
+    clearFieldErrors();
 
     if (!selectedDate) {
       showFormMessage(S.errPickDay);
@@ -586,28 +735,35 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const phoneInput = $('#booking-phone') as HTMLInputElement | null;
-    const phoneNormalized = (phoneInput?.value ?? '')
+    const nameValue = name?.value.trim() ?? '';
+    const phoneValue = (phone?.value ?? '')
+      .trim()
       .replace(/\s/g, '')
       .replace(/[۰-۹]/g, (c) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
-    if (phoneNormalized && !/^09\d{9}$/.test(phoneNormalized)) {
-      showFormMessage(S.errPhone);
-      showToast(S.errPhoneToast);
-      phoneInput?.focus();
+    const serviceValue = service?.value ?? '';
+
+    if (!nameValue) {
+      setFieldError('name', S.errName);
+      name?.focus();
       return;
     }
-
-    const name = $('#booking-name') as HTMLInputElement | null;
-    const phone = $('#booking-phone') as HTMLInputElement | null;
-    const email = $('#booking-email') as HTMLInputElement | null;
-    const service = $('#booking-service') as HTMLSelectElement | null;
+    if (!phoneValue || !/^09\d{9}$/.test(phoneValue)) {
+      setFieldError('phone', S.errPhone);
+      phone?.focus();
+      return;
+    }
+    if (!serviceValue) {
+      setFieldError('service', S.errService);
+      service?.focus();
+      return;
+    }
 
     // Remember the customer's contact details for next time (pre-fill), but
     // clear the chosen service, date and time so a fresh booking starts clean.
     saveCurrentDraft({
-      name: name?.value.trim() ?? '',
-      phone: phone?.value.trim() ?? '',
-      email: email?.value.trim() ?? '',
+      name: nameValue,
+      phone: phoneValue,
+      email: ($('#booking-email') as HTMLInputElement | null)?.value.trim() ?? '',
       service: '',
       date: '',
       time: '',
@@ -642,10 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
     usedRefs.add(ref);
     sessionStorage.setItem('deldar_used_refs', JSON.stringify([...usedRefs]));
 
-    const nameValue = name?.value.trim() ?? '';
-    const phoneValue = phone?.value.trim() ?? '';
-    const emailValue = email?.value.trim() ?? '';
-    const serviceValue = service?.value ?? '';
+    const emailValue = ($('#booking-email') as HTMLInputElement | null)?.value.trim() ?? '';
 
     const group = (label: string, value: string) => [label, value];
 

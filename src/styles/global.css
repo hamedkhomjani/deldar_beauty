@@ -2039,6 +2039,17 @@ html.dark-theme .moon-icon {
     animation: none;
 }
 
+.time-slot:focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
+}
+
+.days-grid span:focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
 .time-legend {
     display: flex;
     justify-content: center;
@@ -2066,6 +2077,75 @@ html.dark-theme .moon-icon {
     /* Outlined gold matches the gold-bordered (available) slot */
     background: transparent;
     border: 1.5px solid var(--accent-gold);
+}
+
+/* Booking progress steps */
+.booking-steps {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0;
+    list-style: none;
+    max-width: 520px;
+    margin: 0 auto 40px;
+    padding: 0;
+}
+
+.booking-steps .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    color: var(--text-secondary);
+}
+
+.booking-steps .step + .step::before {
+    content: '';
+    position: absolute;
+    top: 17px;
+    inset-inline-start: -50%;
+    width: 80%;
+    height: 2px;
+    background: var(--glass-border);
+}
+
+.booking-steps .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--glass-border);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-weight: 700;
+    transition: var(--transition-smooth);
+    position: relative;
+    z-index: 1;
+}
+
+.booking-steps .step-label {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.booking-steps .step.active .step-num {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15);
+}
+
+.booking-steps .step.done .step-num {
+    background: var(--gold-gradient);
+    border-color: transparent;
+    color: var(--dark-charcoal);
+}
+
+.booking-steps .step.done + .step::before {
+    background: var(--accent-gold);
 }
 
 /* Details Form */
@@ -2132,6 +2212,25 @@ html.dark-theme .moon-icon {
     top: 15px;
     color: var(--accent-gold);
     pointer-events: none;
+}
+
+/* Field-level validation errors */
+.field-error {
+    color: #d9534f;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    min-height: 0;
+    display: none;
+}
+
+.form-group.invalid .field-error {
+    display: block;
+}
+
+.form-group.invalid input,
+.form-group.invalid select {
+    border-color: #d9534f;
+    box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.15);
 }
 
 .btn-confirm {
