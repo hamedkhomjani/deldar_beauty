@@ -4,6 +4,7 @@
  * Replaces the old popup overlay with a proper standalone page.
  */
 import Layout from '../components/Layout.astro';
+import { SALON } from '../config';
 import { t, localizedPath, type Lang } from '../i18n';
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
 
 const { lang } = Astro.props;
 const dict = t(lang);
+const salonPhone = SALON.phoneDisplay[lang];
+const salonAddress = SALON.address[lang];
 ---
 
 <Layout
@@ -61,6 +64,12 @@ const dict = t(lang);
             <span>{dict.calendarDownload}</span>
           </button>
         </div>
+      </div>
+      <div class="booking-contact">
+        <p class="booking-contact-title">{dict.rescheduleTitle}</p>
+        <p class="booking-contact-text">{dict.rescheduleText}</p>
+        <a class="booking-call" href={`tel:${salonPhone}`}>{dict.callUsLabel}: {salonPhone}</a>
+        <p class="booking-address">{dict.contactAddressLabel}: {salonAddress}</p>
       </div>
       <a class="btn-back" href={localizedPath('/', lang)}>{dict.bookingBackHome}</a>
     </div>

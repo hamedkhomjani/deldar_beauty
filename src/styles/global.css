@@ -1233,6 +1233,47 @@ html.dark-theme .moon-icon {
     flex-shrink: 0;
 }
 
+.booking-contact {
+    margin-top: 24px;
+    padding: 18px 16px;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    background: var(--bg-primary);
+    text-align: center;
+}
+
+.booking-contact-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 6px;
+}
+
+.booking-contact-text {
+    font-size: 0.88rem;
+    color: var(--text-secondary, rgba(120, 114, 100, 0.9));
+    margin: 0 0 12px;
+}
+
+.booking-contact .booking-call {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-decoration: none;
+    font-size: 0.95rem;
+    direction: ltr;
+}
+
+.booking-contact .booking-call:hover {
+    text-decoration: underline;
+}
+
+.booking-contact .booking-address {
+    font-size: 0.85rem;
+    color: var(--text-secondary, rgba(120, 114, 100, 0.9));
+    margin: 10px 0 0;
+}
+
 .booking-success-card .btn-back {
     display: inline-block;
 }
@@ -1284,6 +1325,19 @@ html.dark-theme .moon-icon {
 
 .form-msg.show {
     opacity: 1;
+}
+
+.booking-reassure {
+    color: var(--accent-gold);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 6px 0 0;
+}
+
+.booking-note {
+    color: var(--text-muted, rgba(120, 114, 100, 0.85));
+    font-size: 0.78rem;
+    margin: 3px 0 0;
 }
 
 /* --- Toasts --- */
@@ -2251,6 +2305,23 @@ html.dark-theme .moon-icon {
     background: var(--gold-gradient);
     color: var(--dark-charcoal);
     box-shadow: var(--gold-glow);
+}
+
+.btn-confirm:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-confirm.ready {
+    background: var(--gold-gradient);
+    color: var(--dark-charcoal);
+    box-shadow: var(--gold-glow);
+    animation: confirmPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes confirmPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.015); }
 }
 
 /* --- Success Screen --- */

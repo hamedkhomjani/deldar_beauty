@@ -213,6 +213,21 @@ function selectDate(date: Date, dayNumber: number): void {
 // Keyboard-calendar helper state
 let cursorDay = 0; // 1-based day within viewDate month; 0 = none
 
+// Whether we've already auto-scrolled to the details form for this session
+let autoAdvanced = false;
+
+function advanceToDetails(): void {
+  const nameInput = $('#booking-name') as HTMLInputElement | null;
+  const form = $('#booking-form');
+  if (!form || !nameInput) return;
+  form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Gently focus the first field so the user can start typing straight away.
+  if (document.activeElement !== nameInput) {
+    const select = $('#booking-service') as HTMLSelectElement | null;
+    (select && !select.value ? select : nameInput).focus({ preventScroll: true });
+  }
+}
+
 function dateForDay(day: number): Date {
   if (LANG === 'fa') {
     const [gY, gM, gD] = jalaliToGregorian(viewDate.year, viewDate.month, day);
@@ -309,6 +324,15 @@ function updateBookingSteps(): void {
     step.classList.toggle('done', done);
     step.classList.toggle('active', isActive && !done);
   });
+
+  // Pulse the confirm button once every step is satisfied.
+  document.querySelector('.btn-confirm')?.classList.toggle('ready', confirmDone);
+
+  // Auto-advance focus to the details form the moment day+time are chosen.
+  if (pickDone && !autoAdvanced) {
+    autoAdvanced = true;
+    advanceToDetails();
+  }
 }
 
 function setFieldError(group: string, message: string): void {
@@ -718,6 +742,13 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#booking-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const submitBtn = document.querySelector<HTMLButtonElement>('.btn-confirm');
+    const reEnable = () => {
+      if (submitBtn) submitBtn.disabled = false;
+    };
+    // Guard against double-submits: disable the button while processing.
+    if (submitBtn) submitBtn.disabled = true;
+
     const name = $('#booking-name') as HTMLInputElement | null;
     const phone = $('#booking-phone') as HTMLInputElement | null;
     const service = $('#booking-service') as HTMLSelectElement | null;
@@ -727,11 +758,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!selectedDate) {
       showFormMessage(S.errPickDay);
       showToast(S.errPickDayToast);
+      reEnable();
       return;
     }
     if (!selectedTime) {
       showFormMessage(S.errPickTime);
       showToast(S.errPickTimeToast);
+      reEnable();
       return;
     }
 
@@ -745,16 +778,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!nameValue) {
       setFieldError('name', S.errName);
       name?.focus();
+      reEnable();
       return;
     }
     if (!phoneValue || !/^09\d{9}$/.test(phoneValue)) {
       setFieldError('phone', S.errPhone);
       phone?.focus();
+      reEnable();
       return;
     }
     if (!serviceValue) {
       setFieldError('service', S.errService);
       service?.focus();
+      reEnable();
       return;
     }
 
