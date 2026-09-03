@@ -302,6 +302,33 @@ function clearFormMessage(): void {
 }
 
 // --- Modal open/close/reset ---
+const DRAFT_KEY = 'deldar_booking_draft';
+function loadDraft(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}') || {};
+  } catch {
+    return {};
+  }
+}
+function saveDraft(data: Record<string, string>): void {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+  } catch {
+    /* storage unavailable */
+  }
+}
+function restoreDraftFields(): void {
+  const d = loadDraft();
+  const nameInput = $('#booking-name') as HTMLInputElement | null;
+  const phoneInput = $('#booking-phone') as HTMLInputElement | null;
+  const emailInput = $('#booking-email') as HTMLInputElement | null;
+  const serviceSelect = $('#booking-service') as HTMLSelectElement | null;
+  if (nameInput && d.name) nameInput.value = d.name;
+  if (phoneInput && d.phone) phoneInput.value = d.phone;
+  if (emailInput && d.email) emailInput.value = d.email;
+  if (serviceSelect && d.service) serviceSelect.value = d.service;
+}
+
 function openBooking(): void {
   const modal = $('#booking-modal');
   if (!modal) return;
@@ -314,6 +341,7 @@ function openBooking(): void {
   renderCalendar();
   selectToday();
   updateSummary();
+  restoreDraftFields();
 }
 
 function closeBooking(): void {
@@ -333,6 +361,7 @@ function resetBooking(): void {
   selectedTime = null;
   clearFormMessage();
   updateSummary();
+  restoreDraftFields();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -346,33 +375,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Remember & resume booking form ---
-  const DRAFT_KEY = 'deldar_booking_draft';
-  const loadDraft = (): Record<string, string> => {
-    try {
-      return JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}') || {};
-    } catch {
-      return {};
-    }
-  };
-  const saveDraft = (data: Record<string, string>) => {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-    } catch {
-      /* storage unavailable */
-    }
-  };
   const nameInput = $('#booking-name') as HTMLInputElement | null;
   const phoneInput = $('#booking-phone') as HTMLInputElement | null;
   const emailInput = $('#booking-email') as HTMLInputElement | null;
   const serviceSelect = $('#booking-service') as HTMLSelectElement | null;
 
-  const draft = loadDraft();
-  const hasDraft = !!(draft.name || draft.phone);
-  if (nameInput && draft.name) nameInput.value = draft.name;
-  if (phoneInput && draft.phone) phoneInput.value = draft.phone;
-  if (emailInput && draft.email) emailInput.value = draft.email;
-  if (serviceSelect && draft.service) serviceSelect.value = draft.service;
-  if (hasDraft && standalonePage) {
+  restoreDraftFields();
+  if ((loadDraft().name || loadDraft().phone) && standalonePage) {
     showToast(S.draftRestored);
   }
 
