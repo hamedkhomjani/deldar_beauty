@@ -203,6 +203,7 @@ function selectDate(date: Date, dayNumber: number): void {
   refreshTimeSlots();
   clearFormMessage();
   updateSummary();
+  saveCurrentDraft();
 }
 
 function todayInfo(): { date: Date; dayNumber: number } {
@@ -264,27 +265,26 @@ function refreshTimeSlots(): void {
   const slots = document.querySelectorAll<HTMLButtonElement>('.time-slot');
   if (!slots.length || !selectedDate) return;
 
+  const dateKey = isoLocal(selectedDate);
+
   const isToday =
     selectedDate.getFullYear() === now.getFullYear() &&
     selectedDate.getMonth() === now.getMonth() &&
     selectedDate.getDate() === now.getDate();
 
-  if (!isToday) {
-    slots.forEach((s) => {
-      s.disabled = false;
-    });
-    return;
-  }
-
-  const minutesNow = tehranMinutesNow();
+  const minutesNow = isToday ? tehranMinutesNow() : -1;
   slots.forEach((s) => {
-    const start = slotStartMinutes(s.textContent ?? '');
-    s.disabled = start !== null && start <= minutesNow;
+    const label = s.textContent?.trim() ?? '';
+    const start = slotStartMinutes(label);
+    const past = isToday && start !== null && start <= minutesNow;
+    const booked = isSlotBooked(dateKey, label);
+    s.disabled = past || booked;
+    s.classList.toggle('reserved', booked && !past);
   });
 
-  // Drop the selection if it landed on an already-passed slot
+  // Drop the selection if it landed on an already-passed or booked slot
   const active = document.querySelector<HTMLButtonElement>('.time-slot.active');
-  if (active?.disabled) {
+  if (active && active.disabled) {
     active.classList.remove('active');
     selectedTime = null;
   }
@@ -329,6 +329,85 @@ function restoreDraftFields(): void {
   if (serviceSelect && d.service) serviceSelect.value = d.service;
 }
 
+/** Local (no timezone shift) ISO date string for a Date, e.g. "2026-09-02" */
+function isoLocal(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function currentDraft(): Record<string, string> {
+  return {
+    name: ($('#booking-name') as HTMLInputElement | null)?.value ?? '',
+    phone: ($('#booking-phone') as HTMLInputElement | null)?.value ?? '',
+    email: ($('#booking-email') as HTMLInputElement | null)?.value ?? '',
+    service: ($('#booking-service') as HTMLSelectElement | null)?.value ?? '',
+    date: selectedDate ? isoLocal(selectedDate) : '',
+    time: selectedTime ?? '',
+  };
+}
+
+function saveCurrentDraft(data: Record<string, string> | undefined = undefined): void {
+  saveDraft(data ?? currentDraft());
+}
+
+// --- Local double-booking guard (same-browser only) ---
+const BOOKED_KEY = 'deldar_booked_slots';
+function bookedSlots(): Array<{ date: string; time: string }> {
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(BOOKED_KEY) || '[]');
+    return Array.isArray(raw) ? (raw as Array<{ date: string; time: string }>) : [];
+  } catch {
+    return [];
+  }
+}
+function isSlotBooked(date: string, time: string): boolean {
+  return bookedSlots().some((b) => b.date === date && b.time === time);
+}
+function markSlotBooked(date: string, time: string): void {
+  const list = bookedSlots();
+  if (!list.some((b) => b.date === date && b.time === time)) {
+    list.push({ date, time });
+    try {
+      localStorage.setItem(BOOKED_KEY, JSON.stringify(list));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+}
+
+/** Restore a previously saved date+time (session slot persistence). */
+function restoreDraftAppointment(): void {
+  const d = loadDraft();
+  if (!d.date) return;
+  const [y, m, day] = d.date.split('-').map(Number);
+  if (!y || !m || !day) return;
+  const restored = new Date(y, m - 1, day);
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (isNaN(restored.getTime()) || restored < todayStart) return;
+
+  if (LANG === 'fa') {
+    const [jy, jm] = gregorianToJalali(y, m, day);
+    viewDate = { year: jy, month: jm };
+  } else {
+    viewDate = { year: y, month: m };
+  }
+  renderCalendar();
+  selectDate(restored, day);
+
+  if (d.time) {
+    const slot = Array.from(document.querySelectorAll<HTMLButtonElement>('.time-slot')).find(
+      (s) => s.textContent?.trim() === d.time,
+    );
+    if (slot && !slot.disabled) {
+      document.querySelectorAll('.time-slot').forEach((s) => s.classList.remove('active'));
+      slot.classList.add('active');
+      selectedTime = d.time;
+      updateSummary();
+    }
+  }
+  saveCurrentDraft();
+}
+
 function openBooking(): void {
   const modal = $('#booking-modal');
   if (!modal) return;
@@ -342,6 +421,7 @@ function openBooking(): void {
   selectToday();
   updateSummary();
   restoreDraftFields();
+  restoreDraftAppointment();
 }
 
 function closeBooking(): void {
@@ -372,6 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCalendar();
     selectToday();
     updateSummary();
+    restoreDraftAppointment();
   }
 
   // --- Remember & resume booking form ---
@@ -405,12 +486,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Service cards open the modal. CTAs and the mobile dock link to the
-  // booking page and are ignored here.
+  // booking page and are ignored here. Card clicks pre-select the service.
   document
     .querySelectorAll('.btn-premium:not(.btn-checkout, .btn-checkout-final, .go-booking), .service-card')
     .forEach((el) => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
+        if (el.classList.contains('service-card')) {
+          const cardName = (el.querySelector('h3')?.textContent ?? '').trim();
+          if (cardName && serviceSelect) {
+            Array.from(serviceSelect.options).forEach((opt) => {
+              if (opt.text.trim() === cardName) opt.selected = true;
+            });
+            saveCurrentDraft();
+            serviceSelect.dispatchEvent(new Event('change'));
+          }
+        }
         openBooking();
       });
     });
@@ -475,12 +566,13 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedTime = slot.textContent?.trim() ?? null;
         clearFormMessage();
         updateSummary();
+        saveCurrentDraft();
       }
     });
   });
 
   // Submit → compose message + open Telegram
-  $('#booking-form')?.addEventListener('submit', (e) => {
+  $('#booking-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if (!selectedDate) {
@@ -511,13 +603,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const service = $('#booking-service') as HTMLSelectElement | null;
 
     // Remember the customer's contact details for next time (pre-fill), but
-    // clear the chosen service so a fresh booking starts clean.
-    saveDraft({
+    // clear the chosen service, date and time so a fresh booking starts clean.
+    saveCurrentDraft({
       name: name?.value.trim() ?? '',
       phone: phone?.value.trim() ?? '',
       email: email?.value.trim() ?? '',
       service: '',
+      date: '',
+      time: '',
     });
+
+    // Mark this date+time as booked so subsequent visitors on this browser
+    // can't double-book the same slot (local-only guard).
+    if (selectedDate && selectedTime) {
+      markSlotBooked(isoLocal(selectedDate), selectedTime);
+    }
 
     // Automatic delivery: CallMeBot → WhatsApp text, Web3Forms → email.
     // Both fire in the background when their key is configured; if neither
@@ -570,26 +670,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let delivered = false;
 
+    // Await delivery before navigating away. If we fire these in the
+    // background and then immediately change window.location, the browser
+    // cancels the in-flight requests — the salon would never receive the
+    // booking. Awaiting (no-cors still resolves) lets the sends complete.
+    const delivery: Promise<void>[] = [];
+
     if (SALON.callmebotKey) {
       const callmebotUrl = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(
         `+${SALON.whatsapp}`,
       )}&text=${encodeURIComponent(msg)}&apikey=${SALON.callmebotKey}`;
-      fetch(callmebotUrl, { mode: 'no-cors' }).catch(() => {});
+      delivery.push(fetch(callmebotUrl, { mode: 'no-cors' }).then(() => undefined).catch(() => undefined));
       delivered = true;
     }
 
     if (SALON.web3FormsKey) {
-      fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: SALON.web3FormsKey,
-          subject: F.tgTitle,
-          message: msg,
-        }),
-      }).catch(() => {});
+      delivery.push(
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: SALON.web3FormsKey,
+            subject: F.tgTitle,
+            message: msg,
+          }),
+        })
+          .then(() => undefined)
+          .catch(() => undefined),
+      );
       delivered = true;
     }
+
+    await Promise.all(delivery);
 
     if (!delivered) {
       window.open(`https://wa.me/${SALON.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
