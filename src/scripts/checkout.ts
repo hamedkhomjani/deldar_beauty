@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (finalTotalEl) finalTotalEl.textContent = `${fmt(total)} ${S.currency}`;
   }
 
-  checkoutForm?.addEventListener('submit', (e) => {
+  checkoutForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const method = (document.getElementById('payment-method') as HTMLSelectElement | null)?.value ?? 'card';
@@ -108,9 +108,36 @@ document.addEventListener('DOMContentLoaded', () => {
       paymentNote.classList.remove('hidden');
     }
 
+    // Record the order to localStorage so admin can view it in the portal
+    try {
+      const customerName = (document.getElementById('full-name') as HTMLInputElement | null)?.value
+        ?? (document.getElementById('first-name') as HTMLInputElement | null)?.value ?? 'مشتری';
+      const phone = (document.getElementById('phone') as HTMLInputElement | null)?.value ?? '';
+      const address = (document.getElementById('address') as HTMLInputElement | null)?.value ?? '';
+
+      const orderItems = cart.map((item) => ({
+        id: item.id ?? '',
+        name: itemName(item),
+        qty: item.quantity,
+        price: item.price,
+      }));
+
+      const { recordCustomerOrder } = await import('./adminStore');
+      recordCustomerOrder({
+        customerName,
+        phone,
+        address,
+        items: orderItems,
+        totalPrice: grandTotal,
+      });
+    } catch {
+      // Non-critical — order logging failure should not block checkout success
+    }
+
     localStorage.removeItem(CART_KEY);
     successOverlay?.classList.add('active');
   });
 
   renderCheckoutSummary();
 });
+

@@ -175,58 +175,63 @@ document.addEventListener('DOMContentLoaded', () => {
   // Qty +/- and remove (event delegation)
   cartItemsContainer?.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    const index = Number(target.dataset.index);
+    const btn = target.closest<HTMLElement>('.plus, .minus, .remove-item');
+    if (!btn) return;
+
+    const index = Number(btn.dataset.index);
     if (!Number.isInteger(index) || cart[index] === undefined) return;
 
-    if (target.classList.contains('plus')) {
+    if (btn.classList.contains('plus')) {
       cart[index].quantity += 1;
       updateCart();
-    } else if (target.classList.contains('minus')) {
+    } else if (btn.classList.contains('minus')) {
       if (cart[index].quantity > 1) {
         cart[index].quantity -= 1;
       } else {
         cart.splice(index, 1);
       }
       updateCart();
-    } else if (target.classList.contains('remove-item')) {
+    } else if (btn.classList.contains('remove-item')) {
       cart.splice(index, 1);
       updateCart();
     }
   });
 
-  // Add-to-cart buttons (shop page) — prefer data attributes, fall back to DOM text
-  document.querySelectorAll<HTMLButtonElement>('.btn-add-cart').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.product-card') as HTMLElement | null;
-      if (!card || !cartItemsContainer) return;
+  // Add-to-cart buttons (shop page) — event delegation so dynamically rendered products work
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement | null;
+    const btn = target?.closest<HTMLButtonElement>('.btn-add-cart');
+    if (!btn || btn.disabled) return;
 
-      const id = card.dataset.productId;
-      let price = Number(card.dataset.productPrice ?? NaN);
+    const card = btn.closest('.product-card') as HTMLElement | null;
+    if (!card) return;
 
-      if (!Number.isFinite(price)) {
-        const priceText = card.querySelector('.product-price')?.textContent ?? '';
-        const cleanPrice = persianToEnglish(priceText).replace(/[^\d]/g, '');
-        price = parseInt(cleanPrice, 10) || 0;
-      }
+    const id = card.dataset.productId;
+    let price = Number(card.dataset.productPrice ?? NaN);
 
-      addToCart({
-        id,
-        name: card.querySelector('.product-title')?.textContent?.trim() ?? undefined,
-        price,
-        image: (card.querySelector('.product-image img') as HTMLImageElement | null)?.src ?? '',
-      });
+    if (!Number.isFinite(price)) {
+      const priceText = card.querySelector('.product-price')?.textContent ?? '';
+      const cleanPrice = persianToEnglish(priceText).replace(/[^\d]/g, '');
+      price = parseInt(cleanPrice, 10) || 0;
+    }
 
-      // Button feedback: flip to "added" briefly
-      const original = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = S.addedFeedback;
-      window.setTimeout(() => {
-        if (btn.isConnected) {
-          btn.disabled = false;
-          btn.textContent = original;
-        }
-      }, 1200);
+    addToCart({
+      id,
+      name: card.querySelector('.product-title')?.textContent?.trim() ?? undefined,
+      price,
+      image: (card.querySelector('.product-image img') as HTMLImageElement | null)?.src ?? '',
     });
+
+    // Button feedback: flip to "added" briefly
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = S.addedFeedback;
+    window.setTimeout(() => {
+      if (btn.isConnected) {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    }, 1200);
   });
 
   // Checkout redirect

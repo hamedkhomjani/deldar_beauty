@@ -621,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .querySelectorAll('.btn-premium:not(.btn-checkout, .btn-checkout-final, .go-booking), .service-card')
     .forEach((el) => {
       el.addEventListener('click', (e) => {
+        if (el.closest('.admin-portal, .admin-auth-overlay, .no-booking')) return;
         e.preventDefault();
         if (el.classList.contains('service-card')) {
           const cardName = (el.querySelector('h3')?.textContent ?? '').trim();

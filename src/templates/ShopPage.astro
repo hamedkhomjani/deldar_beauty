@@ -40,7 +40,7 @@ const jsonLd = [
       <p>{dict.shopSub}</p>
     </header>
 
-    <div class="product-grid">
+    <div id="shop-product-grid" class="product-grid">
       {
         PRODUCTS.map((product) => (
           <div class="product-card" data-reveal data-product-id={product.id} data-product-price={product.price}>
@@ -60,3 +60,50 @@ const jsonLd = [
     </div>
   </main>
 </Layout>
+
+<script>
+  import { getAdminProducts, type AdminProduct } from '../scripts/adminStore';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = localStorage.getItem('deldar_custom_products');
+    if (!raw) return;
+
+    try {
+      const products: AdminProduct[] = getAdminProducts();
+      const grid = document.getElementById('shop-product-grid');
+      if (!grid || products.length === 0) return;
+
+      const lang = (document.documentElement.lang || 'fa') as 'fa' | 'en';
+      const currency = lang === 'en' ? 'Toman' : 'تومان';
+      const priceLocale = lang === 'en' ? 'en-US' : 'fa-IR';
+      const addToCartText = lang === 'en' ? 'Add to Cart' : 'افزودن به سبد خرید';
+      const outOfStockText = lang === 'en' ? 'Out of Stock' : 'ناموجود';
+
+      grid.innerHTML = products
+        .map((product) => {
+          const inStock = product.inStock !== false;
+          const badgeHtml = product.badge ? `<span class="product-badge">${product.badge[lang] || product.badge.fa}</span>` : '';
+          const stockBadgeHtml = !inStock ? `<span class="product-badge out-of-stock">${outOfStockText}</span>` : '';
+
+          return `
+            <div class="product-card ${!inStock ? 'is-out-of-stock' : ''}" data-product-id="${product.id}" data-product-price="${product.price}">
+              ${badgeHtml || stockBadgeHtml}
+              <div class="product-image">
+                <img src="${product.image}" alt="${product.alt[lang] || product.alt.fa}" loading="lazy" />
+              </div>
+              <div class="product-info">
+                <span class="product-category">${product.category[lang] || product.category.fa}</span>
+                <h3 class="product-title">${product.name[lang] || product.name.fa}</h3>
+                <p class="product-price">${product.price.toLocaleString(priceLocale)} ${currency}</p>
+                <button class="btn-add-cart" ${!inStock ? 'disabled' : ''}>${!inStock ? outOfStockText : addToCartText}</button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    } catch (e) {
+      console.error('Failed to parse dynamic products:', e);
+    }
+  });
+</script>
+
