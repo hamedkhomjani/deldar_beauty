@@ -26,6 +26,15 @@ function itemName(item: CartItem): string {
   if (item.id) {
     const product = PRODUCTS.find((p) => p.id === item.id);
     if (product) return product.name[LANG];
+
+    try {
+      const raw = localStorage.getItem('deldar_custom_products');
+      if (raw) {
+        const customProds = JSON.parse(raw);
+        const custom = customProds.find((p: { id: string; name?: Record<string, string> }) => p.id === item.id);
+        if (custom?.name) return custom.name[LANG] || custom.name.fa || item.name || '';
+      }
+    } catch {}
   }
   return item.name ?? '';
 }
