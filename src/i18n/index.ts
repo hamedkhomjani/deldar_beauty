@@ -238,6 +238,7 @@ const fa = {
   free: 'رایگان',
   summaryTotal: 'جمع کل نهایی:',
   checkoutSuccessHeading: 'سفارش شما با موفقیت ثبت شد!',
+  continueShopping: 'ادامه خرید و بازگشت به فروشگاه',
 };
 
 export type Dictionary = typeof fa;
@@ -432,6 +433,7 @@ const en: Dictionary = {
   free: 'Free',
   summaryTotal: 'Grand Total:',
   checkoutSuccessHeading: 'Your order has been placed successfully!',
+  continueShopping: 'Continue Shopping & Return to Store',
 };
 
 export const UI: Record<Lang, Dictionary> = { fa, en };

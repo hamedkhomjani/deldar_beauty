@@ -3344,6 +3344,60 @@ html.dark-theme .moon-icon {
     filter: brightness(1.1);
 }
 
+.checkout-header-bar {
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.checkout-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent-gold);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+
+.checkout-back-link:hover {
+    background: rgba(212, 175, 55, 0.18);
+    color: var(--soft-cream);
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+}
+
+[dir="rtl"] .checkout-back-link svg {
+    transform: scaleX(-1);
+}
+
+.btn-return-shop {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    color: var(--accent-gold);
+    border: 1.5px solid var(--accent-gold);
+    padding: 16px 20px;
+    border-radius: 50px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 14px;
+    transition: var(--transition-smooth);
+}
+
+.btn-return-shop:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--soft-cream);
+    border-color: var(--soft-cream);
+    transform: translateY(-2px);
+}
+
 .summary-card {
     background: var(--dark-charcoal);
     color: white;
