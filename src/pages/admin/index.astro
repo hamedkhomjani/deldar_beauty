@@ -50,6 +50,7 @@ const lang = 'fa';
         <button class="tab-btn active" data-tab="products-tab">📦 لیست و مدیریت محصولات</button>
         <button class="tab-btn" data-tab="add-product-tab">➕ افزودن محصول جدید</button>
         <button class="tab-btn" data-tab="orders-tab">📋 سفارشات مشتریان (<span id="orders-count-badge">0</span>)</button>
+        <button class="tab-btn" data-tab="reviews-tab">⭐ مدیریت نظرات (<span id="reviews-pending-badge">0</span>)</button>
         <button class="tab-btn" data-tab="export-tab">⚡ خروجی کد گیتهاب</button>
       </nav>
 
@@ -156,7 +157,24 @@ const lang = 'fa';
         </div>
       </section>
 
-      <!-- Tab 4: Code Export -->
+      <!-- Tab 4: Reviews Management -->
+      <section id="reviews-tab" class="tab-content">
+        <div class="tab-header">
+          <h2>نظرات و تجربیات ثبت‌شده توسط کاربران</h2>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-review-filter="all">همه نظرات</button>
+            <button class="filter-btn" data-review-filter="pending">در انتظار تایید</button>
+            <button class="filter-btn" data-review-filter="approved">تایید شده</button>
+            <button class="filter-btn" data-review-filter="rejected">رد شده</button>
+          </div>
+        </div>
+
+        <div id="reviews-list-container">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- Tab 5: Code Export -->
       <section id="export-tab" class="tab-content">
         <div class="form-container-card">
           <h2>خروجی کد دائم برای مخزن GitHub</h2>
@@ -220,6 +238,9 @@ const lang = 'fa';
     deleteProduct,
     toggleStock,
     getCustomerOrders,
+    getAdminReviews,
+    updateReviewStatus,
+    deleteReview,
     verifyAdminPin,
     generateProductsTypeScript,
   } from '../../scripts/adminStore';
@@ -260,6 +281,7 @@ const lang = 'fa';
       dashboard?.classList.remove('hidden');
       renderProductsTable();
       renderOrders();
+      renderAdminReviews();
       renderCodeExport();
     }
 
@@ -506,6 +528,112 @@ const lang = 'fa';
         localStorage.removeItem('deldar_customer_orders');
         renderOrders();
       }
+    });
+
+    // Reviews Management
+    let activeReviewFilter = 'all';
+
+    function renderAdminReviews() {
+      const container = document.getElementById('reviews-list-container');
+      const badge = document.getElementById('reviews-pending-badge');
+      if (!container) return;
+
+      const reviews = getAdminReviews();
+      const pendingCount = reviews.filter((r) => r.status === 'pending').length;
+      if (badge) badge.textContent = String(pendingCount);
+
+      const filtered = reviews.filter((r) => {
+        if (activeReviewFilter === 'pending') return r.status === 'pending';
+        if (activeReviewFilter === 'approved') return r.status === 'approved';
+        if (activeReviewFilter === 'rejected') return r.status === 'rejected';
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <p>هیچ نظری در این بخش وجود ندارد.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="reviews-admin-grid">
+          ${filtered
+            .map((r) => {
+              const statusLabel =
+                r.status === 'approved' ? 'تایید شده' : r.status === 'rejected' ? 'رد شده' : 'در انتظار تایید';
+              const statusClass =
+                r.status === 'approved' ? 'badge-success' : r.status === 'rejected' ? 'badge-danger' : 'badge-warning';
+              const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+
+              return `
+                <div class="admin-review-card">
+                  <div class="review-card-header">
+                    <div>
+                      <strong>${r.name}</strong>
+                      <span class="review-service-tag">${r.service}</span>
+                    </div>
+                    <span class="status-badge ${statusClass}">${statusLabel}</span>
+                  </div>
+                  <div class="admin-review-stars">${stars} (${r.rating}/5)</div>
+                  <p class="admin-review-text">"${r.text}"</p>
+                  <div class="review-card-meta">
+                    <span class="date">${r.date}</span>
+                    <div class="review-actions">
+                      ${r.status !== 'approved' ? `<button class="btn-sm btn-approve" data-rev-id="${r.id}">✓ تایید و انتشار</button>` : ''}
+                      ${r.status !== 'rejected' ? `<button class="btn-sm btn-reject" data-rev-id="${r.id}">✕ رد نظر</button>` : ''}
+                      <button class="btn-sm btn-delete-rev" data-rev-id="${r.id}">🗑️ حذف</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+
+      // Event Listeners for Review Action buttons
+      container.querySelectorAll('.btn-approve').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-rev-id');
+          if (id) {
+            updateReviewStatus(id, 'approved');
+            renderAdminReviews();
+          }
+        });
+      });
+
+      container.querySelectorAll('.btn-reject').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-rev-id');
+          if (id) {
+            updateReviewStatus(id, 'rejected');
+            renderAdminReviews();
+          }
+        });
+      });
+
+      container.querySelectorAll('.btn-delete-rev').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-rev-id');
+          if (id && confirm('آیا از حذف این نظر اطمینان دارید؟')) {
+            deleteReview(id);
+            renderAdminReviews();
+          }
+        });
+      });
+    }
+
+    // Filter Button Click Listener
+    document.querySelectorAll('[data-review-filter]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-review-filter]').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeReviewFilter = btn.getAttribute('data-review-filter') ?? 'all';
+        renderAdminReviews();
+      });
     });
 
     // Code Export

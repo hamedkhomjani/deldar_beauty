@@ -9,7 +9,7 @@ import { SERVICES } from '../data/services';
 import { FAQS } from '../data/faq';
 import { REVIEWS } from '../data/reviews';
 import { beautySalonSchema, webSiteSchema, faqSchema, breadcrumbSchema } from '../data/schema';
-import { SALON, asset } from '../config';
+import { SALON, asset, pageUrl } from '../config';
 import { t, localizedPath, type Lang } from '../i18n';
 
 interface Props {
@@ -29,6 +29,7 @@ const jsonLd = [
 const mapQuery = encodeURIComponent(SALON.address.fa);
 const mapEmbedUrl = `https://maps.google.com/maps?q=${mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 const mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapQuery}`;
+const reviewUrl = pageUrl(lang === 'en' ? '/en/review/' : '/review/');
 ---
 
 <Layout
@@ -161,8 +162,9 @@ const mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${m
         <p class="section-tagline">{dict.reviewsTagline}</p>
         <h2>{dict.reviewsH2}</h2>
         <p>{dict.reviewsSub}</p>
+        <a href={reviewUrl} class="btn-outline no-booking review-trigger-btn">{dict.submitReviewBtn}</a>
       </div>
-      <div class="reviews-grid">
+      <div id="reviews-grid" class="reviews-grid">
         {
           REVIEWS.map((review) => (
             <article class="review-card" data-reveal>
@@ -194,6 +196,8 @@ const mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${m
         }
       </div>
     </section>
+
+
 
     <!-- FAQ Section -->
     <section id="faq" class="faq-section container">
@@ -286,3 +290,52 @@ const mapDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${m
     </section>
   </main>
 </Layout>
+
+<script>
+  import { getAdminReviews, type AdminReview } from '../scripts/adminStore';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const reviewsGrid = document.getElementById('reviews-grid');
+
+    // Render Approved Customer Reviews
+    try {
+      const allReviews: AdminReview[] = getAdminReviews();
+      const approved = allReviews.filter((r) => r.status === 'approved');
+
+      if (reviewsGrid && approved.length > 0) {
+        approved.forEach((rev) => {
+          const article = document.createElement('article');
+          article.className = 'review-card';
+
+          const starsHtml = [1, 2, 3, 4, 5]
+            .map(
+              (i) => `
+                <svg class="star ${i <= rev.rating ? 'full' : ''}" width="18" height="18" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>`,
+            )
+            .join('');
+
+          article.innerHTML = `
+            <div class="review-stars" role="img" aria-label="${rev.rating} / 5">
+              ${starsHtml}
+            </div>
+            <blockquote class="review-text">${rev.text}</blockquote>
+            <footer class="review-footer">
+              <span class="review-avatar" aria-hidden="true">${(rev.name || 'م').trim().charAt(0)}</span>
+              <span class="review-meta">
+                <strong class="review-name">${rev.name}</strong>
+                <span class="review-service">${rev.service}</span>
+              </span>
+            </footer>
+          `;
+
+          reviewsGrid.prepend(article);
+        });
+      }
+    } catch (e) {
+      console.error('Failed to load approved reviews:', e);
+    }
+  });
+</script>
+

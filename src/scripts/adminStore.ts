@@ -27,8 +27,19 @@ export interface CustomerOrder {
   status: 'pending' | 'completed' | 'cancelled';
 }
 
+export interface AdminReview {
+  id: string;
+  name: string;
+  service: string;
+  rating: number;
+  text: string;
+  date: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 const PRODUCTS_STORAGE_KEY = 'deldar_custom_products';
 const ORDERS_STORAGE_KEY = 'deldar_customer_orders';
+const REVIEWS_STORAGE_KEY = 'deldar_customer_reviews';
 const ADMIN_PIN_KEY = 'deldar_admin_pin';
 
 /** Retrieve products from localStorage or fall back to static catalog */
@@ -172,4 +183,61 @@ export function tomanToRial(toman: number): number {
   return toman * 10;
 }
 `;
+}
+
+/** Get all reviews (customer submitted reviews) */
+export function getAdminReviews(): AdminReview[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(REVIEWS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.error('Error reading reviews:', e);
+  }
+  return [];
+}
+
+/** Submit a new review from the website form */
+export function submitCustomerReview(review: Omit<AdminReview, 'id' | 'date' | 'status'>): AdminReview {
+  const reviews = getAdminReviews();
+  const newReview: AdminReview = {
+    ...review,
+    id: 'rev_' + Date.now(),
+    date: new Date().toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' }),
+    status: 'pending',
+  };
+  reviews.unshift(newReview);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
+  }
+  return newReview;
+}
+
+/** Update review status (approve or reject) */
+export function updateReviewStatus(id: string, status: 'approved' | 'rejected'): boolean {
+  const reviews = getAdminReviews();
+  const review = reviews.find((r) => r.id === id);
+  if (!review) return false;
+
+  review.status = status;
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
+  }
+  return true;
+}
+
+/** Delete a review */
+export function deleteReview(id: string): boolean {
+  let reviews = getAdminReviews();
+  const initialLen = reviews.length;
+  reviews = reviews.filter((r) => r.id !== id);
+  if (reviews.length === initialLen) return false;
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
+  }
+  return true;
 }

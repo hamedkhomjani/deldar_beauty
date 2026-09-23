@@ -1,0 +1,355 @@
+---
+/**
+ * Review submission page — standalone form for customers to submit reviews.
+ * Bilingual (fa/en). Reviews are stored in localStorage and shown in admin panel.
+ */
+import Layout from '../components/Layout.astro';
+import { breadcrumbSchema } from '../data/schema';
+import { pageUrl } from '../config';
+import { type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const isFa = lang === 'fa';
+
+const pageTitle = isFa ? 'ثبت تجربه و نظر | سالن زیبایی دلدار' : 'Submit Your Review | Deldar Beauty Salon';
+const pageDesc  = isFa
+  ? 'تجربه‌ی خود را از خدمات سالن زیبایی دلدار با ما در میان بگذارید.'
+  : 'Share your experience with Deldar Beauty Salon services.';
+
+const homeUrl   = pageUrl(isFa ? '/' : '/en/');
+
+const jsonLd = [
+  breadcrumbSchema([
+    { name: isFa ? 'خانه' : 'Home', item: isFa ? '/' : '/en/' },
+    { name: isFa ? 'ثبت نظر' : 'Submit Review', item: isFa ? '/review/' : '/en/review/' },
+  ]),
+];
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  lang={lang}
+  bodyClass="review-page"
+  jsonLd={jsonLd}
+>
+  <main class="review-page-main">
+    <div class="review-page-container container">
+
+      <!-- Back link -->
+      <a href={homeUrl} class="review-back-link no-booking">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points={isFa ? '9 18 15 12 9 6' : '15 18 9 12 15 6'} />
+        </svg>
+        {isFa ? 'بازگشت به صفحه اصلی' : 'Back to Home'}
+      </a>
+
+      <!-- Page heading -->
+      <div class="review-page-header" data-reveal>
+        <div class="review-page-icon" aria-hidden="true">★</div>
+        <h1>{isFa ? 'تجربه و نظر خود را به اشتراک بگذارید' : 'Share Your Experience'}</h1>
+        <p>{isFa
+          ? 'نظر شما پس از بررسی توسط مدیریت در سایت منتشر می‌شود.'
+          : 'Your review will be published after moderation.'}</p>
+      </div>
+
+      <!-- Form card -->
+      <div class="review-form-card" data-reveal>
+        <form id="submit-review-form" class="review-standalone-form" novalidate>
+
+          <!-- Star rating -->
+          <div class="form-group review-stars-group">
+            <label class="form-label star-label">
+              {isFa ? 'امتیاز شما:' : 'Your Rating:'}
+            </label>
+            <div id="star-rating-selector" class="star-rating-selector" role="group"
+              aria-label={isFa ? 'انتخاب امتیاز' : 'Select rating'}>
+              <span data-star="1" class="star-item active" role="radio" aria-checked="false" tabindex="0">★</span>
+              <span data-star="2" class="star-item active" role="radio" aria-checked="false" tabindex="0">★</span>
+              <span data-star="3" class="star-item active" role="radio" aria-checked="false" tabindex="0">★</span>
+              <span data-star="4" class="star-item active" role="radio" aria-checked="false" tabindex="0">★</span>
+              <span data-star="5" class="star-item active" role="radio" aria-checked="true"  tabindex="0">★</span>
+            </div>
+            <input type="hidden" id="review-rating-val" value="5" />
+          </div>
+
+          <!-- Name -->
+          <div class="form-group">
+            <label for="review-user-name">
+              {isFa ? 'نام شما' : 'Your Name'} *
+            </label>
+            <input
+              type="text"
+              id="review-user-name"
+              required
+              autocomplete="name"
+              placeholder={isFa ? 'مثال: فاطمه احمدی' : 'e.g. Jane Smith'}
+            />
+          </div>
+
+          <!-- Service received -->
+          <div class="form-group">
+            <label for="review-user-service">
+              {isFa ? 'خدمت دریافت شده' : 'Service Received'} *
+            </label>
+            <input
+              type="text"
+              id="review-user-service"
+              required
+              placeholder={isFa ? 'مثال: رنگ و لایت / کاشت ناخن' : 'e.g. Hair Coloring / Nail Art'}
+            />
+          </div>
+
+          <!-- Review text -->
+          <div class="form-group">
+            <label for="review-user-text">
+              {isFa ? 'متن نظر و تجربه شما' : 'Your Review'} *
+            </label>
+            <textarea
+              id="review-user-text"
+              required
+              rows="5"
+              placeholder={isFa
+                ? 'تجربه‌ی خود را از خدمات سالن زیبایی دلدار بنویسید...'
+                : 'Write your experience with Deldar Beauty Salon...'}
+            ></textarea>
+          </div>
+
+          <!-- Submit button -->
+          <button type="submit" class="btn-premium no-booking review-submit-btn">
+            {isFa ? 'ارسال نظر جهت بررسی' : 'Submit Review'}
+          </button>
+
+        </form>
+
+        <!-- Success state (hidden until submission) -->
+        <div id="review-success" class="review-success hidden">
+          <div class="success-checkmark" aria-hidden="true">✓</div>
+          <h2>{isFa ? 'نظر شما با موفقیت ثبت شد!' : 'Review Submitted!'}</h2>
+          <p>{isFa
+            ? 'ممنون از اعتماد شما. نظرتان پس از بررسی مدیریت در سایت منتشر می‌شود.'
+            : 'Thank you! Your review will be published after moderation.'}</p>
+          <a href={homeUrl} class="btn-premium no-booking" style="display:inline-block; margin-top: 16px;">
+            {isFa ? 'بازگشت به خانه' : 'Back to Home'}
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { submitCustomerReview } from '../scripts/adminStore';
+  import { showToast } from '../scripts/toast';
+
+  const form        = document.getElementById('submit-review-form') as HTMLFormElement | null;
+  const successBox  = document.getElementById('review-success');
+  const ratingInput = document.getElementById('review-rating-val') as HTMLInputElement | null;
+  const starItems   = document.querySelectorAll('#star-rating-selector .star-item');
+
+  // ── Star rating ──────────────────────────────────────────
+  function setRating(val: number) {
+    if (ratingInput) ratingInput.value = String(val);
+    starItems.forEach((s) => {
+      const sVal = Number(s.getAttribute('data-star') ?? 0);
+      s.classList.toggle('active', sVal <= val);
+      s.setAttribute('aria-checked', String(sVal === val));
+    });
+  }
+
+  starItems.forEach((star) => {
+    star.addEventListener('click', () => setRating(Number(star.getAttribute('data-star') ?? 5)));
+    star.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+        e.preventDefault();
+        setRating(Number(star.getAttribute('data-star') ?? 5));
+      }
+    });
+  });
+
+  // ── Form submit ───────────────────────────────────────────
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const name    = (document.getElementById('review-user-name')    as HTMLInputElement | null)?.value.trim() ?? '';
+    const service = (document.getElementById('review-user-service') as HTMLInputElement | null)?.value.trim() ?? '';
+    const text    = (document.getElementById('review-user-text')    as HTMLTextAreaElement | null)?.value.trim() ?? '';
+    const rating  = Number(ratingInput?.value ?? 5);
+
+    if (!name || !service || !text) {
+      const isEn = document.documentElement.lang === 'en';
+      showToast(isEn ? 'Please fill in all required fields.' : 'لطفاً تمام فیلدهای ستاره‌دار را پر کنید.');
+      return;
+    }
+
+    submitCustomerReview({ name, service, rating, text });
+
+    // Show success state
+    form.classList.add('hidden');
+    if (successBox) successBox.classList.remove('hidden');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+<style>
+  .review-page-main {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    min-height: 80vh;
+  }
+
+  .review-page-container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* Back link */
+  .review-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-gold);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 32px;
+    transition: opacity 0.2s;
+  }
+  .review-back-link:hover { opacity: 0.75; }
+
+  /* Page header */
+  .review-page-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .review-page-icon {
+    font-size: 3rem;
+    color: var(--accent-gold);
+    line-height: 1;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 12px rgba(212,175,55,.4));
+  }
+
+  .review-page-header h1 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+
+  .review-page-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  /* Form card */
+  .review-form-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: clamp(24px, 5vw, 48px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+
+  /* Standalone form layout */
+  .review-standalone-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label,
+  .form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    background: var(--bg-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    direction: rtl;
+  }
+  [lang="en"] .form-group input,
+  [lang="en"] .form-group textarea { direction: ltr; }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px rgba(212,175,55,.15);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 130px;
+  }
+
+  /* Star row */
+  .review-stars-group { align-items: center; }
+  .star-label { margin-bottom: 4px; }
+
+  /* Submit button */
+  .review-submit-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    font-size: 1rem;
+  }
+
+  /* Success box */
+  .review-success {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .success-checkmark {
+    font-size: 3.5rem;
+    color: var(--accent-gold);
+    line-height: 1;
+    margin-bottom: 16px;
+    animation: pop-in 0.4s ease;
+  }
+
+  .review-success h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+
+  .review-success p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  @keyframes pop-in {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  /* Hidden utility (scoped fallback) */
+  .hidden { display: none !important; }
+</style>

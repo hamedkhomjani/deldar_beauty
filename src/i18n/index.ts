@@ -91,6 +91,9 @@ const fa = {
   reviewsTagline: 'نظر مشتریان',
   reviewsH2: 'دلدار از نگاه شما',
   reviewsSub: 'تجربه‌ی واقعی خانم‌هایی که به ما اعتماد کردن',
+  submitReviewBtn: '+ ثبت تجربه و نظر شما',
+  submitReviewHeading: 'ثبت تجربه و نظر شما',
+  reviewSubmittedToast: 'نظر شما با موفقیت ثبت شد و پس از بررسی مدیریت منتشر می‌شود.',
   timeSlots: [
     '09:00 صبح',
     '10:00 صبح',
@@ -286,6 +289,9 @@ const en: Dictionary = {
   reviewsTagline: 'Client Stories',
   reviewsH2: 'Loved by Our Clients',
   reviewsSub: 'Real experiences from the women who trust us',
+  submitReviewBtn: '+ Submit Your Experience',
+  submitReviewHeading: 'Submit Your Experience & Review',
+  reviewSubmittedToast: 'Your review was submitted and will be published after admin approval.',
   timeSlots: [
     '09:00 AM',
     '10:00 AM',
