@@ -5,6 +5,7 @@
  * Text fields are bilingual ({ fa, en }) — see src/i18n/index.ts.
  */
 import type { Localized } from '../i18n';
+import { asset } from '../config';
 
 export interface Product {
   id: string;
@@ -24,7 +25,7 @@ export const PRODUCTS: Product[] = [
     name: { fa: 'روغن موی اکسیر طلایی', en: 'Golden Elixir Hair Oil' },
     category: { fa: 'مراقبت از مو', en: 'Hair Care' },
     price: 1_280_000,
-    image: '/assets/images/product-hair-oil.png',
+    image: asset('assets/images/product-hair-oil.png'),
     alt: { fa: 'اکسیر موی طلایی', en: 'Golden hair elixir' },
     description: {
       fa: 'روغن موی گیاهی احیاکننده برای درخشش و تقویت موهای آسیب‌دیده.',
@@ -37,7 +38,7 @@ export const PRODUCTS: Product[] = [
     name: { fa: 'سرم جوان‌ساز رادیانس', en: 'Radiance Anti-Aging Serum' },
     category: { fa: 'مراقبت از پوست', en: 'Skin Care' },
     price: 2_450_000,
-    image: '/assets/images/product-skin-serum.png',
+    image: asset('assets/images/product-skin-serum.png'),
     alt: { fa: 'سرم جوان‌ساز صورت', en: 'Anti-aging face serum' },
     description: {
       fa: 'سرم مراقبت از پوست برای شفافیت و جوان‌سازی پوست صورت.',
@@ -49,7 +50,7 @@ export const PRODUCTS: Product[] = [
     name: { fa: 'ماسک احیاکننده بیوتین', en: 'Biotin Repair Mask' },
     category: { fa: 'مراقبت تخصصی', en: 'Specialized Care' },
     price: 950_000,
-    image: '/assets/images/hair_tools_hands.webp',
+    image: asset('assets/images/hair_tools_hands.webp'),
     alt: { fa: 'ماسک موی پروتئین', en: 'Protein hair mask' },
     description: {
       fa: 'ماسک موی پروتئینی حاوی بیوتین برای ترمیم و نرمی مو.',
@@ -62,7 +63,7 @@ export const PRODUCTS: Product[] = [
     name: { fa: 'مجموعه لوکس مراقبتی', en: 'Luxury Care Set' },
     category: { fa: 'پکیج هدیه', en: 'Gift Set' },
     price: 4_800_000,
-    image: '/assets/images/consultation.webp',
+    image: asset('assets/images/consultation.webp'),
     alt: { fa: 'پک محصولات مراقبتی', en: 'Care products set' },
     description: {
       fa: 'پک هدیه لوکس محصولات مراقبت از پوست و مو برای هدیه‌ای خاص.',

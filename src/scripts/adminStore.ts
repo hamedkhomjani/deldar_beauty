@@ -3,6 +3,7 @@
  * Handles localStorage sync for products, custom additions, stock toggles, and order logs.
  */
 import { PRODUCTS } from '../data/products';
+import { REVIEWS } from '../data/reviews';
 
 export interface AdminProduct {
   id: string;
@@ -41,6 +42,16 @@ const PRODUCTS_STORAGE_KEY = 'deldar_custom_products';
 const ORDERS_STORAGE_KEY = 'deldar_customer_orders';
 const REVIEWS_STORAGE_KEY = 'deldar_customer_reviews';
 const ADMIN_PIN_KEY = 'deldar_admin_pin';
+
+export const INITIAL_ADMIN_REVIEWS: AdminReview[] = REVIEWS.map((r, i) => ({
+  id: `rev_init_${i + 1}`,
+  name: r.name.fa,
+  service: r.service.fa,
+  rating: r.rating,
+  text: r.text.fa,
+  date: '۱۴۰۳/۰۶/۱۵',
+  status: 'approved',
+}));
 
 /** Retrieve products from localStorage or fall back to static catalog */
 export function getAdminProducts(): AdminProduct[] {
@@ -185,19 +196,29 @@ export function tomanToRial(toman: number): number {
 `;
 }
 
-/** Get all reviews (customer submitted reviews) */
+/** Get all reviews (customer submitted reviews + initial approved reviews) */
 export function getAdminReviews(): AdminReview[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === 'undefined') return INITIAL_ADMIN_REVIEWS;
   try {
     const raw = localStorage.getItem(REVIEWS_STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+      const parsed: AdminReview[] = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        // Merge missing initial reviews if they don't exist in parsed storage
+        const existingIds = new Set(parsed.map((r) => r.id));
+        const missingInitial = INITIAL_ADMIN_REVIEWS.filter((initRev) => !existingIds.has(initRev.id));
+        if (missingInitial.length > 0) {
+          const merged = [...parsed, ...missingInitial];
+          localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(merged));
+          return merged;
+        }
+        return parsed;
+      }
     }
   } catch (e) {
     console.error('Error reading reviews:', e);
   }
-  return [];
+  return INITIAL_ADMIN_REVIEWS;
 }
 
 /** Submit a new review from the website form */

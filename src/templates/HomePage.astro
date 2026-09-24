@@ -294,16 +294,16 @@ const reviewUrl = pageUrl(lang === 'en' ? '/en/review/' : '/review/');
 <script>
   import { getAdminReviews, type AdminReview } from '../scripts/adminStore';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initHomePageReviews() {
     const reviewsGrid = document.getElementById('reviews-grid');
 
-    // Render Approved Customer Reviews
+    // Render Approved Customer Reviews (only custom ones, since initial ones are statically rendered in HTML)
     try {
       const allReviews: AdminReview[] = getAdminReviews();
-      const approved = allReviews.filter((r) => r.status === 'approved');
+      const customApproved = allReviews.filter((r) => r.status === 'approved' && !r.id.startsWith('rev_init_'));
 
-      if (reviewsGrid && approved.length > 0) {
-        approved.forEach((rev) => {
+      if (reviewsGrid && customApproved.length > 0) {
+        customApproved.forEach((rev) => {
           const article = document.createElement('article');
           article.className = 'review-card';
 
@@ -336,6 +336,12 @@ const reviewUrl = pageUrl(lang === 'en' ? '/en/review/' : '/review/');
     } catch (e) {
       console.error('Failed to load approved reviews:', e);
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHomePageReviews);
+  } else {
+    initHomePageReviews();
+  }
 </script>
 

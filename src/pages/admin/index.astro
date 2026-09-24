@@ -245,18 +245,13 @@ const lang = 'fa';
     generateProductsTypeScript,
   } from '../../scripts/adminStore';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initAdmin() {
     const authOverlay = document.getElementById('admin-auth-overlay');
     const loginForm = document.getElementById('admin-login-form');
     const pinInput = document.getElementById('admin-pin-input') as HTMLInputElement;
     const authError = document.getElementById('auth-error');
     const dashboard = document.getElementById('admin-dashboard');
     const logoutBtn = document.getElementById('admin-logout-btn');
-
-    // Auto check session
-    if (sessionStorage.getItem('deldar_admin_authed') === 'true') {
-      showDashboard();
-    }
 
     // Login Handle
     loginForm?.addEventListener('submit', (e) => {
@@ -279,27 +274,33 @@ const lang = 'fa';
     function showDashboard() {
       authOverlay?.classList.add('hidden');
       dashboard?.classList.remove('hidden');
-      renderProductsTable();
-      renderOrders();
-      renderAdminReviews();
-      renderCodeExport();
+      try { renderProductsTable(); } catch (err) { console.error('Error rendering products:', err); }
+      try { renderOrders(); } catch (err) { console.error('Error rendering orders:', err); }
+      try { renderAdminReviews(); } catch (err) { console.error('Error rendering reviews:', err); }
+      try { renderCodeExport(); } catch (err) { console.error('Error rendering export:', err); }
     }
 
-    // Tabs Switcher
-    const tabBtns = document.querySelectorAll('.admin-tabs .tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    // Tabs Switcher using Event Delegation
+    const tabsNav = document.querySelector('.admin-tabs');
+    tabsNav?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement | null)?.closest<HTMLElement>('.tab-btn');
+      if (!btn) return;
+      e.preventDefault();
 
-    tabBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-        tabBtns.forEach((b) => b.classList.remove('active'));
-        tabContents.forEach((c) => c.classList.remove('active'));
+      const targetTab = btn.getAttribute('data-tab');
+      document.querySelectorAll('.admin-tabs .tab-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
 
-        btn.classList.add('active');
-        if (targetTab) {
-          document.getElementById(targetTab)?.classList.add('active');
-        }
-      });
+      btn.classList.add('active');
+      if (targetTab) {
+        document.getElementById(targetTab)?.classList.add('active');
+      }
+    });
+
+    // "Add Product" button in products tab header switches to add-product-tab
+    document.getElementById('btn-open-add-modal')?.addEventListener('click', () => {
+      const addTabBtn = document.querySelector<HTMLElement>('.admin-tabs .tab-btn[data-tab="add-product-tab"]');
+      addTabBtn?.click();
     });
 
     // Render Products Table
@@ -420,7 +421,8 @@ const lang = 'fa';
       addForm.reset();
       alert('محصول جدید با موفقیت اضافه شد!');
       // Switch back to products tab
-      document.querySelector('[data-tab="products-tab"]')?.dispatchEvent(new Event('click'));
+      const productsTabBtn = document.querySelector<HTMLElement>('.admin-tabs .tab-btn[data-tab="products-tab"]');
+      productsTabBtn?.click();
       renderProductsTable();
       renderCodeExport();
     });
@@ -626,14 +628,15 @@ const lang = 'fa';
       });
     }
 
-    // Filter Button Click Listener
-    document.querySelectorAll('[data-review-filter]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-review-filter]').forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeReviewFilter = btn.getAttribute('data-review-filter') ?? 'all';
-        renderAdminReviews();
-      });
+    // Filter Button Click Listener (Event Delegation)
+    const filterBtnContainer = document.querySelector('.filter-buttons');
+    filterBtnContainer?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-review-filter]');
+      if (!btn) return;
+      document.querySelectorAll('[data-review-filter]').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeReviewFilter = btn.getAttribute('data-review-filter') ?? 'all';
+      renderAdminReviews();
     });
 
     // Code Export
@@ -652,7 +655,18 @@ const lang = 'fa';
         alert('کد کامل فایل products.ts با موفقیت کپی شد!');
       }
     });
-  });
+
+    // Auto check session (run after all event listeners and handlers are defined)
+    if (sessionStorage.getItem('deldar_admin_authed') === 'true') {
+      showDashboard();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdmin);
+  } else {
+    initAdmin();
+  }
 </script>
 
 <style>
