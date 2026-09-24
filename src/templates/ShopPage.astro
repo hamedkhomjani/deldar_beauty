@@ -6,7 +6,6 @@
 import Layout from '../components/Layout.astro';
 import { PRODUCTS, imageSize } from '../data/products';
 import { productListSchema, breadcrumbSchema, webPageSchema } from '../data/schema';
-import { asset } from '../config';
 import { t, type Lang } from '../i18n';
 
 interface Props {
@@ -47,7 +46,7 @@ const jsonLd = [
           <div class="product-card" data-reveal data-product-id={product.id} data-product-price={product.price}>
             {product.badge && <span class="product-badge">{product.badge[lang]}</span>}
             <div class="product-image">
-              <img src={asset(product.image)} alt={product.alt[lang]} width={imageSize(product.image).width} height={imageSize(product.image).height} loading="lazy" decoding="async" />
+              <img src={product.image} alt={product.alt[lang]} width={imageSize(product.image).width} height={imageSize(product.image).height} loading="lazy" decoding="async" />
             </div>
             <div class="product-info">
               <span class="product-category">{product.category[lang]}</span>
@@ -64,6 +63,7 @@ const jsonLd = [
 
 <script>
   import { getAdminProducts, type AdminProduct } from '../scripts/adminStore';
+  import { asset } from '../config';
 
   document.addEventListener('DOMContentLoaded', () => {
     const raw = localStorage.getItem('deldar_custom_products');
@@ -90,7 +90,7 @@ const jsonLd = [
             <div class="product-card ${!inStock ? 'is-out-of-stock' : ''}" data-product-id="${product.id}" data-product-price="${product.price}">
               ${badgeHtml || stockBadgeHtml}
               <div class="product-image">
-                <img src="${product.image}" alt="${product.alt[lang] || product.alt.fa}" loading="lazy" />
+                <img src="${asset(product.image)}" alt="${product.alt[lang] || product.alt.fa}" loading="lazy" />
               </div>
               <div class="product-info">
                 <span class="product-category">${product.category[lang] || product.category.fa}</span>

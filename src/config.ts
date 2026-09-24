@@ -87,9 +87,13 @@ export const SOCIAL_LINKS = [
 /**
  * Build a site-relative URL that works under the GitHub Pages subpath.
  * Usage: asset('assets/images/logo.svg') → "/deldar_beauty/assets/images/logo.svg"
+ * Idempotent: absolute URLs and already base-prefixed paths pass through
+ * unchanged, so it is safe to call on values from any source (static data,
+ * localStorage/admin products, user input).
  */
 export function asset(path: string): string {
   const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+  if (/^https?:\/\//.test(path) || path.startsWith(`${base}/`)) return path;
   return `${base}/${path.replace(/^\//, '')}`;
 }
 

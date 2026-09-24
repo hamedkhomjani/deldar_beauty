@@ -244,6 +244,7 @@ const lang = 'fa';
     verifyAdminPin,
     generateProductsTypeScript,
   } from '../../scripts/adminStore';
+  import { asset } from '../../config';
 
   function initAdmin() {
     const authOverlay = document.getElementById('admin-auth-overlay');
@@ -329,7 +330,7 @@ const lang = 'fa';
           (p) => `
         <tr>
           <td>
-            <img src="${p.image}" alt="${p.alt.fa}" class="table-img" />
+            <img src="${asset(p.image)}" alt="${p.alt.fa}" class="table-img" />
           </td>
           <td>
             <strong>${p.name.fa}</strong>
@@ -669,7 +670,7 @@ const lang = 'fa';
   }
 </script>
 
-<style>
+<style is:global>
   .admin-portal {
     padding-top: 130px;
     padding-bottom: 80px;
