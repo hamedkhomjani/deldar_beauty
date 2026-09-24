@@ -98,7 +98,8 @@ html.dark-theme {
 
 /* Dark-theme refinements for shared components */
 html.dark-theme .days-grid span.past {
-    color: #555;
+    color: #777;
+    opacity: 0.35;
 }
 
 html.dark-theme .time-slot:disabled {
@@ -2043,10 +2044,17 @@ html.dark-theme .moon-icon {
 .days-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
     text-align: center;
     font-weight: 700;
     margin-bottom: 15px;
     color: var(--text-primary);
+}
+
+.days-header span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .days-grid {
@@ -2058,6 +2066,7 @@ html.dark-theme .moon-icon {
 .days-grid span {
     width: 32px;
     height: 32px;
+    justify-self: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2075,10 +2084,10 @@ html.dark-theme .moon-icon {
 }
 
 .days-grid span.past {
-    color: #ccc;
+    color: #888;
     cursor: not-allowed;
     pointer-events: none;
-    text-decoration: line-through;
+    opacity: 0.4;
 }
 
 .days-grid span.today {
