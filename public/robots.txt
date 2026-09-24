@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /booking/success/
 
-Sitemap: https://hamedkhomjani.github.io/deldar_beauty/sitemap.xml
+Sitemap: https://hamedkhomjani.github.io/deldar_beauty/sitemap-index.xml

@@ -4,7 +4,7 @@
  * Bilingual (fa/en). Reviews are stored in localStorage and shown in admin panel.
  */
 import Layout from '../components/Layout.astro';
-import { breadcrumbSchema } from '../data/schema';
+import { breadcrumbSchema, webPageSchema } from '../data/schema';
 import { pageUrl } from '../config';
 import { type Lang } from '../i18n';
 
@@ -23,6 +23,7 @@ const pageDesc  = isFa
 const homeUrl   = pageUrl(isFa ? '/' : '/en/');
 
 const jsonLd = [
+  webPageSchema(isFa ? '/review' : '/review', pageTitle, lang),
   breadcrumbSchema([
     { name: isFa ? 'خانه' : 'Home', item: isFa ? '/' : '/en/' },
     { name: isFa ? 'ثبت نظر' : 'Submit Review', item: isFa ? '/review/' : '/en/review/' },

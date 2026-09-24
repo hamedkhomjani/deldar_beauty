@@ -4,8 +4,8 @@
  * Cards carry data-id/data-price so the cart can resolve bilingual names.
  */
 import Layout from '../components/Layout.astro';
-import { PRODUCTS } from '../data/products';
-import { productListSchema, breadcrumbSchema } from '../data/schema';
+import { PRODUCTS, imageSize } from '../data/products';
+import { productListSchema, breadcrumbSchema, webPageSchema } from '../data/schema';
 import { asset } from '../config';
 import { t, type Lang } from '../i18n';
 
@@ -20,6 +20,7 @@ const priceLocale = lang === 'en' ? 'en-US' : 'fa-IR';
 
 const jsonLd = [
   productListSchema(PRODUCTS, lang),
+  webPageSchema('/shop', dict.shopTitle, lang),
   breadcrumbSchema([
     { name: lang === 'en' ? 'Home' : 'خانه', item: lang === 'en' ? '/en/' : '/' },
     { name: lang === 'en' ? 'Shop' : 'فروشگاه', item: lang === 'en' ? '/en/shop' : '/shop' },
@@ -46,7 +47,7 @@ const jsonLd = [
           <div class="product-card" data-reveal data-product-id={product.id} data-product-price={product.price}>
             {product.badge && <span class="product-badge">{product.badge[lang]}</span>}
             <div class="product-image">
-              <img src={asset(product.image)} alt={product.alt[lang]} loading="lazy" />
+              <img src={asset(product.image)} alt={product.alt[lang]} width={imageSize(product.image).width} height={imageSize(product.image).height} loading="lazy" decoding="async" />
             </div>
             <div class="product-info">
               <span class="product-category">{product.category[lang]}</span>

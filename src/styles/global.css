@@ -701,6 +701,7 @@ html.dark-theme .moon-icon {
 
 .hero-image img {
     width: 100%;
+    height: auto;
     display: block;
     transition: var(--transition-smooth);
 }
@@ -954,6 +955,7 @@ html.dark-theme .moon-icon {
 
 .consultation-image img {
     width: 100%;
+    height: auto;
     border-radius: 40px;
     box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
     transition: var(--transition-smooth);
@@ -3626,6 +3628,7 @@ html.dark-theme .moon-icon {
 
 .about-image-container img {
     width: 100%;
+    height: auto;
     display: block;
 }
 

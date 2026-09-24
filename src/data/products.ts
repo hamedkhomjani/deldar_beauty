@@ -76,3 +76,18 @@ export const PRODUCTS: Product[] = [
 export function tomanToRial(toman: number): number {
   return toman * 10;
 }
+
+/** Known static image dimensions (pixels) — used on <img> to prevent CLS */
+const IMAGE_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  'product-hair-oil.png': { width: 640, height: 640 },
+  'product-skin-serum.png': { width: 640, height: 640 },
+  'hair_tools_hands.webp': { width: 1025, height: 1025 },
+  'hero.webp': { width: 1025, height: 1025 },
+  'consultation.webp': { width: 1025, height: 1025 },
+};
+
+/** Resolve width/height for an image path (asset/ base-aware) */
+export function imageSize(path: string): { width: number; height: number } {
+  const file = path.split('/').pop() ?? '';
+  return IMAGE_DIMENSIONS[file] ?? { width: 1025, height: 1025 };
+}

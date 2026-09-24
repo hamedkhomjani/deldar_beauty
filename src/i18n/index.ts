@@ -188,6 +188,7 @@ const fa = {
   contactHoursTitle: 'ساعات پذیرش',
   mapIframeTitle: 'موقعیت سالن زیبایی دلدار روی نقشه',
   mapBtn: 'مسیریابی در گوگل مپ',
+  mapBtnNeshan: 'مسیریابی در نشان',
   // About page
   aboutTitle: 'درباره ما | داستان و تیم سالن زیبایی دلدار در تهران',
   aboutDescription:
@@ -386,6 +387,7 @@ const en: Dictionary = {
   contactHoursTitle: 'Opening Hours',
   mapIframeTitle: 'Deldar Beauty Salon location on the map',
   mapBtn: 'Directions on Google Maps',
+  mapBtnNeshan: 'Directions in Neshan',
   // About page
   aboutTitle: 'About Us | The Story & Team of Deldar Beauty Salon in Tehran',
   aboutDescription:

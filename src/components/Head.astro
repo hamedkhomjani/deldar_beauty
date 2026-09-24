@@ -24,7 +24,7 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
   /** Preloads the hero image for faster LCP (homepage only) */
   preloadHero?: boolean;
-  robots?: 'index, follow' | 'noindex, nofollow';
+  robots?: 'index, follow, max-image-preview:large, max-snippet:-1' | 'noindex, nofollow';
 }
 
 const {
@@ -36,7 +36,7 @@ const {
   ogType = 'website',
   jsonLd = [],
   preloadHero = false,
-  robots = 'index, follow',
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1',
 } = Astro.props;
 
 const canonicalUrl = abs(canonical);
@@ -49,6 +49,8 @@ function toAbs(path: string): string {
 const ogImageUrl = toAbs(ogImage);
 const otherLang: Lang = lang === 'en' ? 'fa' : 'en';
 const alternateUrl = toAbs(altLangPath(canonical, otherLang));
+/** Regional BCP47 hreflang tags — kept in sync with the generated sitemap */
+const HREFLANG_TAGS: Record<Lang, string> = { fa: 'fa-IR', en: 'en-US' };
 ---
 
 <script is:inline>
@@ -68,12 +70,13 @@ const alternateUrl = toAbs(altLangPath(canonical, otherLang));
 <meta name="robots" content={robots} />
 <link rel="canonical" href={canonicalUrl} />
 
-<link rel="alternate" hreflang={lang} href={canonicalUrl} />
-<link rel="alternate" hreflang={otherLang} href={alternateUrl} />
+<link rel="alternate" hreflang={HREFLANG_TAGS[lang]} href={canonicalUrl} />
+<link rel="alternate" hreflang={HREFLANG_TAGS[otherLang]} href={alternateUrl} />
 <link rel="alternate" hreflang="x-default" href={toAbs(altLangPath(canonical, 'fa'))} />
 
 <link rel="icon" type="image/png" sizes="32x32" href={asset('assets/images/favicon.png')} />
 <link rel="apple-touch-icon" sizes="180x180" href={asset('assets/images/apple-touch-icon.png')} />
+<link rel="sitemap" href={asset('sitemap-index.xml')} />
 
 <meta property="og:type" content={ogType} />
 <meta property="og:url" content={canonicalUrl} />
@@ -82,6 +85,7 @@ const alternateUrl = toAbs(altLangPath(canonical, otherLang));
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={SITE.name} />
 <meta property="og:locale" content={LOCALE_TAGS[lang]} />
 <meta property="og:locale:alternate" content={LOCALE_TAGS[otherLang]} />
 <meta property="og:site_name" content={SITE.name} />
@@ -91,6 +95,7 @@ const alternateUrl = toAbs(altLangPath(canonical, otherLang));
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImageUrl} />
+<meta name="twitter:image:alt" content={SITE.name} />
 
 {
   jsonLd.map((schema) => (

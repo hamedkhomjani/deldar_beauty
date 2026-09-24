@@ -4,6 +4,7 @@
  */
 import Layout from '../components/Layout.astro';
 import { aboutPageSchema } from '../data/schema';
+import { imageSize } from '../data/products';
 import { asset } from '../config';
 import { t, type Lang } from '../i18n';
 
@@ -34,7 +35,10 @@ const dict = t(lang);
         <img
           src={asset('assets/images/hair_tools_hands.webp')}
           alt={dict.aboutImgAlt}
+          width={imageSize('hair_tools_hands.webp').width}
+          height={imageSize('hair_tools_hands.webp').height}
           loading="lazy"
+          decoding="async"
           style="transition: transform 0.6s ease;"
         />
       </div>

@@ -5,7 +5,7 @@
  */
 import Layout from '../components/Layout.astro';
 import { bookingServiceNames } from '../data/services';
-import { breadcrumbSchema } from '../data/schema';
+import { breadcrumbSchema, webPageSchema } from '../data/schema';
 import { asset } from '../config';
 import { t, type Lang } from '../i18n';
 
@@ -18,6 +18,7 @@ const dict = t(lang);
 const services = bookingServiceNames(lang);
 
 const jsonLd = [
+  webPageSchema('/booking', dict.bookingPageTitle, lang),
   breadcrumbSchema([
     { name: lang === 'en' ? 'Home' : 'خانه', item: lang === 'en' ? '/en/' : '/' },
     {

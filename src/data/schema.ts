@@ -3,13 +3,15 @@
  * Every function returns a plain object that pages inject as JSON-LD.
  * Builders take a `lang` so text matches the page locale.
  */
-import { SITE, SALON } from '../config';
+import { SITE, SALON, GOOGLE_MAPS_DIRECTIONS_URL, NESHAN_DIRECTIONS_URL } from '../config';
 import type { Lang } from '../i18n';
 import type { Product } from './products';
 import { tomanToRial } from './products';
 import type { Service } from './services';
 import type { Faq } from './faq';
-import { REVIEWS_AGGREGATE } from './reviews';
+import { REVIEWS, REVIEWS_AGGREGATE } from './reviews';
+
+const MAP_LINKS = [GOOGLE_MAPS_DIRECTIONS_URL, NESHAN_DIRECTIONS_URL];
 
 export function abs(url: string): string {
   return url.startsWith('http') ? url : SITE.url.replace(/\/$/, '') + url;
@@ -50,24 +52,53 @@ export function beautySalonSchema(services: Service[], lang: Lang) {
     name: SITE.name,
     alternateName: SITE.nameEn,
     description: COPY.salonDescription[lang],
-    image: abs('/assets/images/og-image.png'),
+    image: [
+      abs('/assets/images/og-image.png'),
+      abs('/assets/images/hero.webp'),
+      abs('/assets/images/consultation.webp'),
+      abs('/assets/images/hair_tools_hands.webp'),
+    ],
+    logo: abs('/assets/images/logo.webp'),
     url: langUrl('/', lang),
     telephone: SALON.schemaPhone,
-    priceRange: '$$',
+    priceRange: '$$$',
     address: {
       '@type': 'PostalAddress',
       streetAddress: COPY.streetAddress[lang],
       addressLocality: COPY.addressLocality[lang],
+      addressRegion: 'تهران',
       postalCode: '1234567890',
       addressCountry: 'IR',
     },
-    geo: { '@type': 'GeoCoordinates', latitude: 35.7812, longitude: 51.412 },
+    geo: { '@type': 'GeoCoordinates', latitude: SALON.geo.lat, longitude: SALON.geo.lng },
+    hasMap: MAP_LINKS,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: SALON.schemaPhone,
+      contactType: 'customer service',
+      availableLanguage: ['fa-IR', 'en'],
+    },
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: REVIEWS_AGGREGATE.ratingValue,
       reviewCount: REVIEWS_AGGREGATE.reviewCount,
       bestRating: REVIEWS_AGGREGATE.bestRating,
+      worstRating: '1',
     },
+    review: REVIEWS.map((r, i) => ({
+      '@type': 'Review',
+      '@id': `${SITE.url}#review-${i + 1}`,
+      author: { '@type': 'Person', name: r.name[lang] },
+      datePublished: '2026-08-15',
+      reviewBody: r.text[lang],
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: r.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+      itemReviewed: { '@id': `${SITE.url}#salon` },
+    })),
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -79,13 +110,19 @@ export function beautySalonSchema(services: Service[], lang: Lang) {
     sameAs: [
       `https://instagram.com/${SALON.instagram}`,
       `https://t.me/${SALON.telegram}`,
+      `https://wa.me/${SALON.whatsapp}`,
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: COPY.catalogName[lang],
+      url: langUrl('/#services', lang),
       itemListElement: services.map((s) => ({
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: s.name[lang] },
+        itemOffered: {
+          '@type': 'Service',
+          name: s.name[lang],
+          url: langUrl('/#services', lang),
+        },
       })),
     },
   };
@@ -100,6 +137,18 @@ export function webSiteSchema(lang: Lang) {
     name: SITE.name,
     inLanguage: lang === 'en' ? 'en-US' : 'fa-IR',
     publisher: { '@id': `${SITE.url}#salon` },
+  };
+}
+
+export function webPageSchema(path: string, title: string, lang: Lang) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${langUrl(path, lang)}#webpage`,
+    url: langUrl(path, lang),
+    name: title,
+    inLanguage: lang === 'en' ? 'en-US' : 'fa-IR',
+    isPartOf: { '@id': `${SITE.url}#website` },
   };
 }
 

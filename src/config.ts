@@ -41,7 +41,20 @@ export const SALON = {
     fa: 'شنبه تا پنجشنبه: ۱۰:۰۰ الی ۱۹:۰۰',
     en: 'Saturday to Thursday: 10:00 – 19:00',
   } satisfies Localized,
+  /** Saloon coordinates — used by JSON-LD geo + Neshan directions */
+  geo: { lat: 35.7812, lng: 51.412 },
 };
+
+/**
+ * Neshan (نشان) — Iran's primary maps/navigation app.
+ * Open in Neshan to the salon's coordinates; local SEO + Iranian users rely on it.
+ */
+export const NESHAN_DIRECTIONS_URL = `https://neshan.org/maps/routing/car/origin/-/destination/${SALON.geo.lat},${SALON.geo.lng}`;
+
+/** Google Maps directions link (address query) */
+export const GOOGLE_MAPS_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+  SALON.address.fa
+)}`;
 
 export const BANK = {
   /** Card-to-card payment details (placeholder – replace with real numbers) */
