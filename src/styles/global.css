@@ -1110,11 +1110,6 @@ html.dark-theme .moon-icon {
     margin-bottom: 50px;
 }
 
-.booking-page-header .booking-page-logo {
-    width: 110px;
-    margin-bottom: 20px;
-}
-
 .booking-page-header h1 {
     font-size: clamp(2rem, 5vw, 3.2rem);
     margin-bottom: 12px;
