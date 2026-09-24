@@ -10,7 +10,7 @@
 import { SALON } from '../config';
 import { showToast } from './toast';
 import { trapTab } from './focusTrap';
-import { BOOKING_STRINGS, G_MONTH_NAMES_EN, J_MONTH_NAMES_EN, LANG } from './lang';
+import { BOOKING_STRINGS, G_MONTH_NAMES_EN, J_MONTH_NAMES_EN, LANG, fmtDigits, toLatinDigits } from './lang';
 
 const S = BOOKING_STRINGS[LANG];
 
@@ -101,7 +101,7 @@ let selectedTime: string | null = null;
 /** Pure-Jalali date string (used in the Persian message sent to the salon) */
 function jalaliDateString(d: Date): string {
   const [jy, jm, jd] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
-  return `${jd} ${J_MONTH_NAMES_FA[jm - 1]} ${jy}`;
+  return `${fmtDigits(jd)} ${J_MONTH_NAMES_FA[jm - 1]} ${fmtDigits(jy)}`;
 }
 
 function formatSelectedDate(d: Date): string {
@@ -130,7 +130,7 @@ function renderCalendar(): void {
   let totalDays: number;
 
   if (LANG === 'fa') {
-    monthLabel.textContent = `${J_MONTH_NAMES_FA[viewDate.month - 1]} ${viewDate.year}`;
+    monthLabel.textContent = `${J_MONTH_NAMES_FA[viewDate.month - 1]} ${fmtDigits(viewDate.year)}`;
 
     // First weekday of the month (0=Sunday) → shift to Saturday-based Persian week
     const [gY, gM, gD] = jalaliToGregorian(viewDate.year, viewDate.month, 1);
@@ -164,7 +164,7 @@ function renderCalendar(): void {
 
   for (let i = 1; i <= totalDays; i++) {
     const span = document.createElement('span');
-    span.textContent = String(i);
+    span.textContent = fmtDigits(i);
 
     const cellDate =
       LANG === 'fa'
@@ -202,7 +202,7 @@ function selectDate(date: Date, dayNumber: number): void {
   selectedDate = date;
   document.querySelectorAll('.days-grid span').forEach((s) => s.classList.remove('active'));
   document.querySelectorAll('.days-grid span').forEach((s) => {
-    if (s.textContent === String(dayNumber)) s.classList.add('active');
+    if (s.textContent === fmtDigits(dayNumber)) s.classList.add('active');
   });
   refreshTimeSlots();
   clearFormMessage();
@@ -257,7 +257,7 @@ function focusCalDay(day: number): void {
   cursorDay = day;
   const cells = document.querySelectorAll<HTMLElement>('.days-grid span');
   cells.forEach((c) => {
-    if (c.textContent === String(day)) c.focus();
+    if (c.textContent === fmtDigits(day)) c.focus();
   });
 }
 
@@ -705,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Keyboard navigation for the calendar grid
   ($('#calendar-days') as HTMLElement | null)?.addEventListener('keydown', (e) => {
     const active = document.activeElement as HTMLElement | null;
-    const day = active && active.matches('.days-grid span') ? Number(active.textContent) : NaN;
+    const day = active && active.matches('.days-grid span') ? Number(toLatinDigits(active.textContent ?? '')) : NaN;
     if (isNaN(day)) return;
 
     if (e.key === 'Enter' || e.key === ' ') {
@@ -839,7 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const slotMinutes = selectedTime ? slotStartMinutes(selectedTime) : null;
     const time24 =
       slotMinutes !== null
-        ? `${String(Math.floor(slotMinutes / 60)).padStart(2, '0')}:${String(slotMinutes % 60).padStart(2, '0')}`
+        ? fmtDigits(`${String(Math.floor(slotMinutes / 60)).padStart(2, '0')}:${String(slotMinutes % 60).padStart(2, '0')}`)
         : (selectedTime ?? '');
 
     // Unique booking reference for follow-up (easy to remember, unique).

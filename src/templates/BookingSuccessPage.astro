@@ -83,6 +83,7 @@ const salonAddress = SALON.address[lang];
 
   const pageLang = document.documentElement.lang === 'en' ? 'en' : 'fa';
   const dict = t(pageLang);
+  const toLatinDigits = (s: string) => s.replace(/[۰-۹]/g, (c) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
   const SALON_NAME = pageLang === 'en' ? SITE.nameEn : SITE.name;
   const SALON_ADDRESS = SALON.address[pageLang];
   const REF_PREFIX = dict.bookingRefLabel;
@@ -125,7 +126,7 @@ const salonAddress = SALON.address[lang];
 
   function buildEvent(): { title: string; startStr: string; endStr: string; icsUrl: string } {
     if (!iso || !timeStr) return { title: '', startStr: '', endStr: '', icsUrl: '' };
-    const [hour, minute] = timeStr.split(':').map((n) => parseInt(n, 10) || 0);
+    const [hour, minute] = toLatinDigits(timeStr).split(':').map((n) => parseInt(n, 10) || 0);
     const start = new Date(`${iso}T00:00:00`);
     start.setHours(hour, minute, 0, 0);
     const end = new Date(start.getTime() + 60 * 60 * 1000);

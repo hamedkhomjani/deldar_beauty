@@ -16,6 +16,22 @@ export function fmt(n: number): string {
   return n.toLocaleString(LANG === 'en' ? 'en-US' : 'fa-IR');
 }
 
+const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+
+/**
+ * Locale-aware digits: converts Western (Latin) digits to Persian (۰-۹)
+ * digits when the page language is fa; returns the value unchanged in en.
+ */
+export function fmtDigits(value: string | number): string {
+  if (LANG === 'en') return String(value);
+  return String(value).replace(/[0-9]/g, (d) => FA_DIGITS[Number(d)]);
+}
+
+/** Convert Persian (۰-۹) digits back to Latin ones (for internal parsing). */
+export function toLatinDigits(value: string): string {
+  return value.replace(/[۰-۹]/g, (d) => String(FA_DIGITS.indexOf(d)));
+}
+
 /** Strings used by cart.ts */
 export const CART_STRINGS = {
   fa: {
