@@ -5,6 +5,7 @@
  * so the drawer always renders in the current page language.
  */
 import { showToast } from './toast';
+import { trapTab } from './focusTrap';
 import { PRODUCTS } from '../data/products';
 import { CART_STRINGS, LANG, fmt } from './lang';
 
@@ -61,7 +62,7 @@ let cart: CartItem[] = loadCart();
 
 const cartToggle = $('#cart-toggle');
 const closeCart = $('#close-cart');
-const cartDrawer = $('#cart-drawer');
+const cartDrawer = $('#cart-drawer') as HTMLElement | null;
 const cartOverlay = $('#cart-overlay');
 const cartItemsContainer = $('#cart-items');
 const cartTotalAmount = $('#cart-total-amount');
@@ -139,16 +140,29 @@ function renderCart(): void {
   if (cartCountBadge) cartCountBadge.textContent = fmt(count);
 }
 
+function setDrawerState(open: boolean): void {
+  if (!cartDrawer) return;
+  if (open) {
+    cartDrawer.classList.add('active');
+    cartOverlay?.classList.add('active');
+    cartDrawer.removeAttribute('inert');
+  } else {
+    cartDrawer.classList.remove('active');
+    cartOverlay?.classList.remove('active');
+    cartDrawer.setAttribute('inert', '');
+  }
+  cartToggle?.setAttribute('aria-expanded', String(open));
+  document.body.style.overflow = open ? 'hidden' : 'auto';
+  if (open) (closeCart as HTMLElement | null)?.focus();
+  else (cartToggle as HTMLElement | null)?.focus();
+}
+
 function openCart(): void {
-  cartDrawer?.classList.add('active');
-  cartOverlay?.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  setDrawerState(true);
 }
 
 function toggleCart(): void {
-  const isActive = cartDrawer?.classList.toggle('active') ?? false;
-  cartOverlay?.classList.toggle('active', isActive);
-  document.body.style.overflow = isActive ? 'hidden' : 'auto';
+  setDrawerState(!(cartDrawer?.classList.contains('active') ?? false));
 }
 
 function addToCart(product: { id?: string; name?: string; price: number; image: string }): void {
@@ -175,11 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
   closeCart?.addEventListener('click', toggleCart);
   cartOverlay?.addEventListener('click', toggleCart);
 
-  // Escape closes the cart drawer
+  // Escape closes the cart drawer; Tab is trapped inside while open
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (cartDrawer?.classList.contains('active')) toggleCart();
   });
+  cartDrawer?.addEventListener('keydown', (e: KeyboardEvent) => trapTab(e, cartDrawer));
 
   // Qty +/- and remove (event delegation)
   cartItemsContainer?.addEventListener('click', (e) => {

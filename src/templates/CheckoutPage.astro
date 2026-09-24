@@ -22,7 +22,7 @@ const zero = lang === 'en' ? '0 Toman' : '۰ تومان';
   robots="noindex, nofollow"
   checkout
 >
-  <main class="container checkout-container">
+  <main id="main-content" class="container checkout-container">
     <div class="checkout-header-bar">
       <a href={localizedPath('/shop/', lang)} class="checkout-back-link">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -99,7 +99,7 @@ const zero = lang === 'en' ? '0 Toman' : '۰ تومان';
     </div>
   </main>
 
-  <div id="success-overlay" class="success-overlay">
+  <div id="success-overlay" class="success-overlay" role="dialog" aria-modal="true" aria-label={dict.checkoutSuccessHeading} tabindex="-1">
     <div class="success-content">
       <div class="success-icon">
         <svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="3">

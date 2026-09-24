@@ -9,6 +9,7 @@
  */
 import { SALON } from '../config';
 import { showToast } from './toast';
+import { trapTab } from './focusTrap';
 import { BOOKING_STRINGS, G_MONTH_NAMES_EN, J_MONTH_NAMES_EN, LANG } from './lang';
 
 const S = BOOKING_STRINGS[LANG];
@@ -519,8 +520,12 @@ function restoreDraftAppointment(): void {
       (s) => s.textContent?.trim() === d.time,
     );
     if (slot && !slot.disabled) {
-      document.querySelectorAll('.time-slot').forEach((s) => s.classList.remove('active'));
+      document.querySelectorAll('.time-slot').forEach((s) => {
+        s.classList.remove('active');
+        s.setAttribute('aria-pressed', 'false');
+      });
       slot.classList.add('active');
+      slot.setAttribute('aria-pressed', 'true');
       selectedTime = d.time;
       updateSummary();
     }
@@ -528,9 +533,12 @@ function restoreDraftAppointment(): void {
   saveCurrentDraft();
 }
 
+let lastModalTrigger: HTMLElement | null = null;
+
 function openBooking(): void {
   const modal = $('#booking-modal');
   if (!modal) return;
+  lastModalTrigger = document.activeElement as HTMLElement | null;
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
   if (!selectedTime) {
@@ -542,6 +550,9 @@ function openBooking(): void {
   updateSummary();
   restoreDraftFields();
   restoreDraftAppointment();
+  requestAnimationFrame(() => {
+    ($('#close-booking') as HTMLElement | null)?.focus();
+  });
 }
 
 function closeBooking(): void {
@@ -551,6 +562,9 @@ function closeBooking(): void {
   modal.style.display = '';
   document.body.style.overflow = 'auto';
   resetBooking();
+  if (lastModalTrigger && document.contains(lastModalTrigger)) {
+    lastModalTrigger.focus();
+  }
 }
 
 function resetBooking(): void {
@@ -609,10 +623,13 @@ document.addEventListener('DOMContentLoaded', () => {
     clearFieldErrors('service');
   });
 
-  // Escape closes the booking modal
+  // Escape closes the booking modal; Tab is trapped inside while open
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     closeBooking();
+  });
+  ($('#booking-modal') as HTMLElement | null)?.addEventListener('keydown', (e: KeyboardEvent) => {
+    trapTab(e, $('#booking-modal'));
   });
 
   // Service cards open the modal. CTAs and the mobile dock link to the
@@ -643,11 +660,9 @@ document.addEventListener('DOMContentLoaded', () => {
     closeBooking();
   });
 
-  $('#btn-return-home')?.addEventListener('click', () => {
-    const modal = $('#booking-modal');
-    modal?.classList.remove('active');
-    document.body.style.overflow = 'auto';
-    resetBooking();
+  $('#btn-return-home')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeBooking();
   });
 
   // Month navigation
@@ -728,8 +743,12 @@ document.addEventListener('DOMContentLoaded', () => {
   timeSlots.forEach((slot) => {
     slot.addEventListener('click', () => {
       if (!(slot as HTMLButtonElement).disabled) {
-        timeSlots.forEach((s) => s.classList.remove('active'));
+        timeSlots.forEach((s) => {
+          s.classList.remove('active');
+          s.setAttribute('aria-pressed', 'false');
+        });
         slot.classList.add('active');
+        slot.setAttribute('aria-pressed', 'true');
         selectedTime = slot.textContent?.trim() ?? null;
         clearFormMessage();
         updateSummary();

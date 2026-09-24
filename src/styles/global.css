@@ -127,6 +127,35 @@ html {
     font-size: 15px;
 }
 
+/* --- Skip Link (keyboard users) --- */
+.skip-link {
+    position: fixed;
+    top: 16px;
+    inset-inline-start: 16px;
+    z-index: 100000;
+    padding: 12px 20px;
+    background: var(--dark-charcoal);
+    color: #ffffff;
+    border-radius: 12px;
+    border: 2px solid var(--accent-gold);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transform: translateY(-400%);
+    transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+    color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skip-link {
+        transition: none;
+    }
+}
+
 /* --- Grain Overlay --- */
 .grain-overlay {
     position: fixed;
@@ -160,10 +189,13 @@ body {
     transition: background-color 0.6s ease, color 0.6s ease;
 }
 
-/* Hide default cursor for custom cursor */
-body,
-body * {
-    cursor: none !important;
+/* Hide default cursor for custom cursor — only on fine-pointer devices
+   and only for users who have not asked for reduced motion. */
+@media (hover: hover) and (pointer: fine) {
+    body,
+    body * {
+        cursor: none !important;
+    }
 }
 
 /* Show default cursor in cart drawer for better UX */
@@ -326,6 +358,17 @@ html.js [data-reveal].visible {
         transition: none !important;
         opacity: 1 !important;
         transform: none !important;
+    }
+
+    /* Restore the native cursor and hide the animated custom cursor */
+    body,
+    body * {
+        cursor: auto !important;
+    }
+
+    .cursor-dot,
+    .cursor-outline {
+        display: none;
     }
 }
 
@@ -1885,6 +1928,9 @@ html.dark-theme .moon-icon {
     align-items: center;
     justify-content: center;
     border: 1px solid var(--glass-border);
+    font-family: inherit;
+    line-height: 1;
+    padding: 0;
 }
 
 .close-modal:hover {
@@ -1954,6 +2000,15 @@ html.dark-theme .moon-icon {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition-smooth);
+    padding: 0;
+    font-family: inherit;
+    color: inherit;
+}
+
+.calendar-header .prev-month:focus-visible,
+.calendar-header .next-month:focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
 }
 
 .calendar-header .prev-month:hover,

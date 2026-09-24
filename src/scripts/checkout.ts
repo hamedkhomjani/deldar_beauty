@@ -145,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     localStorage.removeItem(CART_KEY);
     successOverlay?.classList.add('active');
+    (successOverlay as HTMLElement | null)?.focus({ preventScroll: true });
   });
 
   renderCheckoutSummary();

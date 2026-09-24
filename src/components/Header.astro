@@ -30,7 +30,7 @@ const langSwitchHref = altLangPath(pathname, otherLang);
 ---
 
 <header id="main-header">
-  <nav class="container">
+  <nav class="container" aria-label={dict.navAria}>
     <div class="logo">
       <a href={localizedPath('/', lang)} aria-label={dict.logoAria}>
         <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} />
@@ -50,7 +50,7 @@ const langSwitchHref = altLangPath(pathname, otherLang);
     <div class="header-actions">
       {
         !minimal && (
-          <button id="cart-toggle" class="cart-toggle" aria-label={dict.cartAria}>
+          <button id="cart-toggle" class="cart-toggle" aria-label={dict.cartAria} aria-expanded="false">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -84,7 +84,7 @@ const langSwitchHref = altLangPath(pathname, otherLang);
 
       {
         !minimal && (
-          <button type="button" class="menu-icon" id="menu-toggle" aria-label={dict.menuOpenAria}>
+          <button type="button" class="menu-icon" id="menu-toggle" aria-label={dict.menuOpenAria} aria-expanded="false" aria-controls="mobile-menu">
             <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
               <rect y="4" width="24" height="2" rx="1" />
               <rect y="11" width="24" height="2" rx="1" />

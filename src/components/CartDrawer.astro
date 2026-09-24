@@ -12,7 +12,7 @@ const dict = t(lang);
 
 <div id="cart-overlay" class="cart-overlay"></div>
 
-<div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-label={dict.cartDrawerAria}>
+<div id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-label={dict.cartDrawerAria} tabindex="-1" inert>
   <div class="cart-header">
     <h2>{dict.cartTitle}</h2>
     <button class="close-cart" id="close-cart" aria-label={dict.cartCloseAria}>&times;</button>

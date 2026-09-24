@@ -2,6 +2,8 @@
  * Shared UI behaviour: preloader, theme toggle, header scroll, mobile menu,
  * scroll-to-top on load, scroll reveal, and the mobile booking dock.
  */
+import { trapTab } from './focusTrap';
+
 export {};
 
 function $<T extends Element>(sel: string): T | null {
@@ -73,20 +75,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile menu
   const menuToggle = $('#menu-toggle');
   const menuClose = $('#menu-close');
-  const mobileMenu = $('#mobile-menu');
+  const mobileMenu = $('#mobile-menu') as HTMLElement | null;
+  const openLabel = menuToggle?.getAttribute('aria-label') ?? '';
+  const closeLabel = menuClose?.getAttribute('aria-label') ?? openLabel;
 
-  const closeMenu = (): void => {
-    mobileMenu?.classList.remove('active');
-    document.body.style.overflow = 'auto';
-    (menuToggle as HTMLElement | null)?.focus();
+  const setMenuState = (open: boolean): void => {
+    if (!mobileMenu) return;
+    if (open) {
+      mobileMenu.classList.add('active');
+      mobileMenu.removeAttribute('inert');
+    } else {
+      mobileMenu.classList.remove('active');
+      mobileMenu.setAttribute('inert', '');
+    }
+    menuToggle?.setAttribute('aria-expanded', String(open));
+    menuToggle?.setAttribute('aria-label', open ? closeLabel : openLabel);
+    document.body.style.overflow = open ? 'hidden' : 'auto';
+    if (open) (menuClose as HTMLElement | null)?.focus();
+    else (menuToggle as HTMLElement | null)?.focus();
   };
 
-  menuToggle?.addEventListener('click', () => {
-    mobileMenu?.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    (menuClose as HTMLElement | null)?.focus();
-  });
+  const closeMenu = (): void => setMenuState(false);
 
+  menuToggle?.addEventListener('click', () => setMenuState(true));
   menuClose?.addEventListener('click', closeMenu);
 
   // Any nav link closes the menu too
@@ -94,11 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', closeMenu);
   });
 
-  // Escape closes the mobile menu
+  // Escape closes the mobile menu; Tab is trapped inside the open menu
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (mobileMenu?.classList.contains('active')) closeMenu();
   });
+  mobileMenu?.addEventListener('keydown', (e) => trapTab(e, mobileMenu));
 
   // Scroll reveal animation (skipped for reduced-motion users)
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -62,7 +62,11 @@ const cartDrawer = document.getElementById('cart-drawer');
 cartDrawer?.addEventListener('mouseenter', hideCustomCursor);
 cartDrawer?.addEventListener('mouseleave', showCustomCursor);
 
-// Only run the loop on devices with a fine pointer (skip mobile/touch)
-if (window.matchMedia('(pointer: fine)').matches) {
+// Only run the loop on devices with a fine pointer (skip mobile/touch),
+// and never for users who prefer reduced motion.
+if (
+  window.matchMedia('(pointer: fine)').matches &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+) {
   animateCursor();
 }

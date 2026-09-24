@@ -38,7 +38,7 @@ const jsonLd = [
   noBookingModal
   hideBookingDock
 >
-  <main class="booking-page-main">
+  <main id="main-content" class="booking-page-main">
     <div class="booking-page-header container" data-reveal>
       <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} class="booking-page-logo" />
       <h1>{dict.bookingPageH1}</h1>
@@ -46,7 +46,7 @@ const jsonLd = [
     </div>
 
     <div id="booking-page" class="container">
-      <ol class="booking-steps" aria-label="booking progress">
+      <ol class="booking-steps" aria-label={dict.progressAria}>
         <li data-step="1" class="step"><span class="step-num">{lang === 'fa' ? '۱' : '1'}</span><span class="step-label">{dict.stepPickTitle}</span></li>
         <li data-step="2" class="step"><span class="step-num">{lang === 'fa' ? '۲' : '2'}</span><span class="step-label">{dict.stepDetailsTitle}</span></li>
         <li data-step="3" class="step"><span class="step-num">{lang === 'fa' ? '۳' : '3'}</span><span class="step-label">{dict.stepConfirmTitle}</span></li>
@@ -56,17 +56,17 @@ const jsonLd = [
           <h3>{dict.chooseDay}</h3>
           <div class="calendar-card">
             <div class="calendar-header">
-              <span class="prev-month" aria-label={dict.prevMonthAria}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" class="prev-month" aria-label={dict.prevMonthAria}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
-              </span>
+              </button>
               <span class="current-month"></span>
-              <span class="next-month" aria-label={dict.nextMonthAria}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" class="next-month" aria-label={dict.nextMonthAria}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
-              </span>
+              </button>
             </div>
             <div class="calendar-body">
               <div class="days-header">
@@ -85,14 +85,14 @@ const jsonLd = [
           <h3>{dict.chooseTime}</h3>
           <div class="time-slots" id="time-slots">
             {dict.timeSlots.map((slot, i) => (
-              <button class:list={['time-slot', { active: i === 1 }]}>{slot}</button>
+              <button class:list={['time-slot', { active: i === 1 }]} aria-pressed={i === 1}>{slot}</button>
             ))}
           </div>
           <div class="time-legend">
             <span><i class="dot reserved"></i> {dict.reservedLegend}</span>
             <span><i class="dot available"></i> {dict.availableLegend}</span>
           </div>
-          <p id="booking-summary" class="booking-summary">{dict.summaryPlaceholder}</p>
+          <p id="booking-summary" class="booking-summary" aria-live="polite">{dict.summaryPlaceholder}</p>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ const jsonLd = [
         <h3>{dict.detailsHeading}</h3>
         <form id="booking-form" class="booking-form">
           <div class="form-group" data-field-group="service">
-            <select id="booking-service" required autocomplete="off">
+            <select id="booking-service" required autocomplete="off" aria-label={dict.serviceLabel}>
               <option value="" disabled selected>{dict.servicePlaceholder}</option>
               {services.map((name) => <option>{name}</option>)}
               <option>{dict.freeConsultOption}</option>
@@ -110,20 +110,20 @@ const jsonLd = [
           </div>
           <div class="form-row">
             <div class="form-group" data-field-group="name">
-              <input type="text" id="booking-name" placeholder={dict.namePlaceholder} required autocomplete="name" />
+              <input type="text" id="booking-name" placeholder={dict.namePlaceholder} required autocomplete="name" aria-label={dict.nameLabel} />
               <span class="required-star">*</span>
               <p class="field-error" data-error-for="name"></p>
             </div>
             <div class="form-group" data-field-group="phone">
-              <input type="tel" id="booking-phone" placeholder={dict.phonePlaceholder} required autocomplete="tel" />
+              <input type="tel" id="booking-phone" placeholder={dict.phonePlaceholder} required autocomplete="tel" aria-label={dict.phoneLabel} />
               <span class="required-star">*</span>
               <p class="field-error" data-error-for="phone"></p>
             </div>
           </div>
           <div class="form-group">
-            <input type="email" id="booking-email" placeholder={dict.emailPlaceholder} autocomplete="email" />
+            <input type="email" id="booking-email" placeholder={dict.emailPlaceholder} autocomplete="email" aria-label={dict.emailLabel} />
           </div>
-          <p id="booking-form-msg" class="form-msg"></p>
+          <p id="booking-form-msg" class="form-msg" aria-live="polite"></p>
           <button type="submit" class="btn-confirm">{dict.bookingSubmitBtn}</button>
           <p class="booking-reassure">{dict.bookingNoPay}</p>
           <p class="booking-note">{dict.bookingReservedNote}</p>

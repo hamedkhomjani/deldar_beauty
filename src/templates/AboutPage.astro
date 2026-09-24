@@ -22,7 +22,7 @@ const dict = t(lang);
   lang={lang}
   jsonLd={[aboutPageSchema(lang)]}
 >
-  <div class="container about-page-content">
+  <main id="main-content" class="container about-page-content">
     <h1 class="about-title">
       <span class="text-gradient">{dict.aboutH1}</span>
     </h1>
@@ -47,5 +47,5 @@ const dict = t(lang);
     <p class="about-extra-text">
       {dict.aboutP2}
     </p>
-  </div>
+  </main>
 </Layout>

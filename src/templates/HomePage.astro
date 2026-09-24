@@ -42,14 +42,14 @@ const reviewUrl = pageUrl(lang === 'en' ? '/en/review/' : '/review/');
   jsonLd={jsonLd}
   preloadHero
 >
-  <div id="preloader" class="preloader">
+  <div id="preloader" class="preloader" aria-hidden="true">
     <div class="preloader-content">
       <img src={asset('assets/images/logo.svg')} alt={dict.logoAlt} class="preloader-logo" />
       <div class="preloader-bar"></div>
     </div>
   </div>
 
-  <main>
+  <main id="main-content">
     <!-- Hero Section -->
     <section id="hero" class="hero">
       <div class="hero-bg-accent"></div>

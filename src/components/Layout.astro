@@ -20,6 +20,7 @@ import GrainOverlay from './GrainOverlay.astro';
 import FloatingButton from './FloatingButton.astro';
 import MobileDock from './MobileDock.astro';
 import type { Lang } from '../i18n';
+import { t } from '../i18n';
 import '../styles/global.css';
 
 interface Props {
@@ -77,6 +78,7 @@ const dir = lang === 'en' ? 'ltr' : 'rtl';
   </head>
 
   <body class:list={[bodyClass]}>
+    <a class="skip-link" href="#main-content">{t(lang).skipLink}</a>
     <Cursor />
     {!checkout && <GrainOverlay />}
     {!checkout && <FloatingButton />}
