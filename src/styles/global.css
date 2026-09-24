@@ -1349,6 +1349,7 @@ html.dark-theme .moon-icon {
     font-family: 'Vazirmatn', sans-serif;
     font-size: 0.95rem;
     font-weight: 600;
+    color: var(--text-primary);
     cursor: pointer;
     transition: var(--transition-smooth);
 }
