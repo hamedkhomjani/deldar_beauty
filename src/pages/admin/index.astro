@@ -242,6 +242,20 @@ const lang = 'fa';
         </form>
       </div>
     </div>
+  <!-- Custom Confirm Modal (replaces native confirm(), keeps the custom cursor working) -->
+    <div id="admin-confirm-overlay" class="admin-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="admin-confirm-title">تایید عملیات</h3>
+          <button type="button" class="close-btn" id="admin-confirm-close" aria-label="انصراف">&times;</button>
+        </div>
+        <p id="admin-confirm-message" class="admin-confirm-message"></p>
+        <div class="form-actions">
+          <button type="button" id="admin-confirm-cancel" class="btn-outline">انصراف</button>
+          <button type="button" id="admin-confirm-ok" class="btn-danger-confirm">تایید و ادامه</button>
+        </div>
+      </div>
+    </div>
   </main>
 </Layout>
 
@@ -305,6 +319,54 @@ const lang = 'fa';
         authError.textContent = msg;
         authError.classList.remove('hidden');
       }
+    }
+
+    /** In-page confirm dialog — replaces native confirm() so the custom cursor keeps working. */
+    function customConfirm(message: string): Promise<boolean> {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('admin-confirm-overlay') as HTMLElement | null;
+        const msgEl = document.getElementById('admin-confirm-message') as HTMLElement | null;
+        const okBtn = document.getElementById('admin-confirm-ok') as HTMLButtonElement | null;
+        const cancelBtn = document.getElementById('admin-confirm-cancel') as HTMLButtonElement | null;
+        const closeBtn = document.getElementById('admin-confirm-close') as HTMLButtonElement | null;
+
+        if (!overlay || !msgEl || !okBtn) {
+          resolve(true);
+          return;
+        }
+
+        const previousFocus = document.activeElement as HTMLElement | null;
+
+        const cleanup = (result: boolean) => {
+          overlay.classList.add('hidden');
+          okBtn.removeEventListener('click', onOk);
+          cancelBtn?.removeEventListener('click', onCancel);
+          closeBtn?.removeEventListener('click', onCancel);
+          overlay.removeEventListener('keydown', onKeydown);
+          overlay.removeEventListener('click', onBackdrop);
+          previousFocus?.focus();
+          resolve(result);
+        };
+
+        const onOk = () => cleanup(true);
+        const onCancel = () => cleanup(false);
+        const onKeydown = (e: Event) => {
+          const ev = e as KeyboardEvent;
+          if (ev.key === 'Escape') cleanup(false);
+        };
+        const onBackdrop = (e: Event) => {
+          if ((e.target as HTMLElement) === overlay) cleanup(false);
+        };
+
+        msgEl.textContent = message;
+        overlay.classList.remove('hidden');
+        okBtn.addEventListener('click', onOk);
+        cancelBtn?.addEventListener('click', onCancel);
+        closeBtn?.addEventListener('click', onCancel);
+        overlay.addEventListener('keydown', onKeydown);
+        overlay.addEventListener('click', onBackdrop);
+        okBtn.focus();
+      });
     }
 
     // Login Handle (Supabase auth or PIN fallback)
@@ -441,7 +503,7 @@ const lang = 'fa';
       tbody.querySelectorAll('.btn-delete').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-id');
-          if (id && confirm('آیا از حذف این محصول اطمینان دارید؟')) {
+          if (id && (await customConfirm('آیا از حذف این محصول اطمینان دارید؟'))) {
             await deleteProduct(id);
             await renderProductsTable(searchTerm);
             await renderCodeExport();
@@ -627,7 +689,7 @@ const lang = 'fa';
 
     // Clear orders
     document.getElementById('btn-clear-orders')?.addEventListener('click', async () => {
-      if (confirm('آیا از پاکسازی تمام سفارشات اطمینان دارید؟')) {
+      if (await customConfirm('آیا از پاکسازی تمام سفارشات اطمینان دارید؟')) {
         await clearCustomerOrders();
         await renderOrders();
       }
@@ -721,7 +783,7 @@ const lang = 'fa';
       container.querySelectorAll('.btn-delete-rev').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-rev-id');
-          if (id && confirm('آیا از حذف این نظر اطمینان دارید؟')) {
+          if (id && (await customConfirm('آیا از حذف این نظر اطمینان دارید؟'))) {
             await deleteReview(id);
             await renderAdminReviews();
           }
@@ -1219,5 +1281,27 @@ const lang = 'fa';
 
   .hidden {
     display: none !important;
+  }
+
+  .admin-confirm-message {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    line-height: 1.9;
+  }
+
+  .btn-danger-confirm {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    background: linear-gradient(135deg, #d64545, #b32727);
+    color: #fff;
+    transition: filter 0.2s ease;
+  }
+
+  .btn-danger-confirm:hover {
+    filter: brightness(1.1);
   }
 </style>
