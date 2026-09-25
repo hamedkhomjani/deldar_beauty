@@ -62,15 +62,19 @@ const jsonLd = [
 </Layout>
 
 <script>
-  import { getAdminProducts, type AdminProduct } from '../scripts/adminStore';
+  import { getAdminProducts, syncProductsToLocal, type AdminProduct } from '../scripts/adminStore';
+  import { supabaseConfigured } from '../scripts/supabase';
   import { asset } from '../config';
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const raw = localStorage.getItem('deldar_custom_products');
-    if (!raw) return;
-
+  async function initShopProducts() {
     try {
-      const products: AdminProduct[] = getAdminProducts();
+      // Local-only mode: keep the static SSR grid unless an admin draft exists.
+      const hadLocalStore = localStorage.getItem('deldar_custom_products') !== null;
+      if (!supabaseConfigured && !hadLocalStore) return;
+
+      const products: AdminProduct[] = await getAdminProducts();
+      syncProductsToLocal(products);
+
       const grid = document.getElementById('shop-product-grid');
       if (!grid || products.length === 0) return;
 
@@ -105,6 +109,12 @@ const jsonLd = [
     } catch (e) {
       console.error('Failed to parse dynamic products:', e);
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initShopProducts);
+  } else {
+    initShopProducts();
+  }
 </script>
 

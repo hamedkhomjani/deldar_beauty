@@ -11,16 +11,26 @@ const lang = 'fa';
 
 <Layout title="پورتال مدیریت | سالن زیبایی دلدار" description="پورتال مدیریت محصولات و سفارشات سالن زیبایی دلدار" lang={lang} robots="noindex, nofollow">
   <main class="admin-portal container">
-    <!-- PIN Auth Modal -->
+    <!-- Auth Modal (Supabase email/password when configured, PIN otherwise) -->
     <div id="admin-auth-overlay" class="admin-auth-overlay">
       <div class="auth-card">
         <img src={asset('assets/images/logo.svg')} alt="Deldar Logo" class="auth-logo" />
         <h2>ورود به پورتال مدیریت</h2>
-        <p>لطفاً پین‌کد مدیریتی خود را وارد کنید (پیش‌فرض: 1234)</p>
+        <p id="auth-hint">برای ورود از نام کاربری و رمز عبور مدیریتی خود استفاده کنید.</p>
 
         <form id="admin-login-form" class="auth-form">
-          <div class="form-group">
-            <input type="password" id="admin-pin-input" maxlength="10" placeholder="رمز عبور / PIN" required autofocus />
+          <div id="supabase-fields" class="hidden">
+            <div class="form-group">
+              <input type="email" id="admin-email-input" placeholder="ایمیل مدیریت" autocomplete="email" />
+            </div>
+            <div class="form-group">
+              <input type="password" id="admin-pass-input" placeholder="رمز عبور" autocomplete="current-password" />
+            </div>
+          </div>
+          <div id="pin-fields" class="hidden">
+            <div class="form-group">
+              <input type="password" id="admin-pin-input" maxlength="10" placeholder="رمز عبور / PIN" autocomplete="current-password" />
+            </div>
           </div>
           <div id="auth-error" class="auth-error hidden">رمز عبور اشتباه است!</div>
           <button type="submit" class="btn-premium">ورود به سیستم</button>
@@ -116,7 +126,12 @@ const lang = 'fa';
               </div>
               <div class="form-group">
                 <label for="prod-image">آدرس تصویر (مسیر یا لینک)</label>
-                <input type="text" id="prod-image" placeholder="/assets/images/product-skin-serum.png" required />
+                <input type="text" id="prod-image" placeholder="assets/images/product-skin-serum.png" />
+              </div>
+              <div class="form-group" id="prod-image-upload-group">
+                <label for="prod-image-file">یا بارگذاری تصویر از کامپیوتر</label>
+                <input type="file" id="prod-image-file" accept="image/*" />
+                <img id="prod-image-preview" class="prod-image-preview hidden" alt="پیش‌نمایش تصویر" />
               </div>
 
               <div class="form-group full-width">
@@ -238,47 +253,103 @@ const lang = 'fa';
     deleteProduct,
     toggleStock,
     getCustomerOrders,
+    clearCustomerOrders,
     getAdminReviews,
     updateReviewStatus,
     deleteReview,
     verifyAdminPin,
     generateProductsTypeScript,
   } from '../../scripts/adminStore';
+  import {
+    supabaseConfigured,
+    supabaseSignIn,
+    supabaseSignOut,
+    supabaseHasSession,
+    uploadProductImage,
+  } from '../../scripts/supabase';
   import { asset } from '../../config';
+  import { showToast } from '../../scripts/toast';
 
   function initAdmin() {
     const authOverlay = document.getElementById('admin-auth-overlay');
     const loginForm = document.getElementById('admin-login-form');
-    const pinInput = document.getElementById('admin-pin-input') as HTMLInputElement;
+    const emailInput = document.getElementById('admin-email-input') as HTMLInputElement | null;
+    const passInput = document.getElementById('admin-pass-input') as HTMLInputElement | null;
+    const pinInput = document.getElementById('admin-pin-input') as HTMLInputElement | null;
     const authError = document.getElementById('auth-error');
+    const authHint = document.getElementById('auth-hint');
+    const supabaseFields = document.getElementById('supabase-fields');
+    const pinFields = document.getElementById('pin-fields');
     const dashboard = document.getElementById('admin-dashboard');
     const logoutBtn = document.getElementById('admin-logout-btn');
 
-    // Login Handle
-    loginForm?.addEventListener('submit', (e) => {
+    // Show the right login fields for the active mode
+    if (supabaseConfigured) {
+      supabaseFields?.classList.remove('hidden');
+      pinFields?.classList.add('hidden');
+      if (authHint) authHint.textContent = 'برای ورود، ایمیل و رمز عبور مدیریتی را وارد کنید.';
+      emailInput?.focus();
+    } else {
+      pinFields?.classList.remove('hidden');
+      supabaseFields?.classList.add('hidden');
+      if (authHint) authHint.textContent = 'حالت محلی: پین‌کد مدیریتی را وارد کنید (پیش‌فرض: 1234).';
+      pinInput?.focus();
+    }
+
+    // Hides the Product-image upload group unless Supabase is configured
+    const uploadGroup = document.getElementById('prod-image-upload-group');
+    if (!supabaseConfigured) uploadGroup?.classList.add('hidden');
+
+    function showAuthError(msg: string) {
+      if (authError) {
+        authError.textContent = msg;
+        authError.classList.remove('hidden');
+      }
+    }
+
+    // Login Handle (Supabase auth or PIN fallback)
+    loginForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const pin = pinInput.value;
-      if (verifyAdminPin(pin)) {
-        sessionStorage.setItem('deldar_admin_authed', 'true');
-        showDashboard();
+      authError?.classList.add('hidden');
+
+      if (supabaseConfigured) {
+        const email = emailInput?.value.trim() ?? '';
+        const password = passInput?.value ?? '';
+        if (!email || !password) {
+          showAuthError('ایمیل و رمز عبور را وارد کنید.');
+          return;
+        }
+        const error = await supabaseSignIn(email, password);
+        if (error) {
+          showAuthError('ایمیل یا رمز عبور اشتباه است.');
+          return;
+        }
+        await showDashboard();
       } else {
-        authError?.classList.remove('hidden');
+        const pin = pinInput?.value ?? '';
+        if (verifyAdminPin(pin)) {
+          sessionStorage.setItem('deldar_admin_authed', 'true');
+          await showDashboard();
+        } else {
+          showAuthError('رمز عبور اشتباه است!');
+        }
       }
     });
 
     // Logout
-    logoutBtn?.addEventListener('click', () => {
+    logoutBtn?.addEventListener('click', async () => {
+      await supabaseSignOut();
       sessionStorage.removeItem('deldar_admin_authed');
       location.reload();
     });
 
-    function showDashboard() {
+    async function showDashboard() {
       authOverlay?.classList.add('hidden');
       dashboard?.classList.remove('hidden');
-      try { renderProductsTable(); } catch (err) { console.error('Error rendering products:', err); }
-      try { renderOrders(); } catch (err) { console.error('Error rendering orders:', err); }
-      try { renderAdminReviews(); } catch (err) { console.error('Error rendering reviews:', err); }
-      try { renderCodeExport(); } catch (err) { console.error('Error rendering export:', err); }
+      try { await renderProductsTable(); } catch (err) { console.error('Error rendering products:', err); }
+      try { await renderOrders(); } catch (err) { console.error('Error rendering orders:', err); }
+      try { await renderAdminReviews(); } catch (err) { console.error('Error rendering reviews:', err); }
+      try { await renderCodeExport(); } catch (err) { console.error('Error rendering export:', err); }
     }
 
     // Tabs Switcher using Event Delegation
@@ -305,11 +376,11 @@ const lang = 'fa';
     });
 
     // Render Products Table
-    function renderProductsTable(searchTerm = '') {
+    async function renderProductsTable(searchTerm = '') {
       const tbody = document.getElementById('admin-products-table-body');
       if (!tbody) return;
 
-      let products = getAdminProducts();
+      let products = await getAdminProducts();
       if (searchTerm.trim()) {
         const term = searchTerm.toLowerCase();
         products = products.filter(
@@ -357,23 +428,23 @@ const lang = 'fa';
 
       // Attach Event Handlers
       tbody.querySelectorAll('.stock-toggle-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-id');
           if (id) {
-            toggleStock(id);
-            renderProductsTable(searchTerm);
-            renderCodeExport();
+            await toggleStock(id);
+            await renderProductsTable(searchTerm);
+            await renderCodeExport();
           }
         });
       });
 
       tbody.querySelectorAll('.btn-delete').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-id');
           if (id && confirm('آیا از حذف این محصول اطمینان دارید؟')) {
-            deleteProduct(id);
-            renderProductsTable(searchTerm);
-            renderCodeExport();
+            await deleteProduct(id);
+            await renderProductsTable(searchTerm);
+            await renderCodeExport();
           }
         });
       });
@@ -389,12 +460,23 @@ const lang = 'fa';
     // Search Input
     const searchInput = document.getElementById('product-search') as HTMLInputElement;
     searchInput?.addEventListener('input', () => {
-      renderProductsTable(searchInput.value);
+      renderProductsTable(searchInput.value).catch(() => {});
     });
 
     // Add Product Form Handle
     const addForm = document.getElementById('add-product-form') as HTMLFormElement;
-    addForm?.addEventListener('submit', (e) => {
+    const prodImageFile = document.getElementById('prod-image-file') as HTMLInputElement | null;
+    const prodImagePreview = document.getElementById('prod-image-preview') as HTMLImageElement | null;
+
+    prodImageFile?.addEventListener('change', () => {
+      const file = prodImageFile.files?.[0];
+      if (file && prodImagePreview) {
+        prodImagePreview.src = URL.createObjectURL(file);
+        prodImagePreview.classList.remove('hidden');
+      }
+    });
+
+    addForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const nameFa = (document.getElementById('prod-name-fa') as HTMLInputElement).value;
@@ -402,13 +484,30 @@ const lang = 'fa';
       const catFa = (document.getElementById('prod-category-fa') as HTMLInputElement).value;
       const catEn = (document.getElementById('prod-category-en') as HTMLInputElement).value;
       const price = Number((document.getElementById('prod-price') as HTMLInputElement).value);
-      const image = (document.getElementById('prod-image') as HTMLInputElement).value;
       const descFa = (document.getElementById('prod-desc-fa') as HTMLTextAreaElement).value;
       const descEn = (document.getElementById('prod-desc-en') as HTMLTextAreaElement).value;
       const badgeFa = (document.getElementById('prod-badge-fa') as HTMLInputElement).value;
       const badgeEn = (document.getElementById('prod-badge-en') as HTMLInputElement).value;
 
-      addProduct({
+      let image = (document.getElementById('prod-image') as HTMLInputElement).value.trim();
+
+      // Upload a picked image to Supabase Storage first (when configured)
+      const file = prodImageFile?.files?.[0];
+      if (file) {
+        try {
+          image = await uploadProductImage(file);
+        } catch (uploadErr) {
+          console.error('Image upload failed:', uploadErr);
+          showToast('خطا در بارگذاری تصویر. تصویر از آدرس متنی استفاده شد.');
+        }
+      }
+
+      if (!image) {
+        showToast('لطفاً آدرس تصویر را وارد کنید یا یک تصویر بارگذاری کنید.');
+        return;
+      }
+
+      await addProduct({
         name: { fa: nameFa, en: nameEn },
         category: { fa: catFa, en: catEn },
         price,
@@ -420,17 +519,18 @@ const lang = 'fa';
       });
 
       addForm.reset();
+      prodImagePreview?.classList.add('hidden');
       alert('محصول جدید با موفقیت اضافه شد!');
       // Switch back to products tab
       const productsTabBtn = document.querySelector<HTMLElement>('.admin-tabs .tab-btn[data-tab="products-tab"]');
       productsTabBtn?.click();
-      renderProductsTable();
-      renderCodeExport();
+      await renderProductsTable();
+      await renderCodeExport();
     });
 
     // Open Edit Modal
-    function openEditModal(id: string) {
-      const products = getAdminProducts();
+    async function openEditModal(id: string) {
+      const products = await getAdminProducts();
       const product = products.find((p) => p.id === id);
       if (!product) return;
 
@@ -450,7 +550,7 @@ const lang = 'fa';
 
     // Edit Product Submit
     const editForm = document.getElementById('edit-product-form') as HTMLFormElement;
-    editForm?.addEventListener('submit', (e) => {
+    editForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = (document.getElementById('edit-prod-id') as HTMLInputElement).value;
       const nameFa = (document.getElementById('edit-prod-name-fa') as HTMLInputElement).value;
@@ -459,10 +559,10 @@ const lang = 'fa';
       const catFa = (document.getElementById('edit-prod-category-fa') as HTMLInputElement).value;
       const descFa = (document.getElementById('edit-prod-desc-fa') as HTMLTextAreaElement).value;
 
-      const products = getAdminProducts();
+      const products = await getAdminProducts();
       const prod = products.find((p) => p.id === id);
       if (prod) {
-        updateProduct(id, {
+        await updateProduct(id, {
           name: { fa: nameFa, en: nameEn || prod.name.en },
           price,
           category: { fa: catFa, en: prod.category.en },
@@ -471,15 +571,15 @@ const lang = 'fa';
       }
 
       document.getElementById('edit-product-modal')?.classList.add('hidden');
-      renderProductsTable();
-      renderCodeExport();
+      await renderProductsTable();
+      await renderCodeExport();
     });
 
     // Render Orders
-    function renderOrders() {
+    async function renderOrders() {
       const container = document.getElementById('orders-list-container');
       const badge = document.getElementById('orders-count-badge');
-      const orders = getCustomerOrders();
+      const orders = await getCustomerOrders();
 
       if (badge) badge.textContent = String(orders.length);
       if (!container) return;
@@ -526,22 +626,22 @@ const lang = 'fa';
     }
 
     // Clear orders
-    document.getElementById('btn-clear-orders')?.addEventListener('click', () => {
+    document.getElementById('btn-clear-orders')?.addEventListener('click', async () => {
       if (confirm('آیا از پاکسازی تمام سفارشات اطمینان دارید؟')) {
-        localStorage.removeItem('deldar_customer_orders');
-        renderOrders();
+        await clearCustomerOrders();
+        await renderOrders();
       }
     });
 
     // Reviews Management
     let activeReviewFilter = 'all';
 
-    function renderAdminReviews() {
+    async function renderAdminReviews() {
       const container = document.getElementById('reviews-list-container');
       const badge = document.getElementById('reviews-pending-badge');
       if (!container) return;
 
-      const reviews = getAdminReviews();
+      const reviews = await getAdminReviews();
       const pendingCount = reviews.filter((r) => r.status === 'pending').length;
       if (badge) badge.textContent = String(pendingCount);
 
@@ -599,31 +699,31 @@ const lang = 'fa';
 
       // Event Listeners for Review Action buttons
       container.querySelectorAll('.btn-approve').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-rev-id');
           if (id) {
-            updateReviewStatus(id, 'approved');
-            renderAdminReviews();
+            await updateReviewStatus(id, 'approved');
+            await renderAdminReviews();
           }
         });
       });
 
       container.querySelectorAll('.btn-reject').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-rev-id');
           if (id) {
-            updateReviewStatus(id, 'rejected');
-            renderAdminReviews();
+            await updateReviewStatus(id, 'rejected');
+            await renderAdminReviews();
           }
         });
       });
 
       container.querySelectorAll('.btn-delete-rev').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const id = btn.getAttribute('data-rev-id');
           if (id && confirm('آیا از حذف این نظر اطمینان دارید؟')) {
-            deleteReview(id);
-            renderAdminReviews();
+            await deleteReview(id);
+            await renderAdminReviews();
           }
         });
       });
@@ -631,20 +731,20 @@ const lang = 'fa';
 
     // Filter Button Click Listener (Event Delegation)
     const filterBtnContainer = document.querySelector('.filter-buttons');
-    filterBtnContainer?.addEventListener('click', (e) => {
+    filterBtnContainer?.addEventListener('click', async (e) => {
       const btn = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-review-filter]');
       if (!btn) return;
       document.querySelectorAll('[data-review-filter]').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       activeReviewFilter = btn.getAttribute('data-review-filter') ?? 'all';
-      renderAdminReviews();
+      await renderAdminReviews();
     });
 
     // Code Export
-    function renderCodeExport() {
+    async function renderCodeExport() {
       const codeDisplay = document.getElementById('export-code-display');
       if (codeDisplay) {
-        const products = getAdminProducts();
+        const products = await getAdminProducts();
         codeDisplay.textContent = generateProductsTypeScript(products);
       }
     }
@@ -658,9 +758,14 @@ const lang = 'fa';
     });
 
     // Auto check session (run after all event listeners and handlers are defined)
-    if (sessionStorage.getItem('deldar_admin_authed') === 'true') {
-      showDashboard();
-    }
+    const autoOpen = async () => {
+      if (supabaseConfigured) {
+        if (await supabaseHasSession()) await showDashboard();
+      } else if (sessionStorage.getItem('deldar_admin_authed') === 'true') {
+        await showDashboard();
+      }
+    };
+    autoOpen().catch((err) => console.error('Session restore failed:', err));
   }
 
   if (document.readyState === 'loading') {
@@ -891,6 +996,16 @@ const lang = 'fa';
     height: 50px;
     object-fit: cover;
     border-radius: 10px;
+  }
+
+  .prod-image-preview {
+    display: block;
+    margin-top: 8px;
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid Highlight;
   }
 
   .stock-toggle-btn {

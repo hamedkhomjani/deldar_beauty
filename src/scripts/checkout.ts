@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
       paymentNote.classList.remove('hidden');
     }
 
-    // Record the order to localStorage so admin can view it in the portal
+    // Record the order (Supabase when configured, else localStorage) so the admin can view it
     try {
       const customerName = (document.getElementById('full-name') as HTMLInputElement | null)?.value
         ?? (document.getElementById('first-name') as HTMLInputElement | null)?.value ?? 'مشتری';
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }));
 
       const { recordCustomerOrder } = await import('./adminStore');
-      recordCustomerOrder({
+      await recordCustomerOrder({
         customerName,
         phone,
         address,

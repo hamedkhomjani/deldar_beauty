@@ -302,12 +302,12 @@ const reviewUrl = pageUrl(lang === 'en' ? '/en/review/' : '/review/');
 <script>
   import { getAdminReviews, type AdminReview } from '../scripts/adminStore';
 
-  function initHomePageReviews() {
+  async function initHomePageReviews() {
     const reviewsGrid = document.getElementById('reviews-grid');
 
     // Render Approved Customer Reviews (only custom ones, since initial ones are statically rendered in HTML)
     try {
-      const allReviews: AdminReview[] = getAdminReviews();
+      const allReviews: AdminReview[] = await getAdminReviews();
       const customApproved = allReviews.filter((r) => r.status === 'approved' && !r.id.startsWith('rev_init_'));
 
       if (reviewsGrid && customApproved.length > 0) {

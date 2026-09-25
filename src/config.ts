@@ -14,6 +14,16 @@ export const SITE = {
   themeColor: '#fdfaf5',
 };
 
+/**
+ * Supabase (optional remote admin backend).
+ * Fill these via a `.env` file (PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY)
+ * OR paste the values directly into the two strings below.
+ * When both are empty, the site falls back to browser-only localStorage storage
+ * (no login, no cross-device sync).
+ */
+export const SUPABASE_URL: string = (import.meta.env.PUBLIC_SUPABASE_URL as string | undefined) ?? 'https://nwuifhoylogphokrbtbd.supabase.co';
+export const SUPABASE_ANON_KEY: string = (import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined) ?? 'sb_publishable_eBLlc7SxrxNwZTnngJ0LOQ_F3A5P7oj';
+
 export const SALON = {
   /** WhatsApp number in international format (no +) */
   whatsapp: '46762573273',

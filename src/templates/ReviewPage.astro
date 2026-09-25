@@ -189,7 +189,9 @@ const jsonLd = [
       return;
     }
 
-    submitCustomerReview({ name, service, rating, text });
+    submitCustomerReview({ name, service, rating, text }).catch(() => {
+      showToast('خطا در ثبت نظر. دوباره تلاش کنید.');
+    });
 
     // Show success state
     form.classList.add('hidden');
