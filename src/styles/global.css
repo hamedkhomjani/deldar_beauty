@@ -1594,7 +1594,10 @@ html.dark-theme .moon-icon {
 }
 
 .footer-brand .footer-logo {
-    height: 300px;
+    /* Horizontal lockup (emblem + BEAUTY SALON wordmark), so size by width.
+       Capped at 400px to line up with the brand paragraph below. */
+    width: min(100%, 400px);
+    height: auto;
     margin-bottom: 8px;
     transition: var(--transition-smooth);
 }
