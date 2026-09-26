@@ -7,6 +7,20 @@ import sitemap from '@astrojs/sitemap';
 const NOINDEX_ROUTES = ['/admin', '/checkout', '/booking/success'];
 
 /**
+ * Deployment target, so one source tree builds for both hosts:
+ *   - SITE_BASE → `base` config → import.meta.env.BASE_URL, used by
+ *     asset()/pageUrl() in src/config.ts. Netlify serves from the domain root,
+ *     GitHub Pages from a /deldar_beauty/ subpath.
+ *   - SITE_URL / URL → `site` config (origin only, no base). Netlify exposes the
+ *     site domain as $URL automatically, so Netlify needs no extra setup.
+ * PUBLIC_SITE_URL is then derived for src/config.ts, where absolute URLs must
+ * include the base (SITE.url + '/en/about').
+ */
+const BASE = process.env.SITE_BASE ?? '/deldar_beauty/';
+const ORIGIN = (process.env.SITE_URL ?? process.env.URL ?? 'https://hamedkhomjani.github.io').replace(/\/$/, '');
+process.env.PUBLIC_SITE_URL ??= `${ORIGIN}${BASE === '/' ? '' : BASE}`;
+
+/**
  * @param {string} pathname
  */
 function normalizedPath(pathname) {
@@ -34,9 +48,8 @@ const SITEMAP_RULES = /** @type {Record<string, { priority: number; changefreq: 
 
 // https://astro.build/config
 export default defineConfig({
-  // The live site lives under this GitHub Pages subpath
-  site: 'https://hamedkhomjani.github.io',
-  base: '/deldar_beauty/',
+  site: ORIGIN,
+  base: BASE,
   build: {
     format: 'directory',
   },

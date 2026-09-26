@@ -9,8 +9,8 @@ export const SITE = {
   name: 'سالن زیبایی دلدار',
   nameEn: 'Deldar Beauty Salon',
   base: import.meta.env.BASE_URL ?? '/',
-  /** Absolute URL of the live site */
-  url: 'https://hamedkhomjani.github.io/deldar_beauty/',
+  /** Absolute URL of the live site (no trailing slash) */
+  url: (import.meta.env.PUBLIC_SITE_URL ?? 'https://hamedkhomjani.github.io/deldar_beauty/').replace(/\/$/, ''),
   themeColor: '#fdfaf5',
 };
 

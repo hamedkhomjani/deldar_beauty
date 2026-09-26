@@ -1,0 +1,22 @@
+[build]
+  # astro.config.mjs reads Netlify's $URL for `site` / PUBLIC_SITE_URL, so the
+  # build command needs no extra env injection.
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Netlify serves the site from the domain root, not a /deldar_beauty/ subpath.
+  SITE_BASE = "/"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
