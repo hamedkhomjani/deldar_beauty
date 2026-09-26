@@ -254,9 +254,9 @@ const reviewUrl = pageUrl(lang === 'en' ? '/en/review/' : '/review/');
             <div>
               <h4>{dict.contactPhoneTitle}</h4>
               <p>
-                <a class="info-link" href={`tel:${SALON.schemaPhone}`} dir="ltr">۰۲۱-۱۲۳۴۵۶۷۸</a>
+                <a class="info-link" href={`tel:${SALON.schemaPhone}`} dir="ltr">{SALON.phoneDisplay[lang]}</a>
                 <span class="info-sep">|</span>
-                <a class="info-link" href={`https://wa.me/${SALON.whatsapp}`} target="_blank" rel="noopener" dir="ltr">۰۹۱۲-۴۹۸۷۸۱۰</a>
+                <a class="info-link" href={`https://wa.me/${SALON.whatsapp}`} target="_blank" rel="noopener">{dict.contactWhatsapp}</a>
               </p>
             </div>
           </div>

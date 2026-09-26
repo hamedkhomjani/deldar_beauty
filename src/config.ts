@@ -24,9 +24,15 @@ export const SITE = {
 export const SUPABASE_URL: string = (import.meta.env.PUBLIC_SUPABASE_URL as string | undefined) ?? 'https://nwuifhoylogphokrbtbd.supabase.co';
 export const SUPABASE_ANON_KEY: string = (import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined) ?? 'sb_publishable_eBLlc7SxrxNwZTnngJ0LOQ_F3A5P7oj';
 
+/**
+ * The salon's WhatsApp / mobile line, in international format: no `+`, no leading
+ * zero (98 = Iran). Single source of truth — every wa.me link, the callmebot
+ * booking delivery and the schema.org phone are derived from it.
+ */
+const WHATSAPP = '989124987810';
+
 export const SALON = {
-  /** WhatsApp number in international format (no +) */
-  whatsapp: '46762573273',
+  whatsapp: WHATSAPP,
   /**
    * Automatic booking delivery (both fire when set; wa.me fallback when not).
    * - callmebotKey: activate at callmebot.com ("I allow callmebot...") → key sent to you
@@ -37,15 +43,15 @@ export const SALON = {
   telegram: 'deldar_beauty',
   instagram: 'deldarhaircutt',
   phoneDisplay: {
-    fa: '۰۲۱-۱۲۳۴۵۶۷۸ | ۰۹۱۲-۴۹۸۷۸۱۰',
-    en: '021-12345678 | 0912-4987810',
+    fa: '۰۹۱۲-۴۹۸۷۸۱۰',
+    en: '0912-4987810',
   } satisfies Localized,
   address: {
     fa: 'تهران، خیابان ظفر، پلاک ۱۲۳، واحد ۵',
     en: 'Tehran, Zafar St., No. 123, Unit 5',
   } satisfies Localized,
-  /** Keep the phone field of schema.org in sync with whatsapp */
-  schemaPhone: '+989124987810',
+  /** schema.org phone, derived from whatsapp so the two can never drift apart */
+  schemaPhone: `+${WHATSAPP}`,
   /** Hours shown on the site */
   hoursDisplay: {
     fa: 'شنبه تا پنجشنبه: ۱۰:۰۰ الی ۱۹:۰۰',
